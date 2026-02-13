@@ -1,7 +1,7 @@
 // Service Worker VLEP Mission v3.6
 // © 2025 Quentin THOMAS
 
-const CACHE_NAME = 'vlep-mission-v3.6.0';
+const CACHE_NAME = 'vlep-mission-v3.7.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
