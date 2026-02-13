@@ -28,7 +28,6 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>VLEP Mission v3.6 - © Quentin THOMAS</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     /* 
      * VLEP Mission v3.6
@@ -452,8 +451,7 @@ function renderHome(){
   h+='<div class="nav-item" onclick="state.showModal=\'importChoice\';render();"><div class="nav-icon" style="background:linear-gradient(135deg,#0891b2,#06b6d4);">'+ICONS.upload+'</div><div class="nav-label">Importer une mission</div></div>';
   h+='<div class="nav-item" onclick="state.view=\'db-terrain\';render();"><div class="nav-icon orange">'+ICONS.search+'</div><div class="nav-label">Base de données</div><div class="nav-count">'+state.agentsDB.length+'</div></div></div>';
   h+='<input type="file" id="import-mission-input" accept=".json" style="display:none;" onchange="handleImportMission(event);">';
-  if(state.showModal==='importChoice')h+='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>Importer une mission</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div><div class="nav-menu" style="margin:8px 0;"><div class="nav-item" onclick="state.showModal=null;triggerImportMission();"><div class="nav-icon" style="background:linear-gradient(135deg,#0891b2,#06b6d4);">'+ICONS.upload+'</div><div class="nav-label">Fichier JSON</div></div><div class="nav-item" onclick="state.showModal=\'importQR\';render();"><div class="nav-icon" style="background:linear-gradient(135deg,var(--purple),#a78bfa);">'+ICONS.share+'</div><div class="nav-label">QR Code / Texte</div></div></div></div></div>';
-  if(state.showModal==='importQR')h+=renderImportQRModal();
+  if(state.showModal==='importChoice'){state.showModal=null;triggerImportMission();}
   h+='<div class="version-info">Version 3.6 © 2025 Quentin THOMAS</div>';
   return h;
 }
@@ -611,11 +609,11 @@ function renderPrepaMission(){
   }
   h+='<button class="btn btn-danger btn-icon" onclick="deleteMission('+m.id+');">'+ICONS.trash+'</button>';
   h+='</div>';
-  h+='<div class="row mt-8"><button class="btn btn-gray" style="flex:1;" onclick="exportMissionJSON('+m.id+');">'+ICONS.download+' Export JSON</button><button class="btn btn-primary" style="flex:1;" onclick="showQRCodeModal('+m.id+');">'+ICONS.share+' QR Code</button></div>';
+  h+='<div class="row mt-8"><button class="btn btn-gray" onclick="exportMissionJSON('+m.id+');">'+ICONS.download+' Export JSON</button></div>';
+  if(state._returnToTerrain)h+='<button class="btn btn-primary mt-8" onclick="returnToTerrain();">'+ICONS.check+' Retour au terrain</button>';
   if(m.status==='prepa')h+='<button class="btn btn-primary mt-8" onclick="state.showModal=\'prepaAuto\';state.prepaAutoData=null;render();" style="background:linear-gradient(135deg,var(--purple),#a78bfa);">'+ICONS.zap+' Prépa automatique (devis)</button>';
   if(state.showModal==='editInfo')h+=renderEditInfoModal(m);
   if(state.showModal==='prepaAuto')h+=renderPrepaAutoModal(m);
-  if(state.showModal==='qrCode')h+=renderQRCodeModal();
   return h;
 }
 
@@ -1377,10 +1375,10 @@ function renderTerrainMission(){
   var h='<div class="sticky-header"><button class="back-btn" onclick="state.view=\'terrain-list\';state.currentMissionId=null;render();">'+ICONS.arrowLeft+' Liste</button><div style="display:flex;justify-content:space-between;align-items:center;"><div style="color:white;font-weight:700;font-size:14px;">'+escapeHtml(m.clientSite)+'</div><div class="row" style="gap:4px;"><button class="btn btn-gray btn-small btn-icon" onclick="unvalidateMissionFromTerrain();" title="Repasser en prépa" style="background:rgba(255,255,255,0.15);color:white;border:none;">'+ICONS.arrowLeft+'</button><button class="btn btn-danger btn-icon" onclick="deleteMissionTerrain();" style="width:24px;height:24px;">'+ICONS.trash+'</button></div></div></div>';
   h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' • <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+'</p></div>';
   h+='<div class="row mb-12"><button class="btn btn-gray" onclick="state.view=\'conditions\';render();">'+ICONS.thermometer+' Conditions</button><button class="btn btn-blue" onclick="state.view=\'liste-echantillons\';render();">'+ICONS.list+' Échantillons</button></div>';
-  h+='<div class="row mb-12"><button class="btn btn-gray" style="flex:1;" onclick="exportMissionJSON('+m.id+');">'+ICONS.download+' Export JSON</button><button class="btn btn-primary" style="flex:1;" onclick="showQRCodeModal('+m.id+');">'+ICONS.share+' QR Code</button></div>';
+  h+='<div class="row mb-12"><button class="btn btn-gray" onclick="exportMissionJSON('+m.id+');">'+ICONS.download+' Export JSON</button></div>';
   
   // Boutons d'ajout
-  h+='<div class="row mb-12"><button class="btn btn-success btn-small" onclick="state.showModal=\'addGehTerrain\';render();">+ GEH</button><button class="btn btn-primary btn-small" onclick="state.showModal=\'addPrelTerrain\';render();">+ Prélèvement</button></div>';
+  h+='<div class="row mb-12"><button class="btn btn-success btn-small" onclick="state.showModal=\'addGehTerrain\';render();">+ GEH</button><button class="btn btn-primary btn-small" onclick="state.showModal=\'addPrelTerrain\';render();">+ Prélèvement</button><button class="btn btn-gray btn-small" onclick="editMissionFromTerrain();">'+ICONS.edit+' Modifier</button></div>';
   
   if(state.fusionMode){
     h+='<div class="info-box info-box-warning mb-12"><p><strong>Mode fusion manuelle actif</strong></p><p>Sélectionnez les prélèvements à fusionner (même GEH, même type)</p></div><div class="row mb-12"><button class="btn btn-gray" onclick="cancelFusion();">Annuler</button><button class="btn btn-success" onclick="doFusion();" '+(state.selectedForFusion.length<2?'disabled':'')+'>Fusionner ('+state.selectedForFusion.length+')</button></div>';
@@ -1412,6 +1410,7 @@ function renderTerrainMission(){
         }
         h+='<div class="prel-content" onclick="'+(state.fusionMode?'toggleFusionSelect('+p.id+');':'openPrel('+p.id+');')+'"><div class="prel-title" style="color:'+mc+';">'+agentNames+'</div><div class="prel-subtitle">'+p.type+' • '+p.subPrelevements.length+' sous-prél. '+(p.isReglementaire?'<span class="prel-reg-badge">Régl.</span>':'<span class="prel-nonreg-badge">Non-régl.</span>')+'</div></div>';
         if(!state.fusionMode){
+          if(p.agents&&p.agents.length>1)h+='<button class="btn btn-gray btn-icon" style="width:24px;height:24px;font-size:11px;margin-right:2px;" onclick="event.stopPropagation();defusionPrel('+p.id+');" title="Défusionner">'+ICONS.merge+'</button>';
           h+='<button class="btn btn-danger btn-icon" style="width:24px;height:24px;font-size:11px;margin-right:2px;" onclick="event.stopPropagation();deletePrelTerrain('+p.id+');">'+ICONS.trash+'</button>';
         }
         h+='<div class="prel-arrow" onclick="'+(state.fusionMode?'toggleFusionSelect('+p.id+');':'openPrel('+p.id+');')+'">'+ICONS.arrowRight+'</div></div>';
@@ -1424,7 +1423,6 @@ function renderTerrainMission(){
   if(state.showModal==='addGehTerrain')h+=renderAddGehTerrainModal();
   if(state.showModal==='addPrelTerrain')h+=renderAddPrelTerrainModal();
   if(state.showModal==='smartFusion')h+=renderSmartFusionModal();
-  if(state.showModal==='qrCode')h+=renderQRCodeModal();
   
   return h;
 }
@@ -1674,6 +1672,30 @@ function startFusionMode(){
   render();
 }
 
+
+
+function returnToTerrain(){
+  var m=getCurrentMission();
+  if(!m)return;
+  m.status=state._oldStatus||'validee';
+  if(m.status==='prepa')m.status='validee';
+  state._returnToTerrain=false;
+  state._oldStatus=null;
+  state.view='terrain-mission';
+  saveData('vlep_missions_v3',state.missions);
+  render();
+}
+function editMissionFromTerrain(){
+  var m=getCurrentMission();
+  if(!m)return;
+  var oldStatus=m.status;
+  m.status='prepa';
+  state.view='prepa-mission';
+  state._returnToTerrain=true;
+  state._oldStatus=oldStatus;
+  saveData('vlep_missions_v3',state.missions);
+  render();
+}
 function cancelFusion(){state.fusionMode=false;state.selectedForFusion=[];render();}
 
 function toggleFusionSelect(pid){
@@ -1726,6 +1748,32 @@ function doFusion(){
   saveData('vlep_missions_v3',state.missions);
   state.fusionMode=false;
   state.selectedForFusion=[];
+  render();
+}
+
+
+// ===== DEFUSION =====
+function defusionPrel(prelId){
+  var m=getCurrentMission();
+  if(!m)return;
+  var p=m.prelevements.find(function(x){return x.id===prelId;});
+  if(!p||!p.agents||p.agents.length<2){alert('Ce prélèvement ne contient qu\'un seul agent, impossible de défusionner.');return;}
+  if(!confirm('Défusionner ce prélèvement ?\nChaque agent redeviendra un prélèvement séparé.'))return;
+  var newPrels=[];
+  p.agents.forEach(function(agent){
+    var np={id:Date.now()+Math.floor(Math.random()*1000),gehId:p.gehId,type:p.type,isReglementaire:p.isReglementaire,agents:[agent],subPrelevements:[]};
+    p.subPrelevements.forEach(function(sub){
+      var ns=JSON.parse(JSON.stringify(sub));
+      ns.id=Date.now()+Math.floor(Math.random()*10000);
+      if(ns.agentData){var kept={};if(ns.agentData[agent.name])kept[agent.name]=ns.agentData[agent.name];ns.agentData=kept;}
+      np.subPrelevements.push(ns);
+    });
+    newPrels.push(np);
+  });
+  var idx=m.prelevements.findIndex(function(x){return x.id===prelId;});
+  m.prelevements.splice(idx,1);
+  newPrels.forEach(function(np){m.prelevements.splice(idx,0,np);idx++;});
+  saveData('vlep_missions_v3',state.missions);
   render();
 }
 

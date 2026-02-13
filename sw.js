@@ -1,13 +1,12 @@
 // Service Worker VLEP Mission v3.6
 // © 2025 Quentin THOMAS
 
-const CACHE_NAME = 'vlep-mission-v3.8.0';
+const CACHE_NAME = 'vlep-mission-v3.9.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
 // Installation : mise en cache des fichiers
