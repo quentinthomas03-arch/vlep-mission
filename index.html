@@ -311,7 +311,7 @@
   <script>
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// VLEP Mission v3.6
+// VLEP Mission v3.7
 // © 2025 Quentin THOMAS - Tous droits réservés
 // CONFIDENTIEL - Propriété exclusive de Quentin THOMAS
 // Toute reproduction ou utilisation non autorisée est interdite
@@ -355,7 +355,7 @@ var ICONS = {
 
 var AGENT_COLORS=['#00a878','#0f4c81','#e63946','#7c3aed','#f59e0b','#0891b2','#c026d3','#65a30d','#0284c7','#db2777','#4f46e5','#059669','#d97706','#7c2d12','#1d4ed8'];
 var DEFAULT_GEH_COUNT=5;
-var state={_author:'Quentin THOMAS',_copyright:'© 2025 Quentin THOMAS',view:'home',missions:[],agentsDB:[],currentMissionId:null,currentPrelId:null,activeSubIndex:0,showModal:null,searchText:'',expandedGeh:{},fusionMode:false,selectedForFusion:[],quickPrelType:'8h',quickPrelReg:true,quickAgentSearch:'',quickGehId:null,echantillonSort:'date',blancAgentSearch:'',blancAgents:[],quickMission:null,newPrelData:null,timers:{}};
+var state={_author:'Quentin THOMAS',_copyright:'© 2025 Quentin THOMAS',view:'home',missions:[],agentsDB:[],currentMissionId:null,currentPrelId:null,activeSubIndex:0,showModal:null,searchText:'',expandedGeh:{},fusionMode:false,selectedForFusion:[],quickPrelType:'8h',quickPrelReg:true,quickAgentSearch:'',quickGehId:null,echantillonSort:'date',blancAgentSearch:'',blancAgents:[],quickMission:null,newPrelData:null,timers:{},showCIPSection:false};
 
 function escapeHtml(t){if(!t)return'';return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escapeJs(t){if(!t)return'';var s=String(t);s=s.split(String.fromCharCode(92)).join(String.fromCharCode(92,92));s=s.split(String.fromCharCode(39)).join(String.fromCharCode(92,39));s=s.replace(/"/g,'&quot;');return s;}
@@ -390,8 +390,7 @@ function repairMissions(){
       }
     }
   });
-}
-function getCurrentMission(){for(var i=0;i<state.missions.length;i++){if(state.missions[i].id===state.currentMissionId)return state.missions[i];}return null;}
+}function getCurrentMission(){for(var i=0;i<state.missions.length;i++){if(state.missions[i].id===state.currentMissionId)return state.missions[i];}return null;}
 function getAgentColor(m,n){if(!m.agentColors)m.agentColors={};if(!m.agentColors[n]){var u=Object.values(m.agentColors);for(var i=0;i<AGENT_COLORS.length;i++){if(u.indexOf(AGENT_COLORS[i])===-1){m.agentColors[n]=AGENT_COLORS[i];break;}}if(!m.agentColors[n])m.agentColors[n]=AGENT_COLORS[Object.keys(m.agentColors).length%AGENT_COLORS.length];}return m.agentColors[n];}
 function lightenColor(h,p){var n=parseInt(h.replace('#',''),16);var r=Math.min(255,Math.floor((n>>16)+(255-(n>>16))*p));var g=Math.min(255,Math.floor(((n>>8)&0xFF)+(255-((n>>8)&0xFF))*p));var b=Math.min(255,Math.floor((n&0xFF)+(255-(n&0xFF))*p));return'#'+(0x1000000+r*0x10000+g*0x100+b).toString(16).slice(1);}
 
@@ -411,7 +410,25 @@ function getCodeAnalytique(agent){
 function hasVLEP8h(n){var a=getAgentFromDB(n);return a&&a['VLEP 8h (mg/m3)']&&a['VLEP 8h (mg/m3)'].trim()!==''&&a['VLEP 8h (mg/m3)']!=='-';}
 function hasVLEPCT(n){var a=getAgentFromDB(n);return a&&a['VLEP CT (mg/m3)']&&a['VLEP CT (mg/m3)'].trim()!==''&&a['VLEP CT (mg/m3)']!=='-';}
 
-function createEmptyMission(){var g=[];for(var i=0;i<DEFAULT_GEH_COUNT;i++)g.push({id:generateId(),num:i+1,name:''});return{id:generateId(),status:'prepa',createdAt:new Date().toISOString(),clientSite:'',preleveur:'',debitmetre:'',gehs:g,agents:[],affectations:{},prelevements:[],conditionsAmbiantes:[],agentColors:{}};}
+function createEmptyMission(){var g=[];for(var i=0;i<DEFAULT_GEH_COUNT;i++)g.push({id:generateId(),num:i+1,name:''});return{id:generateId(),status:'prepa',createdAt:new Date().toISOString(),clientSite:'',preleveur:'',debitmetre:'',tachymetre:'',cipAgents:[],gehs:g,agents:[],affectations:{},prelevements:[],conditionsAmbiantes:[],agentColors:{}};}
+
+function isAgentCIP(m,agentName){return m.cipAgents&&m.cipAgents.indexOf(agentName)!==-1;}
+function toggleCIPAgent(agentName){
+  var m=getCurrentMission();if(!m)return;
+  if(!m.cipAgents)m.cipAgents=[];
+  var idx=m.cipAgents.indexOf(agentName);
+  if(idx===-1)m.cipAgents.push(agentName);
+  else m.cipAgents.splice(idx,1);
+  saveData('vlep_missions_v3',state.missions);
+  render();
+}
+function calcDebitVariationCIP(di,df){
+  if(!di||!df)return null;
+  var a=parseFloat(String(di).replace(',','.'));
+  var b=parseFloat(String(df).replace(',','.'));
+  if(isNaN(a)||isNaN(b)||a===0)return null;
+  return Math.abs(b-a);
+}
 
 function render(){
   var h='';
@@ -593,7 +610,7 @@ function renderPrepaMission(){
   var ac=m.agents.length;
   var pc=countPrelevements(m);
   var h='<button class="back-btn" onclick="state.view=\'prepa-list\';state.currentMissionId=null;render();">'+ICONS.arrowLeft+' Liste</button>';
-  h+='<div class="card"><h2>'+ICONS.clipboard+' '+escapeHtml(m.clientSite||'Nouvelle mission')+'</h2><div class="info-box mt-12"><p><span class="svg-icon">'+ICONS.user+'</span> Préleveur : <strong>'+escapeHtml(m.preleveur||'-')+'</strong></p><p><span class="svg-icon">'+ICONS.tool+'</span> Débitmètre : <strong>'+escapeHtml(m.debitmetre||'-')+'</strong></p></div><button class="btn btn-gray btn-small mt-12" onclick="state.showModal=\'editInfo\';render();">'+ICONS.edit+' Modifier infos</button></div>';
+  h+='<div class="card"><h2>'+ICONS.clipboard+' '+escapeHtml(m.clientSite||'Nouvelle mission')+'</h2><div class="info-box mt-12"><p><span class="svg-icon">'+ICONS.user+'</span> Préleveur : <strong>'+escapeHtml(m.preleveur||'-')+'</strong></p><p><span class="svg-icon">'+ICONS.tool+'</span> Débitmètre : <strong>'+escapeHtml(m.debitmetre||'-')+'</strong></p>'+(m.tachymetre?'<p><span class="svg-icon">'+ICONS.gauge+'</span> Tachymètre : <strong>'+escapeHtml(m.tachymetre)+'</strong></p>':'')+'</div><button class="btn btn-gray btn-small mt-12" onclick="state.showModal=\'editInfo\';render();">'+ICONS.edit+' Modifier infos</button></div>';
   var step1=gc>0;var step2=ac>0;var step3=pc>0;
   h+='<div class="info-box mt-12"><p><strong>Étapes de préparation :</strong></p><p>'+(step1?'<span style="color:var(--accent);display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>':'<span style="opacity:0.3;display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>')+' 1. Définir les GEH ('+(gc||'aucun')+')</p><p>'+(step2?'<span style="color:var(--accent);display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>':'<span style="opacity:0.3;display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>')+' 2. Sélectionner les agents ('+(ac||'aucun')+')</p><p>'+(step3?'<span style="color:var(--accent);display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>':'<span style="opacity:0.3;display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>')+' 3. Affecter agents / GEH ('+(pc||'aucun')+' prél.)</p></div>';
   h+='<div class="nav-menu"><div class="nav-item" onclick="state.view=\'prepa-geh\';render();"><div class="nav-icon">'+ICONS.folder+'</div><div class="nav-label">1. GEH</div><div class="nav-count">'+gc+'</div></div><div class="nav-item" onclick="state.view=\'prepa-agents\';state.searchText=\'\';render();"><div class="nav-icon green">'+ICONS.beaker+'</div><div class="nav-label">2. Agents chimiques</div><div class="nav-count">'+ac+'</div></div></div>';
@@ -618,7 +635,7 @@ function renderPrepaMission(){
 }
 
 function renderEditInfoModal(m){
-  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>Infos mission</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div><div class="field"><label class="label">Client / Site *</label><input type="text" class="input" id="edit-clientsite" value="'+escapeHtml(m.clientSite)+'" placeholder="Ex: Entreprise ABC - Usine Nord"></div><div class="field"><label class="label">Préleveur</label><input type="text" class="input" id="edit-preleveur" value="'+escapeHtml(m.preleveur)+'"></div><div class="field"><label class="label">Débitmètre</label><input type="text" inputmode="numeric" class="input" id="edit-debitmetre" value="'+escapeHtml(m.debitmetre)+'"></div><div class="row"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-primary" onclick="saveEditInfo();">Enregistrer</button></div></div></div>';
+  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>Infos mission</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div><div class="field"><label class="label">Client / Site *</label><input type="text" class="input" id="edit-clientsite" value="'+escapeHtml(m.clientSite)+'" placeholder="Ex: Entreprise ABC - Usine Nord"></div><div class="field"><label class="label">Préleveur</label><input type="text" class="input" id="edit-preleveur" value="'+escapeHtml(m.preleveur)+'"></div><div class="field"><label class="label">Débitmètre</label><input type="text" inputmode="numeric" class="input" id="edit-debitmetre" value="'+escapeHtml(m.debitmetre)+'" placeholder="N° débitmètre"></div><div class="field"><label class="label">Tachymètre <span style="font-weight:400;color:#94a3b8;font-size:11px;">(CIP)</span></label><input type="text" inputmode="numeric" class="input" id="edit-tachymetre" value="'+escapeHtml(m.tachymetre||'')+'" placeholder="N° tachymètre CIP"></div><div class="row"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-primary" onclick="saveEditInfo();">Enregistrer</button></div></div></div>';
   return h;
 }
 
@@ -627,9 +644,11 @@ function saveEditInfo(){
   var cs=document.getElementById('edit-clientsite');
   var pr=document.getElementById('edit-preleveur');
   var db=document.getElementById('edit-debitmetre');
+  var tc=document.getElementById('edit-tachymetre');
   if(cs)m.clientSite=cs.value.trim();
   if(pr)m.preleveur=pr.value.trim();
   if(db)m.debitmetre=db.value.trim();
+  if(tc)m.tachymetre=tc.value.trim();
   saveData('vlep_missions_v3',state.missions);
   state.showModal=null;
   render();
@@ -1373,7 +1392,21 @@ function renderTerrainMission(){
   var m=getCurrentMission();
   if(!m){state.view='terrain-list';render();return'';}
   var h='<div class="sticky-header"><button class="back-btn" onclick="state.view=\'terrain-list\';state.currentMissionId=null;render();">'+ICONS.arrowLeft+' Liste</button><div style="display:flex;justify-content:space-between;align-items:center;"><div style="color:white;font-weight:700;font-size:14px;">'+escapeHtml(m.clientSite)+'</div><div class="row" style="gap:4px;"><button class="btn btn-gray btn-small btn-icon" onclick="unvalidateMissionFromTerrain();" title="Repasser en prépa" style="background:rgba(255,255,255,0.15);color:white;border:none;">'+ICONS.arrowLeft+'</button><button class="btn btn-danger btn-icon" onclick="deleteMissionTerrain();" style="width:24px;height:24px;">'+ICONS.trash+'</button></div></div></div>';
-  h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' • <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+'</p></div>';
+  h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' • <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+(m.tachymetre?' • <span class="svg-icon">'+ICONS.gauge+'</span> '+escapeHtml(m.tachymetre):'')+'</p></div>';
+  // CIP Agent selection
+  if(m.agents&&m.agents.length>0){
+    var hasCIP=m.cipAgents&&m.cipAgents.length>0;
+    h+='<div class="card" style="padding:8px 10px;margin-bottom:8px;border:1px solid '+(hasCIP?'#f59e0b':'#e5e7eb')+';"><div style="display:flex;align-items:center;gap:6px;margin-bottom:'+(state.showCIPSection?'6':'0')+'px;cursor:pointer;" onclick="state.showCIPSection=!state.showCIPSection;render();"><span class="svg-icon" style="color:#f59e0b;">'+ICONS.zap+'</span><span style="font-size:12px;font-weight:600;color:#92400e;">Pompe CIP</span><span style="font-size:10px;color:#b45309;margin-left:auto;">'+(hasCIP?m.cipAgents.length+' agent(s)':'aucun')+'</span><span style="font-size:11px;color:#94a3b8;">'+ICONS.chevronRight+'</span></div>';
+    if(state.showCIPSection){
+      h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+      m.agents.forEach(function(a){
+        var isCIP=isAgentCIP(m,a.name);
+        h+='<button style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid '+(isCIP?'#f59e0b':'#dce8f0')+';background:'+(isCIP?'#fef3c7':'white')+';color:'+(isCIP?'#92400e':'#94a3b8')+';transition:all 0.15s;" onclick="toggleCIPAgent(\''+escapeJs(a.name)+'\');">'+escapeHtml(a.name)+(isCIP?' ✓':'')+'</button>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+  }
   h+='<div class="row mb-12"><button class="btn btn-gray" onclick="state.view=\'conditions\';render();">'+ICONS.thermometer+' Conditions</button><button class="btn btn-blue" onclick="state.view=\'liste-echantillons\';render();">'+ICONS.list+' Échantillons</button></div>';
   h+='<div class="row mb-12"><button class="btn btn-gray" onclick="exportMissionJSON('+m.id+');">'+ICONS.download+' Export JSON</button></div>';
   
@@ -1401,7 +1434,7 @@ function renderTerrainMission(){
         var allDone=p.subPrelevements.every(function(s){return s.completed;});
         var mc=p.agents&&p.agents[0]?p.agents[0].color:'#3b82f6';
         var isSelected=state.selectedForFusion.indexOf(p.id)!==-1;
-        var agentNames=p.agents&&p.agents.length>0?p.agents.map(function(a){return escapeHtml(a.name);}).join(' + '):'Agent inconnu';
+        var agentNames=p.agents&&p.agents.length>0?p.agents.map(function(a){return escapeHtml(a.name)+(isAgentCIP(m,a.name)?' <span style="font-size:8px;padding:1px 4px;border-radius:3px;background:#fef3c7;color:#92400e;font-weight:700;vertical-align:middle;">CIP</span>':'');}).join(' + '):'Agent inconnu';
         h+='<div class="prel-item '+(isSelected?'selected':'')+'" style="background:'+lightenColor(mc,0.85)+';">';
         if(state.fusionMode){
           h+='<div class="prel-checkbox '+(isSelected?'checked':'')+'" onclick="toggleFusionSelect('+p.id+');">✓</div>';
@@ -1476,9 +1509,7 @@ function deleteGehTerrain(gehId){
   m.gehs.forEach(function(g,i){g.num=i+1;});
   saveData('vlep_missions_v3',state.missions);
   render();
-}
-
-function deletePrelTerrain(prelId){
+}function deletePrelTerrain(prelId){
   var m=getCurrentMission();if(!m)return;
   var prel=m.prelevements.find(function(p){return p.id===prelId;});
   if(!prel)return;
@@ -1995,19 +2026,26 @@ function renderSubPrelForm(p,sb,idx){
       var aname=a.name||'Agent inconnu';
       if(!sb.agentData[aname])sb.agentData[aname]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:''};
       var ad=sb.agentData[aname];
-      var variation=calcDebitVariation(ad.debitInitial,ad.debitFinal);
-      var hasWarning=variation!==null&&variation>5;
+      var isCIP=isAgentCIP(m,aname);
+      var variation=isCIP?calcDebitVariationCIP(ad.debitInitial,ad.debitFinal):calcDebitVariation(ad.debitInitial,ad.debitFinal);
+      var hasWarning=isCIP?(variation!==null&&variation>200):(variation!==null&&variation>5);
       
-      h+='<div class="multi-agent-item"><div class="multi-agent-header"><div class="multi-agent-color" style="background:'+(a.color||'#3b82f6')+';"></div><div class="multi-agent-name">'+escapeHtml(aname)+'</div></div><div class="multi-agent-fields">';
+      h+='<div class="multi-agent-item" style="'+(isCIP?'border-left:3px solid #f59e0b;':'')+'"><div class="multi-agent-header"><div class="multi-agent-color" style="background:'+(a.color||'#3b82f6')+';"></div><div class="multi-agent-name">'+escapeHtml(aname)+(isCIP?' <span style="font-size:9px;padding:1px 5px;border-radius:4px;background:#fef3c7;color:#92400e;font-weight:700;">CIP</span>':'')+'</div></div><div class="multi-agent-fields">';
       
       // N° Pompe avec bouton copier J-1
       h+='<div class="multi-agent-row"><label>N° Pompe';
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
       h+='</label><input type="text" inputmode="numeric" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
-      if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
+      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="'+(isCIP?'tours/min':'L/min')+'" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
+      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="'+(isCIP?'tours/min':'L/min')+'" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+      if(variation!==null){
+        if(isCIP){
+          h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(0)+' t/m</span>';
+        }else{
+          h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';
+        }
+      }
       h+='</div>';
       
       h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';
@@ -2558,14 +2596,14 @@ function createRegSheet(m,prels){
   // Ligne 9 : Matériel de prélèvement
   aoa.push(['Matériel de mesure','']);
   
-  // Lignes 10-11 : pompe + débitmètre
+  // Lignes 10-11 : pompe + débitmètre/tachymètre
   var row10=['n° d\'identification','pompe'];
   var row11=['','Débimetre'];
   for(var i=0;i<prels.length;i++){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
     row10.push(ad&&ad.numPompe?ad.numPompe:'');
     row10.push('');
-    row11.push(m.debitmetre||'');
+    row11.push(isAgentCIP(m,prels[i].agent)?(m.tachymetre||''):(m.debitmetre||''));
     row11.push('');
   }
   aoa.push(row10);
@@ -2605,8 +2643,7 @@ function createRegSheet(m,prels){
       rowDebut.push('');
       rowFin.push(plage&&plage.fin?plage.fin:'');
       rowFin.push('');
-    }
-    
+    } 
     aoa.push(rowDebut);
     aoa.push(rowFin);
   }
@@ -2942,14 +2979,14 @@ function createNonRegSheet(m,prels){
   }
   aoa.push(row5);
   
-  // Lignes 6-7 : pompe + débitmètre
+  // Lignes 6-7 : pompe + débitmètre/tachymètre
   var row6=['n° d\'identification','pompe'];
   var row7=['','débitmètre'];
   for(var i=0;i<prels.length;i++){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
     row6.push(ad&&ad.numPompe?ad.numPompe:'');
     row6.push('');
-    row7.push(m.debitmetre||'');
+    row7.push(isAgentCIP(m,prels[i].agent)?(m.tachymetre||''):(m.debitmetre||''));
     row7.push('');
   }
   aoa.push(row6);
@@ -3362,7 +3399,7 @@ function createActiviteSheet(m){
   
   // En-tête
   aoa.push(['Relevé d\'activité - '+m.clientSite]);
-  aoa.push(['Préleveur: '+(m.preleveur||''),'','Débitmètre: '+(m.debitmetre||'')]);
+  aoa.push(['Préleveur: '+(m.preleveur||''),'','Débitmètre: '+(m.debitmetre||'')+((m.tachymetre)?' / Tachymètre: '+m.tachymetre:'')]);
   aoa.push([]);
   
   // En-tête tableau
@@ -3723,6 +3760,7 @@ function openQuickEntry(){
     clientSite:'',
     preleveur:'',
     debitmetre:'',
+    tachymetre:'',
     gehs:[{id:generateId(),num:1,name:''}],
     agents:[],
     prelevements:[]
@@ -3742,6 +3780,7 @@ function renderQuickEntry(){
   h+='<div class="field"><label class="label">Client / Site *</label><input type="text" class="input" id="quick-client" value="'+escapeHtml(q.clientSite)+'" placeholder="Ex: Entreprise ABC" onchange="state.quickMission.clientSite=this.value;"></div>';
   h+='<div class="field"><label class="label">Préleveur</label><input type="text" class="input" id="quick-preleveur" value="'+escapeHtml(q.preleveur)+'" placeholder="Votre nom" onchange="state.quickMission.preleveur=this.value;"></div>';
   h+='<div class="field"><label class="label">Débitmètre</label><input type="text" class="input" id="quick-debitmetre" value="'+escapeHtml(q.debitmetre)+'" placeholder="N° débitmètre" onchange="state.quickMission.debitmetre=this.value;"></div>';
+  h+='<div class="field"><label class="label">Tachymètre <span style="font-weight:400;color:#94a3b8;font-size:11px;">(CIP)</span></label><input type="text" class="input" id="quick-tachymetre" value="'+escapeHtml(q.tachymetre||'')+'" placeholder="N° tachymètre CIP" onchange="state.quickMission.tachymetre=this.value;"></div>';
   h+='</div>';
   
   // GEH
@@ -3939,6 +3978,7 @@ function createQuickMission(){
   m.clientSite=q.clientSite;
   m.preleveur=q.preleveur;
   m.debitmetre=q.debitmetre;
+  m.tachymetre=q.tachymetre||'';
   m.gehs=q.gehs.filter(function(g){return g.name;}).map(function(g,i){
     return{id:g.id,num:i+1,name:g.name};
   });
