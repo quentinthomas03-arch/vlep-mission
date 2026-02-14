@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 ═══════════════════════════════════════════════════════════════════════════════
-  VLEP Mission v3.7.1
+  VLEP Mission v3.8
   © 2025 Quentin THOMAS - Tous droits réservés
   
   CONFIDENTIEL - USAGE STRICTEMENT INTERNE
@@ -26,15 +26,15 @@
   <meta name="copyright" content="© 2025 Quentin THOMAS - Tous droits réservés">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>VLEP Mission v3.7.1 - © Quentin THOMAS</title>
+  <title>VLEP Mission v3.8 - © Quentin THOMAS</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     /* 
-     * VLEP Mission v3.7.1
+     * VLEP Mission v3.8
      * © 2025 Quentin THOMAS - Tous droits réservés
      * Propriété exclusive - Reproduction interdite
      */
-    /* === VLEP Mission v3.7.1 - Design Socotec Blue Refined === */
+    /* === VLEP Mission v3.8 - Design Socotec Blue Refined === */
     :root {
       --primary: #0066b3;
       --primary-dark: #004d87;
@@ -80,6 +80,7 @@
     .btn-gray { background: rgba(0,0,0,0.04); color: var(--text-dark); border: 1px solid var(--border-subtle); backdrop-filter: blur(10px); }
     .btn-blue { background: var(--primary-pale); color: var(--primary); }
     .btn-orange { background: var(--warning); color: white; }
+    .btn-warning { background: #f59e0b; color: white; }
     .btn-small { padding: 6px 10px; font-size: 12px; width: auto; }
     .btn-icon { width: 28px; height: 28px; padding: 0; border-radius: 7px; }
     .btn-icon svg { width: 14px; height: 14px; }
@@ -256,6 +257,20 @@
     .dictation-btn svg { width: 16px; height: 16px; }
     .dictation-btn.recording { background: var(--danger); animation: pulse-record 1s infinite; }
     @keyframes pulse-record { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    #app { animation: fadeSlideIn 0.2s ease-out; }
+    .global-timer { position: fixed; bottom: 16px; right: 16px; z-index: 999; background: linear-gradient(135deg, var(--metal-dark), var(--metal-mid)); color: white; border-radius: 16px; padding: 8px 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer; user-select: none; transition: all 0.2s; }
+    .global-timer:active { transform: scale(0.95); }
+    .global-timer.running { background: linear-gradient(135deg, #047857, #059669); }
+    .global-timer .timer-display { font-size: 16px; letter-spacing: 0.5px; }
+    .global-timer .timer-btn { width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+    .global-timer .timer-btn.start { background: var(--accent); color: white; }
+    .global-timer .timer-btn.stop { background: var(--danger); color: white; }
+    .global-timer .timer-btn.reset { background: rgba(255,255,255,0.2); color: white; font-size: 10px; }
+    .validation-modal-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; border-bottom: 1px solid #f1f5f9; }
+    .validation-ok { color: #059669; }
+    .validation-warn { color: #f59e0b; }
+    .validation-err { color: #ef4444; }
     .blanc-warning { background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 3px solid var(--warning); border-radius: 8px; padding: 8px 10px; font-size: 11px; color: #92400e; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
     .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.6); display: none; align-items: flex-end; justify-content: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px); }
     .modal.show { display: flex; }
@@ -277,6 +292,8 @@
     /* SVG Icons inline helper */
     .svg-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; vertical-align: middle; }
     .svg-icon svg { width: 14px; height: 14px; }
+    h1 > svg, h2 > svg, .btn > svg, .section-title > svg, .modal-header h2 > svg, label > svg, .back-btn > svg, p > svg, strong > svg, .info-box svg, .condition-label > svg, .copy-btn > svg, .dictation-btn > svg, .prel-arrow > svg { width: 16px; height: 16px; display: inline-block; vertical-align: middle; }
+    h1 > svg { width: 20px; height: 20px; }
 
     /* === SPLASH SCREEN === */
     .splash { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(145deg, #c8cdd5 0%, #a8aeb8 30%, #8b929e 60%, #c0c5ce 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease, transform 0.5s ease; }
@@ -311,7 +328,7 @@
   <script>
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// VLEP Mission v3.7.1
+// VLEP Mission v3.8
 // © 2025 Quentin THOMAS - Tous droits réservés
 // CONFIDENTIEL - Propriété exclusive de Quentin THOMAS
 // Toute reproduction ou utilisation non autorisée est interdite
@@ -450,8 +467,12 @@ function render(){
     default:h=renderHome();
   }
   document.getElementById('app').innerHTML=h;
+  document.getElementById('app').style.animation='none';
+  void document.getElementById('app').offsetHeight;
+  document.getElementById('app').style.animation='fadeSlideIn 0.2s ease-out';
   if(state.view==='db-terrain')setTimeout(updateDbResults,50);
   if(state.view==='quick-entry')setTimeout(function(){var i=document.getElementById('quick-agent-search');if(i)i.focus();},50);
+  renderGlobalTimer();
 }
 
 function renderHome(){
@@ -700,14 +721,14 @@ function renderPrepaAutoModal(m){
     h+='<div class="section-title mt-12">Aperçu</div>';
     
     // GEH détectés
-    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">'+ICONS.folder+' '+p.gehs.length+' GEH détectés</div>';
+    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;"><span class="svg-icon">'+ICONS.folder+'</span> '+p.gehs.length+' GEH détectés</div>';
     p.gehs.forEach(function(g){
       h+='<div style="font-size:12px;color:var(--text-muted);padding:2px 0;">'+g.num+'. '+escapeHtml(g.name)+'</div>';
     });
     h+='</div>';
     
     // Agents et affectations
-    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">'+ICONS.beaker+' '+p.agents.length+' agent(s) chimique(s)</div>';
+    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;"><span class="svg-icon">'+ICONS.beaker+'</span> '+p.agents.length+' agent(s) chimique(s)</div>';
     p.rows.forEach(function(r){
       var regLabel=r.isReg?'<span style="color:#047857;font-size:10px;font-weight:700;"> REG</span>':'<span style="color:#b45309;font-size:10px;font-weight:700;"> NR</span>';
       h+='<div style="background:#f8fafc;border-radius:6px;padding:8px;margin-bottom:6px;border-left:3px solid var(--primary);">';
@@ -1137,7 +1158,7 @@ function renderPrepaAgents(){
   if(!m){state.view='prepa-list';render();return'';}
   var h='<button class="back-btn" onclick="state.view=\'prepa-mission\';render();">'+ICONS.arrowLeft+' Mission</button><div class="card"><h2>'+ICONS.beaker+' Agents chimiques</h2><p class="subtitle">Sélectionnez les ACD pour cette mission</p></div>';
   h+='<div class="search-box"><span class="search-icon">'+ICONS.search+'</span><input type="text" class="search-input" id="agent-search" placeholder="Rechercher un agent..." value="'+escapeHtml(state.searchText)+'" oninput="handleAgentSearchInput(this.value);"></div>';
-  h+='<div id="search-results-container" onmousedown="handleSearchClick(event,\'addAgentFromSearch\');" ontouchend="handleSearchClick(event,\'addAgentFromSearch\');">';
+  h+='<div id="search-results-container" onmousedown="event.preventDefault();" onclick="handleSearchClick(event,\'addAgentFromSearch\');">';
   if(state.searchText.length>=2){
     var r=searchAgentsDB(state.searchText);
     var f=r.filter(function(x){return!m.agents.some(function(a){return a.name===x;});});
@@ -1190,13 +1211,9 @@ function updateSearchResultsOnly(){
 
 function handleSearchClick(event,fnName){
   var el=event.target;
-  while(el&&!el.dataset.agent){el=el.parentElement;}
-  if(!el||!el.dataset.agent)return;
-  if(el.dataset.disabled)return;
-  event.preventDefault();
-  event.stopPropagation();
-  var name=el.dataset.agent;
-  if(typeof window[fnName]==='function')window[fnName](name);
+  while(el&&el!==event.currentTarget&&!el.dataset.agent){el=el.parentElement;}
+  if(!el||!el.dataset.agent||el.dataset.disabled)return;
+  if(typeof window[fnName]==='function')window[fnName](el.dataset.agent);
 }
 
 function addAgentFromSearch(n){
@@ -1564,7 +1581,7 @@ function renderAddPrelTerrainModal(){
   // Agents
   h+='<div class="field"><label class="label">Agent(s) chimique(s) *</label>';
   h+='<input type="text" class="input" id="new-prel-agent-search" placeholder="Rechercher..." value="'+escapeHtml(d.agentSearch||'')+'" oninput="handleNewPrelAgentSearch(this.value);"></div>';
-  h+='<div id="new-prel-search-results" onmousedown="handleSearchClick(event,\'addNewPrelAgent\');" ontouchend="handleSearchClick(event,\'addNewPrelAgent\');">';
+  h+='<div id="new-prel-search-results" onmousedown="event.preventDefault();" onclick="handleSearchClick(event,\'addNewPrelAgent\');">';
   if(d.agentSearch&&d.agentSearch.length>=2){
     var results=searchAgentsDB(d.agentSearch);
     var filtered=results.filter(function(x){return!d.agents.some(function(a){return a.name===x;});});
@@ -2019,6 +2036,11 @@ function renderSubPrelForm(p,sb,idx){
   
   var h='<div class="card">';
   
+  // Raccourci : Copier tout depuis J-1
+  if(canCopyFromPrevious){
+    h+='<div style="display:flex;justify-content:flex-end;margin-bottom:6px;"><button class="btn btn-gray btn-small" style="font-size:10px;padding:4px 10px;" onclick="copyAllFromPrevious('+p.id+','+idx+');">'+ICONS.copy+' Copier tout J-1 (opérateur, pompes, réf.)</button></div>';
+  }
+  
   // Opérateur avec bouton copier J-1
   h+='<div class="field"><div class="field-header"><label class="label">Opérateur / Point fixe</label>';
   if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyFromPrevious('+p.id+','+idx+',\'operateur\');">'+ICONS.list+' J-1</button>';
@@ -2305,7 +2327,7 @@ function renderListeEchantillons(){
   if(!m.blancs)m.blancs=[];
   
   var h='<button class="back-btn" onclick="state.view=\'terrain-mission\';render();">'+ICONS.arrowLeft+' Mission</button><div class="card"><h2>'+ICONS.list+' Liste échantillons</h2><p class="subtitle">'+escapeHtml(m.clientSite)+'</p></div>';
-  h+='<div class="row mb-12"><button class="btn btn-success" onclick="state.showModal=\'addBlanc\';state.blancAgentSearch=\'\';state.blancAgents=[];render();">+ Blanc terrain</button><button class="btn btn-primary" onclick="exportExcel();">'+ICONS.download+' Export Excel</button></div>';
+  h+='<div class="row mb-12"><button class="btn btn-success" onclick="state.showModal=\'addBlanc\';state.blancAgentSearch=\'\';state.blancAgents=[];render();">+ Blanc terrain</button><button class="btn btn-primary" onclick="validateBeforeExport();">'+ICONS.check+' Valider & Export</button></div>';
   h+='<div class="row mb-12"><span style="font-size:13px;margin-right:8px;">Trier par :</span><button class="btn btn-small '+(state.echantillonSort==='date'?'btn-blue':'btn-gray')+'" onclick="state.echantillonSort=\'date\';render();">Date</button><button class="btn btn-small '+(state.echantillonSort==='agent'?'btn-blue':'btn-gray')+'" onclick="state.echantillonSort=\'agent\';render();">Agent</button></div>';
   
   // FIX #2: Regrouper par référence échantillon
@@ -2371,6 +2393,7 @@ function renderListeEchantillons(){
   }
   
   if(state.showModal==='addBlanc')h+=renderAddBlancModal();
+  if(state.showModal==='validation')h+=renderValidationModal();
   return h;
 }
 
@@ -2380,7 +2403,7 @@ function renderAddBlancModal(){
   h+='<div class="field"><label class="label">Référence échantillon *</label><input type="text" class="input" id="blanc-ref" placeholder="Ex: BT-001" value="'+escapeHtml(state.blancRef||'')+'" oninput="state.blancRef=this.value;"></div>';
   h+='<div class="field"><label class="label">Date</label><input type="date" class="input" id="blanc-date" value="'+(state.blancDate||'')+'" oninput="state.blancDate=this.value;"></div>';
   h+='<div class="field"><label class="label">Agent(s) chimique(s)</label><input type="text" class="input" id="blanc-agent-search" placeholder="Rechercher..." value="'+escapeHtml(state.blancAgentSearch||'')+'" oninput="handleBlancAgentSearch(this.value);"></div>';
-  h+='<div id="blanc-search-results" onmousedown="handleSearchClick(event,\'addBlancAgent\');" ontouchend="handleSearchClick(event,\'addBlancAgent\');">';
+  h+='<div id="blanc-search-results" onmousedown="event.preventDefault();" onclick="handleSearchClick(event,\'addBlancAgent\');">';
   if(state.blancAgentSearch&&state.blancAgentSearch.length>=2){
     var r=searchAgentsDB(state.blancAgentSearch).slice(0,6);
     if(r.length>0){
@@ -3807,7 +3830,7 @@ function renderQuickEntry(){
   // Agents
   h+='<div class="card"><h2>'+ICONS.beaker+' Agents chimiques</h2>';
   h+='<div class="search-box"><span class="search-icon">'+ICONS.search+'</span><input type="text" class="search-input" id="quick-agent-search" placeholder="Rechercher un agent..." value="'+escapeHtml(state.quickAgentSearch)+'" oninput="handleQuickAgentSearch(this.value);"></div>';
-  h+='<div id="quick-search-results" onmousedown="handleSearchClick(event,\'addQuickAgent\');" ontouchend="handleSearchClick(event,\'addQuickAgent\');">';
+  h+='<div id="quick-search-results" onmousedown="event.preventDefault();" onclick="handleSearchClick(event,\'addQuickAgent\');">';
   if(state.quickAgentSearch&&state.quickAgentSearch.length>=2){
     var results=searchAgentsDB(state.quickAgentSearch);
     var filtered=results.filter(function(x){return!q.agents.some(function(a){return a.name===x;});});
@@ -4226,7 +4249,7 @@ function doImportQR(){
   importMissionFromText(text);
 }
 
-// ===== DICTÉE VOCALE =====
+// ===== DICTÉE VOCALE AMÉLIORÉE =====
 var activeDictation=null;
 
 function toggleDictation(prelId,subIdx){
@@ -4240,6 +4263,7 @@ function toggleDictation(prelId,subIdx){
   var btn=document.getElementById('dict-btn-'+prelId+'-'+subIdx);
   
   if(activeDictation&&activeDictation.key===key){
+    activeDictation.stopped=true;
     activeDictation.recognition.stop();
     activeDictation=null;
     if(btn)btn.classList.remove('recording');
@@ -4247,6 +4271,7 @@ function toggleDictation(prelId,subIdx){
   }
   
   if(activeDictation){
+    activeDictation.stopped=true;
     activeDictation.recognition.stop();
     var oldBtn=document.getElementById('dict-btn-'+activeDictation.prelId+'-'+activeDictation.subIdx);
     if(oldBtn)oldBtn.classList.remove('recording');
@@ -4256,43 +4281,259 @@ function toggleDictation(prelId,subIdx){
   recognition.lang='fr-FR';
   recognition.continuous=true;
   recognition.interimResults=true;
+  recognition.maxAlternatives=1;
   
   var textarea=document.getElementById('obs-'+prelId+'-'+subIdx);
   var baseText=textarea?textarea.value:'';
+  var finalTranscript='';
+  
+  var dictObj={key:key,prelId:prelId,subIdx:subIdx,recognition:recognition,stopped:false};
   
   recognition.onresult=function(event){
-    var transcript='';
+    var interim='';
     for(var i=event.resultIndex;i<event.results.length;i++){
-      transcript+=event.results[i][0].transcript;
+      var t=event.results[i][0].transcript;
+      if(event.results[i].isFinal){
+        // Capitaliser première lettre si début de phrase
+        if(!finalTranscript&&!baseText){t=t.charAt(0).toUpperCase()+t.slice(1);}
+        finalTranscript+=t;
+      }else{
+        interim+=t;
+      }
     }
     if(textarea){
-      textarea.value=baseText+(baseText?' ':'')+transcript;
-    }
-    if(event.results[event.results.length-1].isFinal){
-      baseText=textarea.value;
-      updateSubFieldWithAutoDate(prelId,subIdx,'observations',textarea.value);
+      var sep=(baseText&&!baseText.match(/\s$/)&&(finalTranscript||interim))?' ':'';
+      textarea.value=baseText+sep+finalTranscript+interim;
     }
   };
   
   recognition.onerror=function(event){
-    if(event.error!=='aborted'&&event.error!=='no-speech'){
-      alert('Erreur dictée : '+event.error);
-    }
-    activeDictation=null;
-    if(btn)btn.classList.remove('recording');
+    if(event.error==='no-speech'||event.error==='aborted')return;
+    console.log('Dictée erreur:',event.error);
   };
   
   recognition.onend=function(){
+    // Sauvegarder le texte final
     if(textarea){
+      baseText=baseText+(baseText&&finalTranscript?' ':'')+finalTranscript;
+      textarea.value=baseText;
       updateSubFieldWithAutoDate(prelId,subIdx,'observations',textarea.value);
+      finalTranscript='';
     }
-    activeDictation=null;
-    if(btn)btn.classList.remove('recording');
+    // Auto-restart si pas arrêté manuellement
+    if(!dictObj.stopped&&activeDictation&&activeDictation.key===key){
+      try{recognition.start();}catch(e){
+        activeDictation=null;
+        if(btn)btn.classList.remove('recording');
+      }
+    }else{
+      activeDictation=null;
+      if(btn)btn.classList.remove('recording');
+    }
   };
   
   recognition.start();
-  activeDictation={key:key,prelId:prelId,subIdx:subIdx,recognition:recognition};
+  activeDictation=dictObj;
   if(btn)btn.classList.add('recording');
+}
+
+// ===== TIMER GLOBAL FLOTTANT =====
+var globalTimerState={running:false,startTime:0,elapsed:0,interval:null};
+
+function renderGlobalTimer(){
+  var existing=document.getElementById('global-timer-overlay');
+  // Toujours afficher sur les vues terrain
+  var terrainViews=['terrain-list','terrain-mission','terrain-prel','conditions','liste-echantillons','quick-entry'];
+  if(terrainViews.indexOf(state.view)===-1&&!globalTimerState.running){
+    if(existing)existing.remove();
+    return;
+  }
+  if(!existing){
+    existing=document.createElement('div');
+    existing.id='global-timer-overlay';
+    existing.className='global-timer';
+    document.body.appendChild(existing);
+  }
+  var elapsed=globalTimerState.elapsed;
+  if(globalTimerState.running)elapsed+=Date.now()-globalTimerState.startTime;
+  var h=Math.floor(elapsed/3600000);
+  var m=Math.floor((elapsed%3600000)/60000);
+  var s=Math.floor((elapsed%60000)/1000);
+  var display=(h>0?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  existing.className='global-timer'+(globalTimerState.running?' running':'');
+  existing.innerHTML='<span class="timer-display">⏱ '+display+'</span>'+
+    (globalTimerState.running?
+      '<button class="timer-btn stop" onclick="event.stopPropagation();stopGlobalTimer();">⏸</button>':
+      '<button class="timer-btn start" onclick="event.stopPropagation();startGlobalTimer();">▶</button>')+
+    (elapsed>0?'<button class="timer-btn reset" onclick="event.stopPropagation();resetGlobalTimer();">↺</button>':'');
+}
+
+function startGlobalTimer(){
+  if(globalTimerState.running)return;
+  globalTimerState.running=true;
+  globalTimerState.startTime=Date.now();
+  globalTimerState.interval=setInterval(function(){renderGlobalTimer();},1000);
+  renderGlobalTimer();
+}
+
+function stopGlobalTimer(){
+  if(!globalTimerState.running)return;
+  globalTimerState.elapsed+=Date.now()-globalTimerState.startTime;
+  globalTimerState.running=false;
+  if(globalTimerState.interval)clearInterval(globalTimerState.interval);
+  globalTimerState.interval=null;
+  renderGlobalTimer();
+}
+
+function resetGlobalTimer(){
+  if(globalTimerState.running){
+    if(globalTimerState.interval)clearInterval(globalTimerState.interval);
+  }
+  globalTimerState={running:false,startTime:0,elapsed:0,interval:null};
+  renderGlobalTimer();
+}
+
+// ===== RACCOURCI : DUPLIQUER SOUS-PRÉLÈVEMENT J-1 COMPLET =====
+function copyAllFromPrevious(prelId,subIdx){
+  var m=getCurrentMission();if(!m)return;
+  var p=m.prelevements.find(function(x){return x.id===prelId;});
+  if(!p||subIdx<1)return;
+  var prev=p.subPrelevements[subIdx-1];
+  var curr=p.subPrelevements[subIdx];
+  if(!prev||!curr)return;
+  // Copier tous les champs communs sauf la date
+  curr.operateur=prev.operateur||'';
+  curr.observations=prev.observations||'';
+  // Copier les données agents
+  if(prev.agentData){
+    if(!curr.agentData)curr.agentData={};
+    Object.keys(prev.agentData).forEach(function(agentName){
+      var ad=prev.agentData[agentName];
+      curr.agentData[agentName]={
+        refEchantillon:ad.refEchantillon||'',
+        numPompe:ad.numPompe||'',
+        debitInitial:'',
+        debitFinal:'',
+      };
+    });
+  }
+  // Copier les plages horaires (structure vide)
+  if(prev.plages&&prev.plages.length>0){
+    curr.plages=prev.plages.map(function(){return{debut:'',fin:''};});
+  }
+  saveData('vlep_missions_v3',state.missions);
+  render();
+}
+
+// ===== VALIDATION PRÉ-EXPORT EXCEL =====
+function validateBeforeExport(){
+  var m=getCurrentMission();
+  if(!m){alert('Aucune mission');return;}
+  var issues=[];
+  var warnings=[];
+  var ok=[];
+  
+  // Vérif info mission
+  if(!m.clientSite)issues.push('Nom client/site manquant');
+  else ok.push('Client/site : '+m.clientSite);
+  if(!m.preleveur)warnings.push('Préleveur non renseigné');
+  else ok.push('Préleveur : '+m.preleveur);
+  if(!m.debitmetre)warnings.push('Débitmètre non renseigné');
+  
+  // Vérif prélèvements
+  var totalSubs=0;
+  var missingRef=0;
+  var missingPompe=0;
+  var missingDebit=0;
+  var missingDate=0;
+  var missingPlages=0;
+  var debitWarnings=0;
+  
+  m.prelevements.forEach(function(p){
+    p.subPrelevements.forEach(function(sb,si){
+      totalSubs++;
+      if(!sb.date)missingDate++;
+      if(!sb.plages||sb.plages.length===0)missingPlages++;
+      else{
+        var hasEmpty=sb.plages.some(function(pl){return!pl.debut||!pl.fin;});
+        if(hasEmpty)missingPlages++;
+      }
+      if(p.agents){
+        p.agents.forEach(function(a){
+          var aname=a.name||'';
+          var ad=(sb.agentData&&sb.agentData[aname])||{};
+          if(!ad.refEchantillon)missingRef++;
+          if(!ad.numPompe)missingPompe++;
+          if(!ad.debitInitial||!ad.debitFinal)missingDebit++;
+          else{
+            var isCIP=isAgentCIP(m,aname);
+            var variation=isCIP?calcDebitVariationCIP(ad.debitInitial,ad.debitFinal):calcDebitVariation(ad.debitInitial,ad.debitFinal);
+            if(variation!==null){
+              if(isCIP&&variation>200)debitWarnings++;
+              else if(!isCIP&&variation>5)debitWarnings++;
+            }
+          }
+        });
+      }
+    });
+  });
+  
+  if(totalSubs===0)issues.push('Aucun sous-prélèvement trouvé');
+  else ok.push(totalSubs+' sous-prélèvement(s)');
+  
+  if(missingRef>0)issues.push(missingRef+' réf. échantillon manquante(s)');
+  if(missingPompe>0)warnings.push(missingPompe+' n° pompe manquant(s)');
+  if(missingDebit>0)warnings.push(missingDebit+' débit(s) manquant(s)');
+  if(missingDate>0)warnings.push(missingDate+' date(s) manquante(s)');
+  if(missingPlages>0)warnings.push(missingPlages+' plage(s) horaire(s) incomplète(s)');
+  if(debitWarnings>0)issues.push(debitWarnings+' variation(s) de débit hors norme');
+  
+  // Vérif conditions
+  if(!m.conditions||m.conditions.length===0)warnings.push('Aucune condition ambiante renseignée');
+  else ok.push(m.conditions.length+' jour(s) de conditions');
+  
+  // Vérif blancs
+  var blancs=getBlancForAgent?m.prelevements.length:0;
+  
+  // Afficher modal de validation
+  state.validationResult={ok:ok,warnings:warnings,issues:issues};
+  state.showModal='validation';
+  render();
+}
+
+function renderValidationModal(){
+  var v=state.validationResult;
+  if(!v)return'';
+  var hasIssues=v.issues.length>0;
+  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>'+ICONS.check+' Validation export</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div>';
+  
+  if(v.ok.length>0){
+    h+='<div style="margin-bottom:8px;">';
+    v.ok.forEach(function(t){h+='<div class="validation-modal-item validation-ok">✓ '+escapeHtml(t)+'</div>';});
+    h+='</div>';
+  }
+  if(v.warnings.length>0){
+    h+='<div style="margin-bottom:8px;">';
+    v.warnings.forEach(function(t){h+='<div class="validation-modal-item validation-warn">⚠ '+escapeHtml(t)+'</div>';});
+    h+='</div>';
+  }
+  if(v.issues.length>0){
+    h+='<div style="margin-bottom:8px;">';
+    v.issues.forEach(function(t){h+='<div class="validation-modal-item validation-err">✗ '+escapeHtml(t)+'</div>';});
+    h+='</div>';
+  }
+  
+  if(hasIssues){
+    h+='<div class="info-box info-box-warning mt-8"><p><strong>Attention :</strong> des données obligatoires sont manquantes. L\'export peut être incomplet.</p></div>';
+  }else if(v.warnings.length>0){
+    h+='<div class="info-box mt-8"><p>Quelques champs optionnels ne sont pas renseignés.</p></div>';
+  }else{
+    h+='<div class="info-box info-box-success mt-8"><p><strong>Tout est bon !</strong> La mission est complète.</p></div>';
+  }
+  
+  h+='<div class="row mt-12"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-'+(hasIssues?'warning':'success')+'" onclick="state.showModal=null;exportExcel();">'+ICONS.download+' Exporter '+(hasIssues?'quand même':'')+'</button></div>';
+  h+='</div></div>';
+  return h;
 }
 
 render();
