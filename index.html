@@ -421,8 +421,8 @@ function getCodeAnalytique(agent){
   return agent['code_analyse']||agent['Code analytique']||agent['Code analyse']||'';
 }
 
-function hasVLEP8h(n){var a=getAgentFromDB(n);return a&&a['VLEP 8h (mg/m3)']&&a['VLEP 8h (mg/m3)'].trim()!==''&&a['VLEP 8h (mg/m3)']!=='-';}
-function hasVLEPCT(n){var a=getAgentFromDB(n);return a&&a['VLEP CT (mg/m3)']&&a['VLEP CT (mg/m3)'].trim()!==''&&a['VLEP CT (mg/m3)']!=='-';}
+function hasVLEP8h(n){var a=getAgentFromDB(n);if(!a)return false;var v=a['VLEP 8h (mg/m3)'];return v!==undefined&&v!==null&&v!==''&&String(v).trim()!==''&&String(v).trim()!=='-';}
+function hasVLEPCT(n){var a=getAgentFromDB(n);if(!a)return false;var v=a['VLEP CT (mg/m3)'];return v!==undefined&&v!==null&&v!==''&&String(v).trim()!==''&&String(v).trim()!=='-';}
 
 function createEmptyMission(){var g=[];for(var i=0;i<DEFAULT_GEH_COUNT;i++)g.push({id:generateId(),num:i+1,name:''});return{id:generateId(),status:'prepa',createdAt:new Date().toISOString(),clientSite:'',preleveur:'',debitmetre:'',cipAgents:[],gehs:g,agents:[],affectations:{},prelevements:[],conditionsAmbiantes:[],agentColors:{}};}
 
