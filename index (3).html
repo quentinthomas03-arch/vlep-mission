@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 ═══════════════════════════════════════════════════════════════════════════════
-  VLEP Mission v3.8
+  VLEP Mission v3.6
   © 2025 Quentin THOMAS - Tous droits réservés
   
   CONFIDENTIEL - USAGE STRICTEMENT INTERNE
@@ -26,15 +26,15 @@
   <meta name="copyright" content="© 2025 Quentin THOMAS - Tous droits réservés">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>VLEP Mission v3.8 - © Quentin THOMAS</title>
+  <title>VLEP Mission v3.6 - © Quentin THOMAS</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     /* 
-     * VLEP Mission v3.8
+     * VLEP Mission v3.6
      * © 2025 Quentin THOMAS - Tous droits réservés
      * Propriété exclusive - Reproduction interdite
      */
-    /* === VLEP Mission v3.8 - Design Socotec Blue Refined === */
+    /* === VLEP Mission v3.6 - Design Socotec Blue Refined === */
     :root {
       --primary: #0066b3;
       --primary-dark: #004d87;
@@ -277,20 +277,6 @@
     /* SVG Icons inline helper */
     .svg-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; vertical-align: middle; }
     .svg-icon svg { width: 14px; height: 14px; }
-    h1>svg,h2>svg,.btn>svg,.section-title>svg,.modal-header h2>svg,label>svg,.back-btn>svg,p>svg,strong>svg,.info-box svg,.condition-label>svg,.copy-btn>svg,.dictation-btn>svg,.prel-arrow>svg{width:16px;height:16px;display:inline-block;vertical-align:middle}
-    h1>svg{width:20px;height:20px}
-    @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    #app{animation:fadeSlideIn .18s ease-out}
-    .btn-warning{background:#f59e0b;color:white}
-    .global-timer{position:fixed;bottom:16px;right:16px;z-index:999;background:linear-gradient(135deg,#2d3039,#484c56);color:white;border-radius:16px;padding:8px 14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;user-select:none}
-    .global-timer.running{background:linear-gradient(135deg,#047857,#059669)}
-    .global-timer .timer-display{font-size:16px;letter-spacing:.5px}
-    .global-timer .timer-btn{width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
-    .global-timer .timer-btn.start{background:#00b38a;color:white}
-    .global-timer .timer-btn.stop{background:#ef4444;color:white}
-    .global-timer .timer-btn.reset{background:rgba(255,255,255,.2);color:white}
-    .validation-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
-    .validation-ok{color:#059669}.validation-warn{color:#d97706}.validation-err{color:#ef4444}
 
     /* === SPLASH SCREEN === */
     .splash { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(145deg, #c8cdd5 0%, #a8aeb8 30%, #8b929e 60%, #c0c5ce 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease, transform 0.5s ease; }
@@ -325,7 +311,7 @@
   <script>
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// VLEP Mission v3.8
+// VLEP Mission v3.6
 // © 2025 Quentin THOMAS - Tous droits réservés
 // CONFIDENTIEL - Propriété exclusive de Quentin THOMAS
 // Toute reproduction ou utilisation non autorisée est interdite
@@ -369,7 +355,7 @@ var ICONS = {
 
 var AGENT_COLORS=['#00a878','#0f4c81','#e63946','#7c3aed','#f59e0b','#0891b2','#c026d3','#65a30d','#0284c7','#db2777','#4f46e5','#059669','#d97706','#7c2d12','#1d4ed8'];
 var DEFAULT_GEH_COUNT=5;
-var state={_author:'Quentin THOMAS',_copyright:'© 2025 Quentin THOMAS',view:'home',missions:[],agentsDB:[],currentMissionId:null,currentPrelId:null,activeSubIndex:0,showModal:null,searchText:'',expandedGeh:{},fusionMode:false,selectedForFusion:[],quickPrelType:'8h',quickPrelReg:true,quickAgentSearch:'',quickGehId:null,echantillonSort:'date',blancAgentSearch:'',blancAgents:[],quickMission:null,newPrelData:null,timers:{},showCIPSection:false};
+var state={_author:'Quentin THOMAS',_copyright:'© 2025 Quentin THOMAS',view:'home',missions:[],agentsDB:[],currentMissionId:null,currentPrelId:null,activeSubIndex:0,showModal:null,searchText:'',expandedGeh:{},fusionMode:false,selectedForFusion:[],quickPrelType:'8h',quickPrelReg:true,quickAgentSearch:'',quickGehId:null,echantillonSort:'date',blancAgentSearch:'',blancAgents:[],quickMission:null,newPrelData:null,timers:{}};
 
 function escapeHtml(t){if(!t)return'';return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escapeJs(t){if(!t)return'';var s=String(t);s=s.split(String.fromCharCode(92)).join(String.fromCharCode(92,92));s=s.split(String.fromCharCode(39)).join(String.fromCharCode(92,39));s=s.replace(/"/g,'&quot;');return s;}
@@ -424,31 +410,7 @@ function getCodeAnalytique(agent){
 function hasVLEP8h(n){var a=getAgentFromDB(n);return a&&a['VLEP 8h (mg/m3)']&&a['VLEP 8h (mg/m3)'].trim()!==''&&a['VLEP 8h (mg/m3)']!=='-';}
 function hasVLEPCT(n){var a=getAgentFromDB(n);return a&&a['VLEP CT (mg/m3)']&&a['VLEP CT (mg/m3)'].trim()!==''&&a['VLEP CT (mg/m3)']!=='-';}
 
-function createEmptyMission(){var g=[];for(var i=0;i<DEFAULT_GEH_COUNT;i++)g.push({id:generateId(),num:i+1,name:''});return{id:generateId(),status:'prepa',createdAt:new Date().toISOString(),clientSite:'',preleveur:'',debitmetre:'',cipAgents:[],gehs:g,agents:[],affectations:{},prelevements:[],conditionsAmbiantes:[],agentColors:{}};}
-
-function handleSearchClick(event,fnName){
-  var el=event.target;
-  while(el&&el!==event.currentTarget&&!el.dataset.agent){el=el.parentElement;}
-  if(!el||!el.dataset.agent||el.dataset.disabled)return;
-  if(typeof window[fnName]==='function')window[fnName](el.dataset.agent);
-}
-
-function isAgentCIP(m,agentName){
-  if(!m||!m.cipAgents)return false;
-  return m.cipAgents.indexOf(agentName)!==-1;
-}
-function toggleCIPAgent(agentName){
-  var m=getCurrentMission();if(!m)return;
-  if(!m.cipAgents)m.cipAgents=[];
-  var idx=m.cipAgents.indexOf(agentName);
-  if(idx===-1)m.cipAgents.push(agentName);else m.cipAgents.splice(idx,1);
-  saveData('vlep_missions_v3',state.missions);render();
-}
-function calcDebitVariationCIP(di,df){
-  if(!di||!df)return null;
-  var a=parseFloat(String(di).replace(',','.'));var b=parseFloat(String(df).replace(',','.'));
-  if(isNaN(a)||isNaN(b)||a===0)return null;return Math.abs(b-a);
-}
+function createEmptyMission(){var g=[];for(var i=0;i<DEFAULT_GEH_COUNT;i++)g.push({id:generateId(),num:i+1,name:''});return{id:generateId(),status:'prepa',createdAt:new Date().toISOString(),clientSite:'',preleveur:'',debitmetre:'',gehs:g,agents:[],affectations:{},prelevements:[],conditionsAmbiantes:[],agentColors:{}};}
 
 function render(){
   var h='';
@@ -470,10 +432,6 @@ function render(){
     default:h=renderHome();
   }
   document.getElementById('app').innerHTML=h;
-  document.getElementById('app').style.animation='none';
-  void document.getElementById('app').offsetHeight;
-  document.getElementById('app').style.animation='fadeSlideIn 0.18s ease-out';
-  renderGlobalTimer();
   if(state.view==='db-terrain')setTimeout(updateDbResults,50);
   if(state.view==='quick-entry')setTimeout(function(){var i=document.getElementById('quick-agent-search');if(i)i.focus();},50);
 }
@@ -722,14 +680,14 @@ function renderPrepaAutoModal(m){
     h+='<div class="section-title mt-12">Aperçu</div>';
     
     // GEH détectés
-    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">'+'<span class="svg-icon">'+ICONS.folder+'</span> '+p.gehs.length+' GEH détectés</div>';
+    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">'+ICONS.folder+' '+p.gehs.length+' GEH détectés</div>';
     p.gehs.forEach(function(g){
       h+='<div style="font-size:12px;color:var(--text-muted);padding:2px 0;">'+g.num+'. '+escapeHtml(g.name)+'</div>';
     });
     h+='</div>';
     
     // Agents et affectations
-    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">'+'<span class="svg-icon">'+ICONS.beaker+'</span> '+p.agents.length+' agent(s) chimique(s)</div>';
+    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">'+ICONS.beaker+' '+p.agents.length+' agent(s) chimique(s)</div>';
     p.rows.forEach(function(r){
       var regLabel=r.isReg?'<span style="color:#047857;font-size:10px;font-weight:700;"> REG</span>':'<span style="color:#b45309;font-size:10px;font-weight:700;"> NR</span>';
       h+='<div style="background:#f8fafc;border-radius:6px;padding:8px;margin-bottom:6px;border-left:3px solid var(--primary);">';
@@ -1159,14 +1117,14 @@ function renderPrepaAgents(){
   if(!m){state.view='prepa-list';render();return'';}
   var h='<button class="back-btn" onclick="state.view=\'prepa-mission\';render();">'+ICONS.arrowLeft+' Mission</button><div class="card"><h2>'+ICONS.beaker+' Agents chimiques</h2><p class="subtitle">Sélectionnez les ACD pour cette mission</p></div>';
   h+='<div class="search-box"><span class="search-icon">'+ICONS.search+'</span><input type="text" class="search-input" id="agent-search" placeholder="Rechercher un agent..." value="'+escapeHtml(state.searchText)+'" oninput="handleAgentSearchInput(this.value);"></div>';
-  h+='<div id="search-results-container" onmousedown="event.preventDefault();" onclick="handleSearchClick(event,\'addAgentFromSearch\');">';
+  h+='<div id="search-results-container">';
   if(state.searchText.length>=2){
     var r=searchAgentsDB(state.searchText);
     var f=r.filter(function(x){return!m.agents.some(function(a){return a.name===x;});});
     if(f.length>0){
       h+='<div class="search-results">';
       f.slice(0,10).forEach(function(x,idx){
-        h+='<div class="search-result-item" data-agent="'+escapeHtml(x)+'">'+escapeHtml(x)+'</div>';
+        h+='<div class="search-result-item" onmousedown="event.preventDefault();" onclick="addAgentFromSearch(\''+escapeJs(x)+'\');">'+escapeHtml(x)+'</div>';
       });
       h+='</div>';
     }
@@ -1202,7 +1160,7 @@ function updateSearchResultsOnly(){
     if(f.length>0){
       h+='<div class="search-results">';
       f.slice(0,10).forEach(function(x){
-        h+='<div class="search-result-item" data-agent="'+escapeHtml(x)+'">'+escapeHtml(x)+'</div>';
+        h+='<div class="search-result-item" onmousedown="event.preventDefault();" onclick="addAgentFromSearch(\''+escapeJs(x)+'\');">'+escapeHtml(x)+'</div>';
       });
       h+='</div>';
     }
@@ -1415,20 +1373,6 @@ function renderTerrainMission(){
   if(!m){state.view='terrain-list';render();return'';}
   var h='<div class="sticky-header"><button class="back-btn" onclick="state.view=\'terrain-list\';state.currentMissionId=null;render();">'+ICONS.arrowLeft+' Liste</button><div style="display:flex;justify-content:space-between;align-items:center;"><div style="color:white;font-weight:700;font-size:14px;">'+escapeHtml(m.clientSite)+'</div><div class="row" style="gap:4px;"><button class="btn btn-gray btn-small btn-icon" onclick="unvalidateMissionFromTerrain();" title="Repasser en prépa" style="background:rgba(255,255,255,0.15);color:white;border:none;">'+ICONS.arrowLeft+'</button><button class="btn btn-danger btn-icon" onclick="deleteMissionTerrain();" style="width:24px;height:24px;">'+ICONS.trash+'</button></div></div></div>';
   h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' • <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+'</p></div>';
-  // CIP Agent selection
-  if(m.agents&&m.agents.length>0){
-    var hasCIP=m.cipAgents&&m.cipAgents.length>0;
-    h+='<div class="card" style="padding:8px 10px;margin-bottom:8px;border:1px solid '+(hasCIP?'#f59e0b':'#e5e7eb')+';"><div style="display:flex;align-items:center;gap:6px;margin-bottom:'+(state.showCIPSection?'6':'0')+'px;cursor:pointer;" onclick="state.showCIPSection=!state.showCIPSection;render();"><span class="svg-icon" style="color:#f59e0b;">'+ICONS.zap+'</span><span style="font-size:12px;font-weight:600;color:#92400e;">Pompe CIP</span><span style="font-size:10px;color:#b45309;margin-left:auto;">'+(hasCIP?m.cipAgents.length+' agent(s)':'aucun')+'</span><span style="font-size:11px;color:#94a3b8;">'+ICONS.chevronRight+'</span></div>';
-    if(state.showCIPSection){
-      h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
-      m.agents.forEach(function(a){
-        var ic=isAgentCIP(m,a.name);
-        h+='<button style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid '+(ic?'#f59e0b':'#dce8f0')+';background:'+(ic?'#fef3c7':'white')+';color:'+(ic?'#92400e':'#94a3b8')+';transition:all 0.15s;" onclick="toggleCIPAgent(\''+escapeJs(a.name)+'\');">'+escapeHtml(a.name)+(ic?' \u2713':'')+'</button>';
-      });
-      h+='</div>';
-    }
-    h+='</div>';
-  }
   h+='<div class="row mb-12"><button class="btn btn-gray" onclick="state.view=\'conditions\';render();">'+ICONS.thermometer+' Conditions</button><button class="btn btn-blue" onclick="state.view=\'liste-echantillons\';render();">'+ICONS.list+' Échantillons</button></div>';
   h+='<div class="row mb-12"><button class="btn btn-gray" onclick="exportMissionJSON('+m.id+');">'+ICONS.download+' Export JSON</button></div>';
   
@@ -1575,14 +1519,14 @@ function renderAddPrelTerrainModal(){
   // Agents
   h+='<div class="field"><label class="label">Agent(s) chimique(s) *</label>';
   h+='<input type="text" class="input" id="new-prel-agent-search" placeholder="Rechercher..." value="'+escapeHtml(d.agentSearch||'')+'" oninput="handleNewPrelAgentSearch(this.value);"></div>';
-  h+='<div id="new-prel-search-results" onmousedown="event.preventDefault();" onclick="handleSearchClick(event,\'addNewPrelAgent\');">';
+  h+='<div id="new-prel-search-results">';
   if(d.agentSearch&&d.agentSearch.length>=2){
     var results=searchAgentsDB(d.agentSearch);
     var filtered=results.filter(function(x){return!d.agents.some(function(a){return a.name===x;});});
     if(filtered.length>0){
       h+='<div class="search-results" style="max-height:120px;overflow-y:auto;">';
       filtered.slice(0,6).forEach(function(x){
-        h+='<div class="search-result-item" data-agent="'+escapeHtml(x)+'">'+escapeHtml(x)+'</div>';
+        h+='<div class="search-result-item" onmousedown="event.preventDefault();" onclick="addNewPrelAgent(\''+escapeJs(x)+'\');">'+escapeHtml(x)+'</div>';
       });
       h+='</div>';
     }
@@ -1657,7 +1601,7 @@ function handleNewPrelAgentSearch(value){
     if(filtered.length>0){
       h+='<div class="search-results" style="max-height:120px;overflow-y:auto;">';
       filtered.slice(0,6).forEach(function(x){
-        h+='<div class="search-result-item" data-agent="'+escapeHtml(x)+'">'+escapeHtml(x)+'</div>';
+        h+='<div class="search-result-item" onmousedown="event.preventDefault();" onclick="addNewPrelAgent(\''+escapeJs(x)+'\');">'+escapeHtml(x)+'</div>';
       });
       h+='</div>';
     }
@@ -2029,9 +1973,6 @@ function renderSubPrelForm(p,sb,idx){
   var canCopyFromPrevious=idx>0;
   
   var h='<div class="card">';
-  if(canCopyFromPrevious){
-    h+='<div style="display:flex;justify-content:flex-end;margin-bottom:6px;"><button class="btn btn-gray btn-small" style="font-size:10px;padding:4px 10px;" onclick="copyAllFromPrevious('+p.id+','+idx+');">'+ICONS.copy+' Copier tout J-1</button></div>';
-  }
   
   // Opérateur avec bouton copier J-1
   h+='<div class="field"><div class="field-header"><label class="label">Opérateur / Point fixe</label>';
@@ -2051,9 +1992,8 @@ function renderSubPrelForm(p,sb,idx){
       var aname=a.name||'Agent inconnu';
       if(!sb.agentData[aname])sb.agentData[aname]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:''};
       var ad=sb.agentData[aname];
-      var isCIP=isAgentCIP(m,aname);
-      var variation=isCIP?calcDebitVariationCIP(ad.debitInitial,ad.debitFinal):calcDebitVariation(ad.debitInitial,ad.debitFinal);
-      var hasWarning=isCIP?(variation!==null&&variation>200):(variation!==null&&variation>5);
+      var variation=calcDebitVariation(ad.debitInitial,ad.debitFinal);
+      var hasWarning=variation!==null&&variation>5;
       
       h+='<div class="multi-agent-item"><div class="multi-agent-header"><div class="multi-agent-color" style="background:'+(a.color||'#3b82f6')+';"></div><div class="multi-agent-name">'+escapeHtml(aname)+'</div></div><div class="multi-agent-fields">';
       
@@ -2313,7 +2253,7 @@ function renderListeEchantillons(){
   if(!m.blancs)m.blancs=[];
   
   var h='<button class="back-btn" onclick="state.view=\'terrain-mission\';render();">'+ICONS.arrowLeft+' Mission</button><div class="card"><h2>'+ICONS.list+' Liste échantillons</h2><p class="subtitle">'+escapeHtml(m.clientSite)+'</p></div>';
-  h+='<div class="row mb-12"><button class="btn btn-success" onclick="state.showModal=\'addBlanc\';state.blancAgentSearch=\'\';state.blancAgents=[];render();">+ Blanc terrain</button><button class="btn btn-primary" onclick="validateBeforeExport();">'+ICONS.check+' Valider & Export</button></div>';
+  h+='<div class="row mb-12"><button class="btn btn-success" onclick="state.showModal=\'addBlanc\';state.blancAgentSearch=\'\';state.blancAgents=[];render();">+ Blanc terrain</button><button class="btn btn-primary" onclick="exportExcel();">'+ICONS.download+' Export Excel</button></div>';
   h+='<div class="row mb-12"><span style="font-size:13px;margin-right:8px;">Trier par :</span><button class="btn btn-small '+(state.echantillonSort==='date'?'btn-blue':'btn-gray')+'" onclick="state.echantillonSort=\'date\';render();">Date</button><button class="btn btn-small '+(state.echantillonSort==='agent'?'btn-blue':'btn-gray')+'" onclick="state.echantillonSort=\'agent\';render();">Agent</button></div>';
   
   // FIX #2: Regrouper par référence échantillon
@@ -2379,7 +2319,6 @@ function renderListeEchantillons(){
   }
   
   if(state.showModal==='addBlanc')h+=renderAddBlancModal();
-  if(state.showModal==='validation')h+=renderValidationModal();
   return h;
 }
 
@@ -2389,14 +2328,14 @@ function renderAddBlancModal(){
   h+='<div class="field"><label class="label">Référence échantillon *</label><input type="text" class="input" id="blanc-ref" placeholder="Ex: BT-001" value="'+escapeHtml(state.blancRef||'')+'" oninput="state.blancRef=this.value;"></div>';
   h+='<div class="field"><label class="label">Date</label><input type="date" class="input" id="blanc-date" value="'+(state.blancDate||'')+'" oninput="state.blancDate=this.value;"></div>';
   h+='<div class="field"><label class="label">Agent(s) chimique(s)</label><input type="text" class="input" id="blanc-agent-search" placeholder="Rechercher..." value="'+escapeHtml(state.blancAgentSearch||'')+'" oninput="handleBlancAgentSearch(this.value);"></div>';
-  h+='<div id="blanc-search-results" onmousedown="event.preventDefault();" onclick="handleSearchClick(event,\'addBlancAgent\');">';
+  h+='<div id="blanc-search-results">';
   if(state.blancAgentSearch&&state.blancAgentSearch.length>=2){
     var r=searchAgentsDB(state.blancAgentSearch).slice(0,6);
     if(r.length>0){
       h+='<div class="search-results" style="max-height:120px;overflow-y:auto;">';
       r.forEach(function(x){
         var already=state.blancAgents&&state.blancAgents.indexOf(x)!==-1;
-        h+='<div class="search-result-item" style="'+(already?'opacity:0.5;':'')+'" data-agent="'+escapeHtml(x)+'"'+(already?' data-disabled="1"':'')+'>'+escapeHtml(x)+(already?' ✓':'')+'</div>';
+        h+='<div class="search-result-item" style="'+(already?'opacity:0.5;':'')+'" onmousedown="event.preventDefault();" onclick="'+(already?'':'addBlancAgent(\''+escapeJs(x)+'\');')+'">'+escapeHtml(x)+(already?' ✓':'')+'</div>';
       });
       h+='</div>';
     }
@@ -2436,7 +2375,7 @@ function updateBlancSearchResults(){
       h+='<div class="search-results" style="max-height:120px;overflow-y:auto;">';
       r.forEach(function(x){
         var already=state.blancAgents&&state.blancAgents.indexOf(x)!==-1;
-        h+='<div class="search-result-item" style="'+(already?'opacity:0.5;':'')+'" data-agent="'+escapeHtml(x)+'"'+(already?' data-disabled="1"':'')+'>'+escapeHtml(x)+(already?' ✓':'')+'</div>';
+        h+='<div class="search-result-item" style="'+(already?'opacity:0.5;':'')+'" onmousedown="event.preventDefault();" onclick="'+(already?'':'addBlancAgent(\''+escapeJs(x)+'\');')+'">'+escapeHtml(x)+(already?' ✓':'')+'</div>';
       });
       h+='</div>';
     }
@@ -3814,14 +3753,14 @@ function renderQuickEntry(){
   // Agents
   h+='<div class="card"><h2>'+ICONS.beaker+' Agents chimiques</h2>';
   h+='<div class="search-box"><span class="search-icon">'+ICONS.search+'</span><input type="text" class="search-input" id="quick-agent-search" placeholder="Rechercher un agent..." value="'+escapeHtml(state.quickAgentSearch)+'" oninput="handleQuickAgentSearch(this.value);"></div>';
-  h+='<div id="quick-search-results" onmousedown="event.preventDefault();" onclick="handleSearchClick(event,\'addQuickAgent\');">';
+  h+='<div id="quick-search-results">';
   if(state.quickAgentSearch&&state.quickAgentSearch.length>=2){
     var results=searchAgentsDB(state.quickAgentSearch);
     var filtered=results.filter(function(x){return!q.agents.some(function(a){return a.name===x;});});
     if(filtered.length>0){
       h+='<div class="search-results">';
       filtered.slice(0,8).forEach(function(x){
-        h+='<div class="search-result-item" data-agent="'+escapeHtml(x)+'">'+escapeHtml(x)+'</div>';
+        h+='<div class="search-result-item" onmousedown="event.preventDefault();" onclick="addQuickAgent(\''+escapeJs(x)+'\');">'+escapeHtml(x)+'</div>';
       });
       h+='</div>';
     }
@@ -3895,7 +3834,7 @@ function handleQuickAgentSearch(value){
     if(filtered.length>0){
       h+='<div class="search-results">';
       filtered.slice(0,8).forEach(function(x){
-        h+='<div class="search-result-item" data-agent="'+escapeHtml(x)+'">'+escapeHtml(x)+'</div>';
+        h+='<div class="search-result-item" onmousedown="event.preventDefault();" onclick="addQuickAgent(\''+escapeJs(x)+'\');">'+escapeHtml(x)+'</div>';
       });
       h+='</div>';
     }
@@ -4232,117 +4171,73 @@ function doImportQR(){
   importMissionFromText(text);
 }
 
-// ===== DICTÉE VOCALE AMÉLIORÉE =====
+// ===== DICTÉE VOCALE =====
 var activeDictation=null;
+
 function toggleDictation(prelId,subIdx){
   var SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SpeechRecognition){alert('Dictée non supportée. Utilisez Chrome/Android.');return;}
+  if(!SpeechRecognition){
+    alert('La dictée vocale n\'est pas supportée par votre navigateur.\n\nUtilisez Chrome sur Android pour cette fonctionnalité.');
+    return;
+  }
+  
   var key=prelId+'_'+subIdx;
   var btn=document.getElementById('dict-btn-'+prelId+'-'+subIdx);
+  
   if(activeDictation&&activeDictation.key===key){
-    activeDictation.stopped=true;activeDictation.recognition.stop();activeDictation=null;
-    if(btn)btn.classList.remove('recording');return;
+    activeDictation.recognition.stop();
+    activeDictation=null;
+    if(btn)btn.classList.remove('recording');
+    return;
   }
+  
   if(activeDictation){
-    activeDictation.stopped=true;activeDictation.recognition.stop();
+    activeDictation.recognition.stop();
     var oldBtn=document.getElementById('dict-btn-'+activeDictation.prelId+'-'+activeDictation.subIdx);
     if(oldBtn)oldBtn.classList.remove('recording');
   }
+  
   var recognition=new SpeechRecognition();
-  recognition.lang='fr-FR';recognition.continuous=true;recognition.interimResults=true;recognition.maxAlternatives=1;
+  recognition.lang='fr-FR';
+  recognition.continuous=true;
+  recognition.interimResults=true;
+  
   var textarea=document.getElementById('obs-'+prelId+'-'+subIdx);
-  var baseText=textarea?textarea.value:'';var finalTranscript='';
-  var dictObj={key:key,prelId:prelId,subIdx:subIdx,recognition:recognition,stopped:false};
+  var baseText=textarea?textarea.value:'';
+  
   recognition.onresult=function(event){
-    var interim='';
+    var transcript='';
     for(var i=event.resultIndex;i<event.results.length;i++){
-      var t=event.results[i][0].transcript;
-      if(event.results[i].isFinal){if(!finalTranscript&&!baseText)t=t.charAt(0).toUpperCase()+t.slice(1);finalTranscript+=t;}
-      else{interim+=t;}
+      transcript+=event.results[i][0].transcript;
     }
-    if(textarea){var sep=(baseText&&!baseText.match(/\s$/)&&(finalTranscript||interim))?' ':'';textarea.value=baseText+sep+finalTranscript+interim;}
+    if(textarea){
+      textarea.value=baseText+(baseText?' ':'')+transcript;
+    }
+    if(event.results[event.results.length-1].isFinal){
+      baseText=textarea.value;
+      updateSubFieldWithAutoDate(prelId,subIdx,'observations',textarea.value);
+    }
   };
-  recognition.onerror=function(event){if(event.error==='no-speech'||event.error==='aborted')return;console.log('Dictée:',event.error);};
+  
+  recognition.onerror=function(event){
+    if(event.error!=='aborted'&&event.error!=='no-speech'){
+      alert('Erreur dictée : '+event.error);
+    }
+    activeDictation=null;
+    if(btn)btn.classList.remove('recording');
+  };
+  
   recognition.onend=function(){
-    if(textarea){baseText=baseText+(baseText&&finalTranscript?' ':'')+finalTranscript;textarea.value=baseText;updateSubFieldWithAutoDate(prelId,subIdx,'observations',textarea.value);finalTranscript='';}
-    if(!dictObj.stopped&&activeDictation&&activeDictation.key===key){try{recognition.start();}catch(e){activeDictation=null;if(btn)btn.classList.remove('recording');}}
-    else{activeDictation=null;if(btn)btn.classList.remove('recording');}
+    if(textarea){
+      updateSubFieldWithAutoDate(prelId,subIdx,'observations',textarea.value);
+    }
+    activeDictation=null;
+    if(btn)btn.classList.remove('recording');
   };
-  recognition.start();activeDictation=dictObj;if(btn)btn.classList.add('recording');
-}
-
-// ===== TIMER GLOBAL FLOTTANT =====
-var globalTimerState={running:false,startTime:0,elapsed:0,interval:null};
-function renderGlobalTimer(){
-  var existing=document.getElementById('global-timer-overlay');
-  var tv=['terrain-list','terrain-mission','terrain-prel','conditions','liste-echantillons','quick-entry'];
-  if(tv.indexOf(state.view)===-1&&!globalTimerState.running){if(existing)existing.remove();return;}
-  if(!existing){existing=document.createElement('div');existing.id='global-timer-overlay';existing.className='global-timer';document.body.appendChild(existing);}
-  var el=globalTimerState.elapsed;if(globalTimerState.running)el+=Date.now()-globalTimerState.startTime;
-  var hrs=Math.floor(el/3600000),mins=Math.floor((el%3600000)/60000),secs=Math.floor((el%60000)/1000);
-  var disp=(hrs>0?hrs+':':'')+String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
-  existing.className='global-timer'+(globalTimerState.running?' running':'');
-  existing.innerHTML='<span class="timer-display">\u23F1 '+disp+'</span>'+(globalTimerState.running?'<button class="timer-btn stop" onclick="event.stopPropagation();stopGlobalTimer();">\u23F8</button>':'<button class="timer-btn start" onclick="event.stopPropagation();startGlobalTimer();">\u25B6</button>')+(el>0?'<button class="timer-btn reset" onclick="event.stopPropagation();resetGlobalTimer();">\u21BA</button>':'');
-}
-function startGlobalTimer(){if(globalTimerState.running)return;globalTimerState.running=true;globalTimerState.startTime=Date.now();globalTimerState.interval=setInterval(function(){renderGlobalTimer();},1000);renderGlobalTimer();}
-function stopGlobalTimer(){if(!globalTimerState.running)return;globalTimerState.elapsed+=Date.now()-globalTimerState.startTime;globalTimerState.running=false;if(globalTimerState.interval)clearInterval(globalTimerState.interval);globalTimerState.interval=null;renderGlobalTimer();}
-function resetGlobalTimer(){if(globalTimerState.interval)clearInterval(globalTimerState.interval);globalTimerState={running:false,startTime:0,elapsed:0,interval:null};renderGlobalTimer();}
-
-// ===== RACCOURCI : COPIER TOUT J-1 =====
-function copyAllFromPrevious(prelId,subIdx){
-  var m=getCurrentMission();if(!m)return;
-  var p=m.prelevements.find(function(x){return x.id===prelId;});
-  if(!p||subIdx<1)return;
-  var prev=p.subPrelevements[subIdx-1],curr=p.subPrelevements[subIdx];
-  if(!prev||!curr)return;
-  curr.operateur=prev.operateur||'';
-  if(prev.agentData){if(!curr.agentData)curr.agentData={};
-    Object.keys(prev.agentData).forEach(function(an){var ad=prev.agentData[an];curr.agentData[an]={refEchantillon:ad.refEchantillon||'',numPompe:ad.numPompe||'',debitInitial:'',debitFinal:''};});
-  }
-  if(prev.plages&&prev.plages.length>0)curr.plages=prev.plages.map(function(){return{debut:'',fin:''};});
-  saveData('vlep_missions_v3',state.missions);render();
-}
-
-// ===== VALIDATION PRÉ-EXPORT =====
-function validateBeforeExport(){
-  var m=getCurrentMission();if(!m){alert('Aucune mission');return;}
-  var issues=[],warnings=[],ok=[];
-  if(!m.clientSite)issues.push('Nom client/site manquant');else ok.push('Client/site : '+m.clientSite);
-  if(!m.preleveur)warnings.push('Pr\u00e9leveur non renseign\u00e9');else ok.push('Pr\u00e9leveur : '+m.preleveur);
-  if(!m.debitmetre)warnings.push('D\u00e9bitm\u00e8tre non renseign\u00e9');
-  var totalSubs=0,missingRef=0,missingPompe=0,missingDebit=0,missingDate=0,missingPlages=0,debitWarn=0;
-  m.prelevements.forEach(function(p){p.subPrelevements.forEach(function(sb){
-    totalSubs++;if(!sb.date)missingDate++;
-    if(!sb.plages||sb.plages.length===0||sb.plages.some(function(pl){return!pl.debut||!pl.fin;}))missingPlages++;
-    if(p.agents){p.agents.forEach(function(a){var ad=(sb.agentData&&sb.agentData[a.name])||{};
-      if(!ad.refEchantillon)missingRef++;if(!ad.numPompe)missingPompe++;
-      if(!ad.debitInitial||!ad.debitFinal)missingDebit++;
-      else{var ic=isAgentCIP(m,a.name);var v=ic?calcDebitVariationCIP(ad.debitInitial,ad.debitFinal):calcDebitVariation(ad.debitInitial,ad.debitFinal);
-        if(v!==null&&((ic&&v>200)||(!ic&&v>5)))debitWarn++;}
-    });}
-  });});
-  if(totalSubs===0)issues.push('Aucun sous-pr\u00e9l\u00e8vement');else ok.push(totalSubs+' sous-pr\u00e9l\u00e8vement(s)');
-  if(missingRef>0)issues.push(missingRef+' r\u00e9f. \u00e9chantillon manquante(s)');
-  if(missingPompe>0)warnings.push(missingPompe+' n\u00b0 pompe manquant(s)');
-  if(missingDebit>0)warnings.push(missingDebit+' d\u00e9bit(s) manquant(s)');
-  if(missingDate>0)warnings.push(missingDate+' date(s) manquante(s)');
-  if(missingPlages>0)warnings.push(missingPlages+' plage(s) horaire(s) incompl\u00e8te(s)');
-  if(debitWarn>0)issues.push(debitWarn+' variation(s) de d\u00e9bit hors norme');
-  if(!m.conditions||m.conditions.length===0)warnings.push('Aucune condition ambiante');
-  else ok.push(m.conditions.length+' jour(s) de conditions');
-  state.validationResult={ok:ok,warnings:warnings,issues:issues};state.showModal='validation';render();
-}
-function renderValidationModal(){
-  var v=state.validationResult;if(!v)return'';var hasErr=v.issues.length>0;
-  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>'+ICONS.check+' Validation export</h2><button class="close-btn" onclick="state.showModal=null;render();">\u00d7</button></div>';
-  if(v.ok.length>0){h+='<div style="margin-bottom:8px;">';v.ok.forEach(function(t){h+='<div class="validation-item validation-ok">\u2713 '+escapeHtml(t)+'</div>';});h+='</div>';}
-  if(v.warnings.length>0){h+='<div style="margin-bottom:8px;">';v.warnings.forEach(function(t){h+='<div class="validation-item validation-warn">\u26A0 '+escapeHtml(t)+'</div>';});h+='</div>';}
-  if(v.issues.length>0){h+='<div style="margin-bottom:8px;">';v.issues.forEach(function(t){h+='<div class="validation-item validation-err">\u2717 '+escapeHtml(t)+'</div>';});h+='</div>';}
-  if(hasErr)h+='<div class="info-box info-box-warning mt-8"><p><strong>Attention :</strong> des donn\u00e9es sont manquantes.</p></div>';
-  else if(v.warnings.length>0)h+='<div class="info-box mt-8"><p>Quelques champs optionnels manquants.</p></div>';
-  else h+='<div class="info-box info-box-success mt-8"><p><strong>Tout est bon !</strong></p></div>';
-  h+='<div class="row mt-12"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn '+(hasErr?'btn-warning':'btn-success')+'" onclick="state.showModal=null;exportExcel();">'+ICONS.download+' Exporter'+(hasErr?' quand m\u00eame':'')+'</button></div>';
-  return h+'</div></div>';
+  
+  recognition.start();
+  activeDictation={key:key,prelId:prelId,subIdx:subIdx,recognition:recognition};
+  if(btn)btn.classList.add('recording');
 }
 
 render();
