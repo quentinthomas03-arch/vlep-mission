@@ -80,7 +80,6 @@
     .btn-gray { background: rgba(0,0,0,0.04); color: var(--text-dark); border: 1px solid var(--border-subtle); backdrop-filter: blur(10px); }
     .btn-blue { background: var(--primary-pale); color: var(--primary); }
     .btn-orange { background: var(--warning); color: white; }
-    .btn-warning { background: #f59e0b; color: white; }
     .btn-small { padding: 6px 10px; font-size: 12px; width: auto; }
     .btn-icon { width: 28px; height: 28px; padding: 0; border-radius: 7px; }
     .btn-icon svg { width: 14px; height: 14px; }
@@ -257,20 +256,6 @@
     .dictation-btn svg { width: 16px; height: 16px; }
     .dictation-btn.recording { background: var(--danger); animation: pulse-record 1s infinite; }
     @keyframes pulse-record { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
-    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    #app { animation: fadeSlideIn 0.2s ease-out; }
-    .global-timer { position: fixed; bottom: 16px; right: 16px; z-index: 999; background: linear-gradient(135deg, var(--metal-dark), var(--metal-mid)); color: white; border-radius: 16px; padding: 8px 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer; user-select: none; transition: all 0.2s; }
-    .global-timer:active { transform: scale(0.95); }
-    .global-timer.running { background: linear-gradient(135deg, #047857, #059669); }
-    .global-timer .timer-display { font-size: 16px; letter-spacing: 0.5px; }
-    .global-timer .timer-btn { width: 26px; height: 26px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; }
-    .global-timer .timer-btn.start { background: var(--accent); color: white; }
-    .global-timer .timer-btn.stop { background: var(--danger); color: white; }
-    .global-timer .timer-btn.reset { background: rgba(255,255,255,0.2); color: white; font-size: 10px; }
-    .validation-modal-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; border-bottom: 1px solid #f1f5f9; }
-    .validation-ok { color: #059669; }
-    .validation-warn { color: #f59e0b; }
-    .validation-err { color: #ef4444; }
     .blanc-warning { background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 3px solid var(--warning); border-radius: 8px; padding: 8px 10px; font-size: 11px; color: #92400e; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
     .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.6); display: none; align-items: flex-end; justify-content: center; z-index: 1000; padding: 16px; backdrop-filter: blur(4px); }
     .modal.show { display: flex; }
@@ -292,8 +277,20 @@
     /* SVG Icons inline helper */
     .svg-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; vertical-align: middle; }
     .svg-icon svg { width: 14px; height: 14px; }
-    h1 > svg, h2 > svg, .btn > svg, .section-title > svg, .modal-header h2 > svg, label > svg, .back-btn > svg, p > svg, strong > svg, .info-box svg, .condition-label > svg, .copy-btn > svg, .dictation-btn > svg, .prel-arrow > svg { width: 16px; height: 16px; display: inline-block; vertical-align: middle; }
-    h1 > svg { width: 20px; height: 20px; }
+    h1>svg,h2>svg,.btn>svg,.section-title>svg,.modal-header h2>svg,label>svg,.back-btn>svg,p>svg,strong>svg,.info-box svg,.condition-label>svg,.copy-btn>svg,.dictation-btn>svg,.prel-arrow>svg{width:16px;height:16px;display:inline-block;vertical-align:middle}
+    h1>svg{width:20px;height:20px}
+    @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    #app{animation:fadeSlideIn .18s ease-out}
+    .btn-warning{background:#f59e0b;color:white}
+    .global-timer{position:fixed;bottom:16px;right:16px;z-index:999;background:linear-gradient(135deg,#2d3039,#484c56);color:white;border-radius:16px;padding:8px 14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;user-select:none}
+    .global-timer.running{background:linear-gradient(135deg,#047857,#059669)}
+    .global-timer .timer-display{font-size:16px;letter-spacing:.5px}
+    .global-timer .timer-btn{width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+    .global-timer .timer-btn.start{background:#00b38a;color:white}
+    .global-timer .timer-btn.stop{background:#ef4444;color:white}
+    .global-timer .timer-btn.reset{background:rgba(255,255,255,.2);color:white}
+    .validation-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
+    .validation-ok{color:#059669}.validation-warn{color:#d97706}.validation-err{color:#ef4444}
 
     /* === SPLASH SCREEN === */
     .splash { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(145deg, #c8cdd5 0%, #a8aeb8 30%, #8b929e 60%, #c0c5ce 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease, transform 0.5s ease; }
@@ -427,24 +424,30 @@ function getCodeAnalytique(agent){
 function hasVLEP8h(n){var a=getAgentFromDB(n);return a&&a['VLEP 8h (mg/m3)']&&a['VLEP 8h (mg/m3)'].trim()!==''&&a['VLEP 8h (mg/m3)']!=='-';}
 function hasVLEPCT(n){var a=getAgentFromDB(n);return a&&a['VLEP CT (mg/m3)']&&a['VLEP CT (mg/m3)'].trim()!==''&&a['VLEP CT (mg/m3)']!=='-';}
 
-function createEmptyMission(){var g=[];for(var i=0;i<DEFAULT_GEH_COUNT;i++)g.push({id:generateId(),num:i+1,name:''});return{id:generateId(),status:'prepa',createdAt:new Date().toISOString(),clientSite:'',preleveur:'',debitmetre:'',tachymetre:'',cipAgents:[],gehs:g,agents:[],affectations:{},prelevements:[],conditionsAmbiantes:[],agentColors:{}};}
+function createEmptyMission(){var g=[];for(var i=0;i<DEFAULT_GEH_COUNT;i++)g.push({id:generateId(),num:i+1,name:''});return{id:generateId(),status:'prepa',createdAt:new Date().toISOString(),clientSite:'',preleveur:'',debitmetre:'',cipAgents:[],gehs:g,agents:[],affectations:{},prelevements:[],conditionsAmbiantes:[],agentColors:{}};}
 
-function isAgentCIP(m,agentName){return m.cipAgents&&m.cipAgents.indexOf(agentName)!==-1;}
+function handleSearchClick(event,fnName){
+  var el=event.target;
+  while(el&&el!==event.currentTarget&&!el.dataset.agent){el=el.parentElement;}
+  if(!el||!el.dataset.agent||el.dataset.disabled)return;
+  if(typeof window[fnName]==='function')window[fnName](el.dataset.agent);
+}
+
+function isAgentCIP(m,agentName){
+  if(!m||!m.cipAgents)return false;
+  return m.cipAgents.indexOf(agentName)!==-1;
+}
 function toggleCIPAgent(agentName){
   var m=getCurrentMission();if(!m)return;
   if(!m.cipAgents)m.cipAgents=[];
   var idx=m.cipAgents.indexOf(agentName);
-  if(idx===-1)m.cipAgents.push(agentName);
-  else m.cipAgents.splice(idx,1);
-  saveData('vlep_missions_v3',state.missions);
-  render();
+  if(idx===-1)m.cipAgents.push(agentName);else m.cipAgents.splice(idx,1);
+  saveData('vlep_missions_v3',state.missions);render();
 }
 function calcDebitVariationCIP(di,df){
   if(!di||!df)return null;
-  var a=parseFloat(String(di).replace(',','.'));
-  var b=parseFloat(String(df).replace(',','.'));
-  if(isNaN(a)||isNaN(b)||a===0)return null;
-  return Math.abs(b-a);
+  var a=parseFloat(String(di).replace(',','.'));var b=parseFloat(String(df).replace(',','.'));
+  if(isNaN(a)||isNaN(b)||a===0)return null;return Math.abs(b-a);
 }
 
 function render(){
@@ -469,10 +472,10 @@ function render(){
   document.getElementById('app').innerHTML=h;
   document.getElementById('app').style.animation='none';
   void document.getElementById('app').offsetHeight;
-  document.getElementById('app').style.animation='fadeSlideIn 0.2s ease-out';
+  document.getElementById('app').style.animation='fadeSlideIn 0.18s ease-out';
+  renderGlobalTimer();
   if(state.view==='db-terrain')setTimeout(updateDbResults,50);
   if(state.view==='quick-entry')setTimeout(function(){var i=document.getElementById('quick-agent-search');if(i)i.focus();},50);
-  renderGlobalTimer();
 }
 
 function renderHome(){
@@ -631,7 +634,7 @@ function renderPrepaMission(){
   var ac=m.agents.length;
   var pc=countPrelevements(m);
   var h='<button class="back-btn" onclick="state.view=\'prepa-list\';state.currentMissionId=null;render();">'+ICONS.arrowLeft+' Liste</button>';
-  h+='<div class="card"><h2>'+ICONS.clipboard+' '+escapeHtml(m.clientSite||'Nouvelle mission')+'</h2><div class="info-box mt-12"><p><span class="svg-icon">'+ICONS.user+'</span> Préleveur : <strong>'+escapeHtml(m.preleveur||'-')+'</strong></p><p><span class="svg-icon">'+ICONS.tool+'</span> Débitmètre : <strong>'+escapeHtml(m.debitmetre||'-')+'</strong></p>'+(m.tachymetre?'<p><span class="svg-icon">'+ICONS.gauge+'</span> Tachymètre : <strong>'+escapeHtml(m.tachymetre)+'</strong></p>':'')+'</div><button class="btn btn-gray btn-small mt-12" onclick="state.showModal=\'editInfo\';render();">'+ICONS.edit+' Modifier infos</button></div>';
+  h+='<div class="card"><h2>'+ICONS.clipboard+' '+escapeHtml(m.clientSite||'Nouvelle mission')+'</h2><div class="info-box mt-12"><p><span class="svg-icon">'+ICONS.user+'</span> Préleveur : <strong>'+escapeHtml(m.preleveur||'-')+'</strong></p><p><span class="svg-icon">'+ICONS.tool+'</span> Débitmètre : <strong>'+escapeHtml(m.debitmetre||'-')+'</strong></p></div><button class="btn btn-gray btn-small mt-12" onclick="state.showModal=\'editInfo\';render();">'+ICONS.edit+' Modifier infos</button></div>';
   var step1=gc>0;var step2=ac>0;var step3=pc>0;
   h+='<div class="info-box mt-12"><p><strong>Étapes de préparation :</strong></p><p>'+(step1?'<span style="color:var(--accent);display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>':'<span style="opacity:0.3;display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>')+' 1. Définir les GEH ('+(gc||'aucun')+')</p><p>'+(step2?'<span style="color:var(--accent);display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>':'<span style="opacity:0.3;display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>')+' 2. Sélectionner les agents ('+(ac||'aucun')+')</p><p>'+(step3?'<span style="color:var(--accent);display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>':'<span style="opacity:0.3;display:inline-flex;width:14px;height:14px;vertical-align:middle;">'+ICONS.check+'</span>')+' 3. Affecter agents / GEH ('+(pc||'aucun')+' prél.)</p></div>';
   h+='<div class="nav-menu"><div class="nav-item" onclick="state.view=\'prepa-geh\';render();"><div class="nav-icon">'+ICONS.folder+'</div><div class="nav-label">1. GEH</div><div class="nav-count">'+gc+'</div></div><div class="nav-item" onclick="state.view=\'prepa-agents\';state.searchText=\'\';render();"><div class="nav-icon green">'+ICONS.beaker+'</div><div class="nav-label">2. Agents chimiques</div><div class="nav-count">'+ac+'</div></div></div>';
@@ -656,7 +659,7 @@ function renderPrepaMission(){
 }
 
 function renderEditInfoModal(m){
-  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>Infos mission</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div><div class="field"><label class="label">Client / Site *</label><input type="text" class="input" id="edit-clientsite" value="'+escapeHtml(m.clientSite)+'" placeholder="Ex: Entreprise ABC - Usine Nord"></div><div class="field"><label class="label">Préleveur</label><input type="text" class="input" id="edit-preleveur" value="'+escapeHtml(m.preleveur)+'"></div><div class="field"><label class="label">Débitmètre</label><input type="text" inputmode="numeric" class="input" id="edit-debitmetre" value="'+escapeHtml(m.debitmetre)+'" placeholder="N° débitmètre"></div><div class="field"><label class="label">Tachymètre <span style="font-weight:400;color:#94a3b8;font-size:11px;">(CIP)</span></label><input type="text" inputmode="numeric" class="input" id="edit-tachymetre" value="'+escapeHtml(m.tachymetre||'')+'" placeholder="N° tachymètre CIP"></div><div class="row"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-primary" onclick="saveEditInfo();">Enregistrer</button></div></div></div>';
+  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>Infos mission</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div><div class="field"><label class="label">Client / Site *</label><input type="text" class="input" id="edit-clientsite" value="'+escapeHtml(m.clientSite)+'" placeholder="Ex: Entreprise ABC - Usine Nord"></div><div class="field"><label class="label">Préleveur</label><input type="text" class="input" id="edit-preleveur" value="'+escapeHtml(m.preleveur)+'"></div><div class="field"><label class="label">Débitmètre</label><input type="text" inputmode="numeric" class="input" id="edit-debitmetre" value="'+escapeHtml(m.debitmetre)+'"></div><div class="row"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-primary" onclick="saveEditInfo();">Enregistrer</button></div></div></div>';
   return h;
 }
 
@@ -665,11 +668,9 @@ function saveEditInfo(){
   var cs=document.getElementById('edit-clientsite');
   var pr=document.getElementById('edit-preleveur');
   var db=document.getElementById('edit-debitmetre');
-  var tc=document.getElementById('edit-tachymetre');
   if(cs)m.clientSite=cs.value.trim();
   if(pr)m.preleveur=pr.value.trim();
   if(db)m.debitmetre=db.value.trim();
-  if(tc)m.tachymetre=tc.value.trim();
   saveData('vlep_missions_v3',state.missions);
   state.showModal=null;
   render();
@@ -721,14 +722,14 @@ function renderPrepaAutoModal(m){
     h+='<div class="section-title mt-12">Aperçu</div>';
     
     // GEH détectés
-    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;"><span class="svg-icon">'+ICONS.folder+'</span> '+p.gehs.length+' GEH détectés</div>';
+    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">'+'<span class="svg-icon">'+ICONS.folder+'</span> '+p.gehs.length+' GEH détectés</div>';
     p.gehs.forEach(function(g){
       h+='<div style="font-size:12px;color:var(--text-muted);padding:2px 0;">'+g.num+'. '+escapeHtml(g.name)+'</div>';
     });
     h+='</div>';
     
     // Agents et affectations
-    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;"><span class="svg-icon">'+ICONS.beaker+'</span> '+p.agents.length+' agent(s) chimique(s)</div>';
+    h+='<div class="card" style="padding:10px;"><div style="font-weight:700;font-size:13px;margin-bottom:6px;">'+'<span class="svg-icon">'+ICONS.beaker+'</span> '+p.agents.length+' agent(s) chimique(s)</div>';
     p.rows.forEach(function(r){
       var regLabel=r.isReg?'<span style="color:#047857;font-size:10px;font-weight:700;"> REG</span>':'<span style="color:#b45309;font-size:10px;font-weight:700;"> NR</span>';
       h+='<div style="background:#f8fafc;border-radius:6px;padding:8px;margin-bottom:6px;border-left:3px solid var(--primary);">';
@@ -1209,13 +1210,6 @@ function updateSearchResultsOnly(){
   container.innerHTML=h;
 }
 
-function handleSearchClick(event,fnName){
-  var el=event.target;
-  while(el&&el!==event.currentTarget&&!el.dataset.agent){el=el.parentElement;}
-  if(!el||!el.dataset.agent||el.dataset.disabled)return;
-  if(typeof window[fnName]==='function')window[fnName](el.dataset.agent);
-}
-
 function addAgentFromSearch(n){
   var m=getCurrentMission();
   if(!m||m.agents.some(function(a){return a.name===n;}))return;
@@ -1420,7 +1414,7 @@ function renderTerrainMission(){
   var m=getCurrentMission();
   if(!m){state.view='terrain-list';render();return'';}
   var h='<div class="sticky-header"><button class="back-btn" onclick="state.view=\'terrain-list\';state.currentMissionId=null;render();">'+ICONS.arrowLeft+' Liste</button><div style="display:flex;justify-content:space-between;align-items:center;"><div style="color:white;font-weight:700;font-size:14px;">'+escapeHtml(m.clientSite)+'</div><div class="row" style="gap:4px;"><button class="btn btn-gray btn-small btn-icon" onclick="unvalidateMissionFromTerrain();" title="Repasser en prépa" style="background:rgba(255,255,255,0.15);color:white;border:none;">'+ICONS.arrowLeft+'</button><button class="btn btn-danger btn-icon" onclick="deleteMissionTerrain();" style="width:24px;height:24px;">'+ICONS.trash+'</button></div></div></div>';
-  h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' • <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+(m.tachymetre?' • <span class="svg-icon">'+ICONS.gauge+'</span> '+escapeHtml(m.tachymetre):'')+'</p></div>';
+  h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' • <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+'</p></div>';
   // CIP Agent selection
   if(m.agents&&m.agents.length>0){
     var hasCIP=m.cipAgents&&m.cipAgents.length>0;
@@ -1428,8 +1422,8 @@ function renderTerrainMission(){
     if(state.showCIPSection){
       h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
       m.agents.forEach(function(a){
-        var isCIP=isAgentCIP(m,a.name);
-        h+='<button style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid '+(isCIP?'#f59e0b':'#dce8f0')+';background:'+(isCIP?'#fef3c7':'white')+';color:'+(isCIP?'#92400e':'#94a3b8')+';transition:all 0.15s;" onclick="toggleCIPAgent(\''+escapeJs(a.name)+'\');">'+escapeHtml(a.name)+(isCIP?' ✓':'')+'</button>';
+        var ic=isAgentCIP(m,a.name);
+        h+='<button style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid '+(ic?'#f59e0b':'#dce8f0')+';background:'+(ic?'#fef3c7':'white')+';color:'+(ic?'#92400e':'#94a3b8')+';transition:all 0.15s;" onclick="toggleCIPAgent(\''+escapeJs(a.name)+'\');">'+escapeHtml(a.name)+(ic?' \u2713':'')+'</button>';
       });
       h+='</div>';
     }
@@ -1462,7 +1456,7 @@ function renderTerrainMission(){
         var allDone=p.subPrelevements.every(function(s){return s.completed;});
         var mc=p.agents&&p.agents[0]?p.agents[0].color:'#3b82f6';
         var isSelected=state.selectedForFusion.indexOf(p.id)!==-1;
-        var agentNames=p.agents&&p.agents.length>0?p.agents.map(function(a){return escapeHtml(a.name)+(isAgentCIP(m,a.name)?' <span style="font-size:8px;padding:1px 4px;border-radius:3px;background:#fef3c7;color:#92400e;font-weight:700;vertical-align:middle;">CIP</span>':'');}).join(' + '):'Agent inconnu';
+        var agentNames=p.agents&&p.agents.length>0?p.agents.map(function(a){return escapeHtml(a.name);}).join(' + '):'Agent inconnu';
         h+='<div class="prel-item '+(isSelected?'selected':'')+'" style="background:'+lightenColor(mc,0.85)+';">';
         if(state.fusionMode){
           h+='<div class="prel-checkbox '+(isSelected?'checked':'')+'" onclick="toggleFusionSelect('+p.id+');">✓</div>';
@@ -2035,10 +2029,8 @@ function renderSubPrelForm(p,sb,idx){
   var canCopyFromPrevious=idx>0;
   
   var h='<div class="card">';
-  
-  // Raccourci : Copier tout depuis J-1
   if(canCopyFromPrevious){
-    h+='<div style="display:flex;justify-content:flex-end;margin-bottom:6px;"><button class="btn btn-gray btn-small" style="font-size:10px;padding:4px 10px;" onclick="copyAllFromPrevious('+p.id+','+idx+');">'+ICONS.copy+' Copier tout J-1 (opérateur, pompes, réf.)</button></div>';
+    h+='<div style="display:flex;justify-content:flex-end;margin-bottom:6px;"><button class="btn btn-gray btn-small" style="font-size:10px;padding:4px 10px;" onclick="copyAllFromPrevious('+p.id+','+idx+');">'+ICONS.copy+' Copier tout J-1</button></div>';
   }
   
   // Opérateur avec bouton copier J-1
@@ -2063,22 +2055,16 @@ function renderSubPrelForm(p,sb,idx){
       var variation=isCIP?calcDebitVariationCIP(ad.debitInitial,ad.debitFinal):calcDebitVariation(ad.debitInitial,ad.debitFinal);
       var hasWarning=isCIP?(variation!==null&&variation>200):(variation!==null&&variation>5);
       
-      h+='<div class="multi-agent-item" style="'+(isCIP?'border-left:3px solid #f59e0b;':'')+'"><div class="multi-agent-header"><div class="multi-agent-color" style="background:'+(a.color||'#3b82f6')+';"></div><div class="multi-agent-name">'+escapeHtml(aname)+(isCIP?' <span style="font-size:9px;padding:1px 5px;border-radius:4px;background:#fef3c7;color:#92400e;font-weight:700;">CIP</span>':'')+'</div></div><div class="multi-agent-fields">';
+      h+='<div class="multi-agent-item"><div class="multi-agent-header"><div class="multi-agent-color" style="background:'+(a.color||'#3b82f6')+';"></div><div class="multi-agent-name">'+escapeHtml(aname)+'</div></div><div class="multi-agent-fields">';
       
       // N° Pompe avec bouton copier J-1
       h+='<div class="multi-agent-row"><label>N° Pompe';
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
       h+='</label><input type="text" inputmode="numeric" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="'+(isCIP?'tours/min':'L/min')+'" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="'+(isCIP?'tours/min':'L/min')+'" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
-      if(variation!==null){
-        if(isCIP){
-          h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(0)+' t/m</span>';
-        }else{
-          h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';
-        }
-      }
+      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
+      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+      if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
       h+='</div>';
       
       h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';
@@ -2630,14 +2616,14 @@ function createRegSheet(m,prels){
   // Ligne 9 : Matériel de prélèvement
   aoa.push(['Matériel de mesure','']);
   
-  // Lignes 10-11 : pompe + débitmètre/tachymètre
+  // Lignes 10-11 : pompe + débitmètre
   var row10=['n° d\'identification','pompe'];
   var row11=['','Débimetre'];
   for(var i=0;i<prels.length;i++){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
     row10.push(ad&&ad.numPompe?ad.numPompe:'');
     row10.push('');
-    row11.push(isAgentCIP(m,prels[i].agent)?(m.tachymetre||''):(m.debitmetre||''));
+    row11.push(m.debitmetre||'');
     row11.push('');
   }
   aoa.push(row10);
@@ -3013,14 +2999,14 @@ function createNonRegSheet(m,prels){
   }
   aoa.push(row5);
   
-  // Lignes 6-7 : pompe + débitmètre/tachymètre
+  // Lignes 6-7 : pompe + débitmètre
   var row6=['n° d\'identification','pompe'];
   var row7=['','débitmètre'];
   for(var i=0;i<prels.length;i++){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
     row6.push(ad&&ad.numPompe?ad.numPompe:'');
     row6.push('');
-    row7.push(isAgentCIP(m,prels[i].agent)?(m.tachymetre||''):(m.debitmetre||''));
+    row7.push(m.debitmetre||'');
     row7.push('');
   }
   aoa.push(row6);
@@ -3433,7 +3419,7 @@ function createActiviteSheet(m){
   
   // En-tête
   aoa.push(['Relevé d\'activité - '+m.clientSite]);
-  aoa.push(['Préleveur: '+(m.preleveur||''),'','Débitmètre: '+(m.debitmetre||'')+((m.tachymetre)?' / Tachymètre: '+m.tachymetre:'')]);
+  aoa.push(['Préleveur: '+(m.preleveur||''),'','Débitmètre: '+(m.debitmetre||'')]);
   aoa.push([]);
   
   // En-tête tableau
@@ -3794,7 +3780,6 @@ function openQuickEntry(){
     clientSite:'',
     preleveur:'',
     debitmetre:'',
-    tachymetre:'',
     gehs:[{id:generateId(),num:1,name:''}],
     agents:[],
     prelevements:[]
@@ -3814,7 +3799,6 @@ function renderQuickEntry(){
   h+='<div class="field"><label class="label">Client / Site *</label><input type="text" class="input" id="quick-client" value="'+escapeHtml(q.clientSite)+'" placeholder="Ex: Entreprise ABC" onchange="state.quickMission.clientSite=this.value;"></div>';
   h+='<div class="field"><label class="label">Préleveur</label><input type="text" class="input" id="quick-preleveur" value="'+escapeHtml(q.preleveur)+'" placeholder="Votre nom" onchange="state.quickMission.preleveur=this.value;"></div>';
   h+='<div class="field"><label class="label">Débitmètre</label><input type="text" class="input" id="quick-debitmetre" value="'+escapeHtml(q.debitmetre)+'" placeholder="N° débitmètre" onchange="state.quickMission.debitmetre=this.value;"></div>';
-  h+='<div class="field"><label class="label">Tachymètre <span style="font-weight:400;color:#94a3b8;font-size:11px;">(CIP)</span></label><input type="text" class="input" id="quick-tachymetre" value="'+escapeHtml(q.tachymetre||'')+'" placeholder="N° tachymètre CIP" onchange="state.quickMission.tachymetre=this.value;"></div>';
   h+='</div>';
   
   // GEH
@@ -4012,7 +3996,6 @@ function createQuickMission(){
   m.clientSite=q.clientSite;
   m.preleveur=q.preleveur;
   m.debitmetre=q.debitmetre;
-  m.tachymetre=q.tachymetre||'';
   m.gehs=q.gehs.filter(function(g){return g.name;}).map(function(g,i){
     return{id:g.id,num:i+1,name:g.name};
   });
@@ -4251,289 +4234,115 @@ function doImportQR(){
 
 // ===== DICTÉE VOCALE AMÉLIORÉE =====
 var activeDictation=null;
-
 function toggleDictation(prelId,subIdx){
   var SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SpeechRecognition){
-    alert('La dictée vocale n\'est pas supportée par votre navigateur.\n\nUtilisez Chrome sur Android pour cette fonctionnalité.');
-    return;
-  }
-  
+  if(!SpeechRecognition){alert('Dictée non supportée. Utilisez Chrome/Android.');return;}
   var key=prelId+'_'+subIdx;
   var btn=document.getElementById('dict-btn-'+prelId+'-'+subIdx);
-  
   if(activeDictation&&activeDictation.key===key){
-    activeDictation.stopped=true;
-    activeDictation.recognition.stop();
-    activeDictation=null;
-    if(btn)btn.classList.remove('recording');
-    return;
+    activeDictation.stopped=true;activeDictation.recognition.stop();activeDictation=null;
+    if(btn)btn.classList.remove('recording');return;
   }
-  
   if(activeDictation){
-    activeDictation.stopped=true;
-    activeDictation.recognition.stop();
+    activeDictation.stopped=true;activeDictation.recognition.stop();
     var oldBtn=document.getElementById('dict-btn-'+activeDictation.prelId+'-'+activeDictation.subIdx);
     if(oldBtn)oldBtn.classList.remove('recording');
   }
-  
   var recognition=new SpeechRecognition();
-  recognition.lang='fr-FR';
-  recognition.continuous=true;
-  recognition.interimResults=true;
-  recognition.maxAlternatives=1;
-  
+  recognition.lang='fr-FR';recognition.continuous=true;recognition.interimResults=true;recognition.maxAlternatives=1;
   var textarea=document.getElementById('obs-'+prelId+'-'+subIdx);
-  var baseText=textarea?textarea.value:'';
-  var finalTranscript='';
-  
+  var baseText=textarea?textarea.value:'';var finalTranscript='';
   var dictObj={key:key,prelId:prelId,subIdx:subIdx,recognition:recognition,stopped:false};
-  
   recognition.onresult=function(event){
     var interim='';
     for(var i=event.resultIndex;i<event.results.length;i++){
       var t=event.results[i][0].transcript;
-      if(event.results[i].isFinal){
-        // Capitaliser première lettre si début de phrase
-        if(!finalTranscript&&!baseText){t=t.charAt(0).toUpperCase()+t.slice(1);}
-        finalTranscript+=t;
-      }else{
-        interim+=t;
-      }
+      if(event.results[i].isFinal){if(!finalTranscript&&!baseText)t=t.charAt(0).toUpperCase()+t.slice(1);finalTranscript+=t;}
+      else{interim+=t;}
     }
-    if(textarea){
-      var sep=(baseText&&!baseText.match(/\s$/)&&(finalTranscript||interim))?' ':'';
-      textarea.value=baseText+sep+finalTranscript+interim;
-    }
+    if(textarea){var sep=(baseText&&!baseText.match(/\s$/)&&(finalTranscript||interim))?' ':'';textarea.value=baseText+sep+finalTranscript+interim;}
   };
-  
-  recognition.onerror=function(event){
-    if(event.error==='no-speech'||event.error==='aborted')return;
-    console.log('Dictée erreur:',event.error);
-  };
-  
+  recognition.onerror=function(event){if(event.error==='no-speech'||event.error==='aborted')return;console.log('Dictée:',event.error);};
   recognition.onend=function(){
-    // Sauvegarder le texte final
-    if(textarea){
-      baseText=baseText+(baseText&&finalTranscript?' ':'')+finalTranscript;
-      textarea.value=baseText;
-      updateSubFieldWithAutoDate(prelId,subIdx,'observations',textarea.value);
-      finalTranscript='';
-    }
-    // Auto-restart si pas arrêté manuellement
-    if(!dictObj.stopped&&activeDictation&&activeDictation.key===key){
-      try{recognition.start();}catch(e){
-        activeDictation=null;
-        if(btn)btn.classList.remove('recording');
-      }
-    }else{
-      activeDictation=null;
-      if(btn)btn.classList.remove('recording');
-    }
+    if(textarea){baseText=baseText+(baseText&&finalTranscript?' ':'')+finalTranscript;textarea.value=baseText;updateSubFieldWithAutoDate(prelId,subIdx,'observations',textarea.value);finalTranscript='';}
+    if(!dictObj.stopped&&activeDictation&&activeDictation.key===key){try{recognition.start();}catch(e){activeDictation=null;if(btn)btn.classList.remove('recording');}}
+    else{activeDictation=null;if(btn)btn.classList.remove('recording');}
   };
-  
-  recognition.start();
-  activeDictation=dictObj;
-  if(btn)btn.classList.add('recording');
+  recognition.start();activeDictation=dictObj;if(btn)btn.classList.add('recording');
 }
 
 // ===== TIMER GLOBAL FLOTTANT =====
 var globalTimerState={running:false,startTime:0,elapsed:0,interval:null};
-
 function renderGlobalTimer(){
   var existing=document.getElementById('global-timer-overlay');
-  // Toujours afficher sur les vues terrain
-  var terrainViews=['terrain-list','terrain-mission','terrain-prel','conditions','liste-echantillons','quick-entry'];
-  if(terrainViews.indexOf(state.view)===-1&&!globalTimerState.running){
-    if(existing)existing.remove();
-    return;
-  }
-  if(!existing){
-    existing=document.createElement('div');
-    existing.id='global-timer-overlay';
-    existing.className='global-timer';
-    document.body.appendChild(existing);
-  }
-  var elapsed=globalTimerState.elapsed;
-  if(globalTimerState.running)elapsed+=Date.now()-globalTimerState.startTime;
-  var h=Math.floor(elapsed/3600000);
-  var m=Math.floor((elapsed%3600000)/60000);
-  var s=Math.floor((elapsed%60000)/1000);
-  var display=(h>0?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  var tv=['terrain-list','terrain-mission','terrain-prel','conditions','liste-echantillons','quick-entry'];
+  if(tv.indexOf(state.view)===-1&&!globalTimerState.running){if(existing)existing.remove();return;}
+  if(!existing){existing=document.createElement('div');existing.id='global-timer-overlay';existing.className='global-timer';document.body.appendChild(existing);}
+  var el=globalTimerState.elapsed;if(globalTimerState.running)el+=Date.now()-globalTimerState.startTime;
+  var hrs=Math.floor(el/3600000),mins=Math.floor((el%3600000)/60000),secs=Math.floor((el%60000)/1000);
+  var disp=(hrs>0?hrs+':':'')+String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
   existing.className='global-timer'+(globalTimerState.running?' running':'');
-  existing.innerHTML='<span class="timer-display">⏱ '+display+'</span>'+
-    (globalTimerState.running?
-      '<button class="timer-btn stop" onclick="event.stopPropagation();stopGlobalTimer();">⏸</button>':
-      '<button class="timer-btn start" onclick="event.stopPropagation();startGlobalTimer();">▶</button>')+
-    (elapsed>0?'<button class="timer-btn reset" onclick="event.stopPropagation();resetGlobalTimer();">↺</button>':'');
+  existing.innerHTML='<span class="timer-display">\u23F1 '+disp+'</span>'+(globalTimerState.running?'<button class="timer-btn stop" onclick="event.stopPropagation();stopGlobalTimer();">\u23F8</button>':'<button class="timer-btn start" onclick="event.stopPropagation();startGlobalTimer();">\u25B6</button>')+(el>0?'<button class="timer-btn reset" onclick="event.stopPropagation();resetGlobalTimer();">\u21BA</button>':'');
 }
+function startGlobalTimer(){if(globalTimerState.running)return;globalTimerState.running=true;globalTimerState.startTime=Date.now();globalTimerState.interval=setInterval(function(){renderGlobalTimer();},1000);renderGlobalTimer();}
+function stopGlobalTimer(){if(!globalTimerState.running)return;globalTimerState.elapsed+=Date.now()-globalTimerState.startTime;globalTimerState.running=false;if(globalTimerState.interval)clearInterval(globalTimerState.interval);globalTimerState.interval=null;renderGlobalTimer();}
+function resetGlobalTimer(){if(globalTimerState.interval)clearInterval(globalTimerState.interval);globalTimerState={running:false,startTime:0,elapsed:0,interval:null};renderGlobalTimer();}
 
-function startGlobalTimer(){
-  if(globalTimerState.running)return;
-  globalTimerState.running=true;
-  globalTimerState.startTime=Date.now();
-  globalTimerState.interval=setInterval(function(){renderGlobalTimer();},1000);
-  renderGlobalTimer();
-}
-
-function stopGlobalTimer(){
-  if(!globalTimerState.running)return;
-  globalTimerState.elapsed+=Date.now()-globalTimerState.startTime;
-  globalTimerState.running=false;
-  if(globalTimerState.interval)clearInterval(globalTimerState.interval);
-  globalTimerState.interval=null;
-  renderGlobalTimer();
-}
-
-function resetGlobalTimer(){
-  if(globalTimerState.running){
-    if(globalTimerState.interval)clearInterval(globalTimerState.interval);
-  }
-  globalTimerState={running:false,startTime:0,elapsed:0,interval:null};
-  renderGlobalTimer();
-}
-
-// ===== RACCOURCI : DUPLIQUER SOUS-PRÉLÈVEMENT J-1 COMPLET =====
+// ===== RACCOURCI : COPIER TOUT J-1 =====
 function copyAllFromPrevious(prelId,subIdx){
   var m=getCurrentMission();if(!m)return;
   var p=m.prelevements.find(function(x){return x.id===prelId;});
   if(!p||subIdx<1)return;
-  var prev=p.subPrelevements[subIdx-1];
-  var curr=p.subPrelevements[subIdx];
+  var prev=p.subPrelevements[subIdx-1],curr=p.subPrelevements[subIdx];
   if(!prev||!curr)return;
-  // Copier tous les champs communs sauf la date
   curr.operateur=prev.operateur||'';
-  curr.observations=prev.observations||'';
-  // Copier les données agents
-  if(prev.agentData){
-    if(!curr.agentData)curr.agentData={};
-    Object.keys(prev.agentData).forEach(function(agentName){
-      var ad=prev.agentData[agentName];
-      curr.agentData[agentName]={
-        refEchantillon:ad.refEchantillon||'',
-        numPompe:ad.numPompe||'',
-        debitInitial:'',
-        debitFinal:'',
-      };
-    });
+  if(prev.agentData){if(!curr.agentData)curr.agentData={};
+    Object.keys(prev.agentData).forEach(function(an){var ad=prev.agentData[an];curr.agentData[an]={refEchantillon:ad.refEchantillon||'',numPompe:ad.numPompe||'',debitInitial:'',debitFinal:''};});
   }
-  // Copier les plages horaires (structure vide)
-  if(prev.plages&&prev.plages.length>0){
-    curr.plages=prev.plages.map(function(){return{debut:'',fin:''};});
-  }
-  saveData('vlep_missions_v3',state.missions);
-  render();
+  if(prev.plages&&prev.plages.length>0)curr.plages=prev.plages.map(function(){return{debut:'',fin:''};});
+  saveData('vlep_missions_v3',state.missions);render();
 }
 
-// ===== VALIDATION PRÉ-EXPORT EXCEL =====
+// ===== VALIDATION PRÉ-EXPORT =====
 function validateBeforeExport(){
-  var m=getCurrentMission();
-  if(!m){alert('Aucune mission');return;}
-  var issues=[];
-  var warnings=[];
-  var ok=[];
-  
-  // Vérif info mission
-  if(!m.clientSite)issues.push('Nom client/site manquant');
-  else ok.push('Client/site : '+m.clientSite);
-  if(!m.preleveur)warnings.push('Préleveur non renseigné');
-  else ok.push('Préleveur : '+m.preleveur);
-  if(!m.debitmetre)warnings.push('Débitmètre non renseigné');
-  
-  // Vérif prélèvements
-  var totalSubs=0;
-  var missingRef=0;
-  var missingPompe=0;
-  var missingDebit=0;
-  var missingDate=0;
-  var missingPlages=0;
-  var debitWarnings=0;
-  
-  m.prelevements.forEach(function(p){
-    p.subPrelevements.forEach(function(sb,si){
-      totalSubs++;
-      if(!sb.date)missingDate++;
-      if(!sb.plages||sb.plages.length===0)missingPlages++;
-      else{
-        var hasEmpty=sb.plages.some(function(pl){return!pl.debut||!pl.fin;});
-        if(hasEmpty)missingPlages++;
-      }
-      if(p.agents){
-        p.agents.forEach(function(a){
-          var aname=a.name||'';
-          var ad=(sb.agentData&&sb.agentData[aname])||{};
-          if(!ad.refEchantillon)missingRef++;
-          if(!ad.numPompe)missingPompe++;
-          if(!ad.debitInitial||!ad.debitFinal)missingDebit++;
-          else{
-            var isCIP=isAgentCIP(m,aname);
-            var variation=isCIP?calcDebitVariationCIP(ad.debitInitial,ad.debitFinal):calcDebitVariation(ad.debitInitial,ad.debitFinal);
-            if(variation!==null){
-              if(isCIP&&variation>200)debitWarnings++;
-              else if(!isCIP&&variation>5)debitWarnings++;
-            }
-          }
-        });
-      }
-    });
-  });
-  
-  if(totalSubs===0)issues.push('Aucun sous-prélèvement trouvé');
-  else ok.push(totalSubs+' sous-prélèvement(s)');
-  
-  if(missingRef>0)issues.push(missingRef+' réf. échantillon manquante(s)');
-  if(missingPompe>0)warnings.push(missingPompe+' n° pompe manquant(s)');
-  if(missingDebit>0)warnings.push(missingDebit+' débit(s) manquant(s)');
+  var m=getCurrentMission();if(!m){alert('Aucune mission');return;}
+  var issues=[],warnings=[],ok=[];
+  if(!m.clientSite)issues.push('Nom client/site manquant');else ok.push('Client/site : '+m.clientSite);
+  if(!m.preleveur)warnings.push('Pr\u00e9leveur non renseign\u00e9');else ok.push('Pr\u00e9leveur : '+m.preleveur);
+  if(!m.debitmetre)warnings.push('D\u00e9bitm\u00e8tre non renseign\u00e9');
+  var totalSubs=0,missingRef=0,missingPompe=0,missingDebit=0,missingDate=0,missingPlages=0,debitWarn=0;
+  m.prelevements.forEach(function(p){p.subPrelevements.forEach(function(sb){
+    totalSubs++;if(!sb.date)missingDate++;
+    if(!sb.plages||sb.plages.length===0||sb.plages.some(function(pl){return!pl.debut||!pl.fin;}))missingPlages++;
+    if(p.agents){p.agents.forEach(function(a){var ad=(sb.agentData&&sb.agentData[a.name])||{};
+      if(!ad.refEchantillon)missingRef++;if(!ad.numPompe)missingPompe++;
+      if(!ad.debitInitial||!ad.debitFinal)missingDebit++;
+      else{var ic=isAgentCIP(m,a.name);var v=ic?calcDebitVariationCIP(ad.debitInitial,ad.debitFinal):calcDebitVariation(ad.debitInitial,ad.debitFinal);
+        if(v!==null&&((ic&&v>200)||(!ic&&v>5)))debitWarn++;}
+    });}
+  });});
+  if(totalSubs===0)issues.push('Aucun sous-pr\u00e9l\u00e8vement');else ok.push(totalSubs+' sous-pr\u00e9l\u00e8vement(s)');
+  if(missingRef>0)issues.push(missingRef+' r\u00e9f. \u00e9chantillon manquante(s)');
+  if(missingPompe>0)warnings.push(missingPompe+' n\u00b0 pompe manquant(s)');
+  if(missingDebit>0)warnings.push(missingDebit+' d\u00e9bit(s) manquant(s)');
   if(missingDate>0)warnings.push(missingDate+' date(s) manquante(s)');
-  if(missingPlages>0)warnings.push(missingPlages+' plage(s) horaire(s) incomplète(s)');
-  if(debitWarnings>0)issues.push(debitWarnings+' variation(s) de débit hors norme');
-  
-  // Vérif conditions
-  if(!m.conditions||m.conditions.length===0)warnings.push('Aucune condition ambiante renseignée');
+  if(missingPlages>0)warnings.push(missingPlages+' plage(s) horaire(s) incompl\u00e8te(s)');
+  if(debitWarn>0)issues.push(debitWarn+' variation(s) de d\u00e9bit hors norme');
+  if(!m.conditions||m.conditions.length===0)warnings.push('Aucune condition ambiante');
   else ok.push(m.conditions.length+' jour(s) de conditions');
-  
-  // Vérif blancs
-  var blancs=getBlancForAgent?m.prelevements.length:0;
-  
-  // Afficher modal de validation
-  state.validationResult={ok:ok,warnings:warnings,issues:issues};
-  state.showModal='validation';
-  render();
+  state.validationResult={ok:ok,warnings:warnings,issues:issues};state.showModal='validation';render();
 }
-
 function renderValidationModal(){
-  var v=state.validationResult;
-  if(!v)return'';
-  var hasIssues=v.issues.length>0;
-  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>'+ICONS.check+' Validation export</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div>';
-  
-  if(v.ok.length>0){
-    h+='<div style="margin-bottom:8px;">';
-    v.ok.forEach(function(t){h+='<div class="validation-modal-item validation-ok">✓ '+escapeHtml(t)+'</div>';});
-    h+='</div>';
-  }
-  if(v.warnings.length>0){
-    h+='<div style="margin-bottom:8px;">';
-    v.warnings.forEach(function(t){h+='<div class="validation-modal-item validation-warn">⚠ '+escapeHtml(t)+'</div>';});
-    h+='</div>';
-  }
-  if(v.issues.length>0){
-    h+='<div style="margin-bottom:8px;">';
-    v.issues.forEach(function(t){h+='<div class="validation-modal-item validation-err">✗ '+escapeHtml(t)+'</div>';});
-    h+='</div>';
-  }
-  
-  if(hasIssues){
-    h+='<div class="info-box info-box-warning mt-8"><p><strong>Attention :</strong> des données obligatoires sont manquantes. L\'export peut être incomplet.</p></div>';
-  }else if(v.warnings.length>0){
-    h+='<div class="info-box mt-8"><p>Quelques champs optionnels ne sont pas renseignés.</p></div>';
-  }else{
-    h+='<div class="info-box info-box-success mt-8"><p><strong>Tout est bon !</strong> La mission est complète.</p></div>';
-  }
-  
-  h+='<div class="row mt-12"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-'+(hasIssues?'warning':'success')+'" onclick="state.showModal=null;exportExcel();">'+ICONS.download+' Exporter '+(hasIssues?'quand même':'')+'</button></div>';
-  h+='</div></div>';
-  return h;
+  var v=state.validationResult;if(!v)return'';var hasErr=v.issues.length>0;
+  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>'+ICONS.check+' Validation export</h2><button class="close-btn" onclick="state.showModal=null;render();">\u00d7</button></div>';
+  if(v.ok.length>0){h+='<div style="margin-bottom:8px;">';v.ok.forEach(function(t){h+='<div class="validation-item validation-ok">\u2713 '+escapeHtml(t)+'</div>';});h+='</div>';}
+  if(v.warnings.length>0){h+='<div style="margin-bottom:8px;">';v.warnings.forEach(function(t){h+='<div class="validation-item validation-warn">\u26A0 '+escapeHtml(t)+'</div>';});h+='</div>';}
+  if(v.issues.length>0){h+='<div style="margin-bottom:8px;">';v.issues.forEach(function(t){h+='<div class="validation-item validation-err">\u2717 '+escapeHtml(t)+'</div>';});h+='</div>';}
+  if(hasErr)h+='<div class="info-box info-box-warning mt-8"><p><strong>Attention :</strong> des donn\u00e9es sont manquantes.</p></div>';
+  else if(v.warnings.length>0)h+='<div class="info-box mt-8"><p>Quelques champs optionnels manquants.</p></div>';
+  else h+='<div class="info-box info-box-success mt-8"><p><strong>Tout est bon !</strong></p></div>';
+  h+='<div class="row mt-12"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn '+(hasErr?'btn-warning':'btn-success')+'" onclick="state.showModal=null;exportExcel();">'+ICONS.download+' Exporter'+(hasErr?' quand m\u00eame':'')+'</button></div>';
+  return h+'</div></div>';
 }
 
 render();
