@@ -446,11 +446,19 @@ function setupSearchDelegation(){
     var el=document.getElementById(m[0]);
     if(el&&!el._delegated){
       el._delegated=true;
-      el.addEventListener('pointerdown',function(e){
+      // Use mousedown on desktop (fires before blur removes items)
+      el.addEventListener('mousedown',function(e){
         var t=e.target;
         while(t&&t!==el&&!t.dataset.agent){t=t.parentElement;}
         if(t&&t.dataset.agent&&t.dataset.disabled!=='1'){
-          e.preventDefault();
+          e.preventDefault();// prevent input blur
+        }
+      });
+      // Use click for actual selection (works on both mobile and desktop)
+      el.addEventListener('click',function(e){
+        var t=e.target;
+        while(t&&t!==el&&!t.dataset.agent){t=t.parentElement;}
+        if(t&&t.dataset.agent&&t.dataset.disabled!=='1'){
           if(typeof window[m[1]]==='function')window[m[1]](t.dataset.agent);
         }
       });
