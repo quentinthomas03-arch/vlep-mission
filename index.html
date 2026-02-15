@@ -633,7 +633,7 @@ function generatePrelevements(m){
         var p={id:generateId(),gehId:g.id,gehName:g.name,gehNum:g.num,agents:[{name:an,color:c}],type:'8h',isReglementaire:isReg8h,subPrelevements:[]};
         for(var s=0;s<ns;s++){
           var sb={id:generateId(),operateur:'',date:'',plages:[{debut:'',fin:''}],observations:'',completed:false,agentData:{}};
-          sb.agentData[an]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:''};
+          sb.agentData[an]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:'',isCIP:false,debitReference:''};
           p.subPrelevements.push(sb);
         }
         m.prelevements.push(p);
@@ -643,7 +643,7 @@ function generatePrelevements(m){
         var pct={id:generateId(),gehId:g.id,gehName:g.name,gehNum:g.num,agents:[{name:an,color:lightenColor(c,0.4)}],type:'CT',isReglementaire:isRegCT,subPrelevements:[]};
         for(var sCT=0;sCT<nsCT;sCT++){
           var sbCT={id:generateId(),operateur:'',date:'',plages:[{debut:'',fin:''}],observations:'',completed:false,agentData:{}};
-          sbCT.agentData[an]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:''};
+          sbCT.agentData[an]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:'',isCIP:false,debitReference:''};
           pct.subPrelevements.push(sbCT);
         }
         m.prelevements.push(pct);
@@ -1737,7 +1737,7 @@ function addPrelTerrain(){
   for(var i=0;i<subCount;i++){
     var sub={id:generateId(),operateur:'',date:'',plages:[{debut:'',fin:''}],observations:'',completed:false,agentData:{}};
     d.agents.forEach(function(a){
-      sub.agentData[a.name]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:''};
+      sub.agentData[a.name]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:'',isCIP:false,debitReference:''};
     });
     newPrel.subPrelevements.push(sub);
   }
@@ -2083,11 +2083,13 @@ function renderSubPrelForm(p,sb,idx){
     p.agents.forEach(function(a){
       if(!sb.agentData)sb.agentData={};
       var aname=a.name||'Agent inconnu';
-      if(!sb.agentData[aname])sb.agentData[aname]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:''};
+      if(!sb.agentData[aname])sb.agentData[aname]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:'',isCIP:false,debitReference:''};
       var ad=sb.agentData[aname];
       var isCIP=isAgentCIP(m,aname);
+      ad.isCIP=isCIP; // Synchroniser isCIP
       var variation=isCIP?calcDebitVariationCIP(ad.debitInitial,ad.debitFinal):calcDebitVariation(ad.debitInitial,ad.debitFinal);
       var hasWarning=isCIP?(variation!==null&&variation>200):(variation!==null&&variation>5);
+      var unitLabel=isCIP?'tr/min':'L/min';
       
       h+='<div class="multi-agent-item"><div class="multi-agent-header"><div class="multi-agent-color" style="background:'+(a.color||'#3b82f6')+';"></div><div class="multi-agent-name">'+escapeHtml(aname)+'</div></div><div class="multi-agent-fields">';
       
@@ -2096,10 +2098,16 @@ function renderSubPrelForm(p,sb,idx){
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
       h+='</label><input type="text" inputmode="numeric" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
-      if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
+      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="'+unitLabel+'" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
+      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="'+unitLabel+'" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+      if(isCIP&&variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(0)+' tr/min</span>';}
+      else if(!isCIP&&variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
       h+='</div>';
+      
+      // Champ débit de référence pour CIP
+      if(isCIP){
+        h+='<div class="multi-agent-row"><label>Débit de référence (tr/min)</label><input type="text" inputmode="decimal" value="'+escapeHtml(ad.debitReference||'')+'" placeholder="Ex: 2000" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitReference\',this.value);"></div>';
+      }
       
       h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';
       h+='</div></div>';
@@ -2196,6 +2204,23 @@ function updateAgentDataWithAutoDate(pid,idx,an,f,v){
     if(!p.subPrelevements[idx].agentData)p.subPrelevements[idx].agentData={};
     if(!p.subPrelevements[idx].agentData[an])p.subPrelevements[idx].agentData[an]={};
     p.subPrelevements[idx].agentData[an][f]=v;
+    
+    // Alerte CIP si débit final et écart > ±200 tr/min
+    if(f==='debitFinal'){
+      var ad=p.subPrelevements[idx].agentData[an];
+      var isCIP=isAgentCIP(m,an);
+      if(isCIP&&ad.debitReference&&ad.debitFinal){
+        var ref=parseFloat(String(ad.debitReference).replace(',','.'));
+        var fin=parseFloat(String(ad.debitFinal).replace(',','.'));
+        if(!isNaN(ref)&&!isNaN(fin)){
+          var ecart=Math.abs(fin-ref);
+          if(ecart>200){
+            alert('⚠️ Écart de '+ecart.toFixed(0)+' tr/min (> ±200 tr/min par rapport au débit de référence)');
+          }
+        }
+      }
+    }
+    
     autoFillDate(p,idx);
     saveData('vlep_missions_v3',state.missions);
   }
@@ -2657,7 +2682,9 @@ function createRegSheet(m,prels){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
     row10.push(ad&&ad.numPompe?ad.numPompe:'');
     row10.push('');
-    row11.push(m.debitmetre||'');
+    var isCIP=ad&&ad.isCIP;
+    var debitmetreLabel=isCIP?'Débitmètre / Tachymètre':(m.debitmetre||'');
+    row11.push(debitmetreLabel);
     row11.push('');
   }
   aoa.push(row10);
@@ -3040,7 +3067,9 @@ function createNonRegSheet(m,prels){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
     row6.push(ad&&ad.numPompe?ad.numPompe:'');
     row6.push('');
-    row7.push(m.debitmetre||'');
+    var isCIP=ad&&ad.isCIP;
+    var debitmetreLabel=isCIP?'Débitmètre / Tachymètre':(m.debitmetre||'');
+    row7.push(debitmetreLabel);
     row7.push('');
   }
   aoa.push(row6);
@@ -4309,8 +4338,16 @@ function toggleDictation(prelId,subIdx){
 var globalTimerState={running:false,startTime:0,elapsed:0,interval:null};
 function renderGlobalTimer(){
   var existing=document.getElementById('global-timer-overlay');
-  var tv=['terrain-list','terrain-mission','terrain-prel','conditions','liste-echantillons','quick-entry'];
-  if(tv.indexOf(state.view)===-1&&!globalTimerState.running){if(existing)existing.remove();return;}
+  // N'afficher le chrono QUE dans les vues CT
+  var showTimer=false;
+  if(state.view==='terrain-prel'&&state.currentPrelId){
+    var m=getCurrentMission();
+    if(m){
+      var p=m.prelevements.find(function(x){return x.id===state.currentPrelId;});
+      if(p&&p.type==='CT')showTimer=true;
+    }
+  }
+  if(!showTimer&&!globalTimerState.running){if(existing)existing.remove();return;}
   if(!existing){existing=document.createElement('div');existing.id='global-timer-overlay';existing.className='global-timer';document.body.appendChild(existing);}
   var el=globalTimerState.elapsed;if(globalTimerState.running)el+=Date.now()-globalTimerState.startTime;
   var hrs=Math.floor(el/3600000),mins=Math.floor((el%3600000)/60000),secs=Math.floor((el%60000)/1000);
@@ -4331,7 +4368,7 @@ function copyAllFromPrevious(prelId,subIdx){
   if(!prev||!curr)return;
   curr.operateur=prev.operateur||'';
   if(prev.agentData){if(!curr.agentData)curr.agentData={};
-    Object.keys(prev.agentData).forEach(function(an){var ad=prev.agentData[an];curr.agentData[an]={refEchantillon:ad.refEchantillon||'',numPompe:ad.numPompe||'',debitInitial:'',debitFinal:''};});
+    Object.keys(prev.agentData).forEach(function(an){var ad=prev.agentData[an];curr.agentData[an]={refEchantillon:ad.refEchantillon||'',numPompe:ad.numPompe||'',debitInitial:'',debitFinal:'',isCIP:ad.isCIP||false,debitReference:ad.debitReference||''};});
   }
   if(prev.plages&&prev.plages.length>0)curr.plages=prev.plages.map(function(){return{debut:'',fin:''};});
   saveData('vlep_missions_v3',state.missions);render();
