@@ -1,88 +1,117 @@
 import { ICONS } from './icons.js';
 import { state, AGENT_COLORS, DEFAULT_GEH_COUNT } from './state.js';
 import { BUILTIN_DB } from './database.js';
-import { escapeHtml, generateId, saveData } from './utils.js';
+import { generateId, saveData } from './utils.js';
 
 // --- INITIALISATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Démarrage de VLEP Mission...");
-    initApp();
-    
-    // Cache le splash screen après 1.5s
-    setTimeout(() => {
-        const splash = document.getElementById('splash');
-        if(splash) splash.style.display = 'none';
-    }, 1500);
+    const saved = localStorage.getItem('vlep_missions_v3');
+    if (saved) state.missions = JSON.parse(saved);
+
+    const splash = document.getElementById('splash');
+    if (splash) splash.style.display = 'none';
+
+    renderHome();
 });
 
-function initApp() {
-    const app = document.getElementById('app');
-    if (!app) return;
-    renderHome();
+// --- LOGIQUE DE FUSION (LE COEUR DU SYSTEME) ---
+function findCompatiblePrelevement(geh, newAgent) {
+    // On cherche si un prélèvement existant a le même Support et Prétraitement
+    return geh.prelevements.find(p => {
+        const firstAgent = p.agents[0];
+        return firstAgent && 
+               firstAgent["Code support"] === newAgent["Code support"] &&
+               firstAgent["Code prétraitement"] === newAgent["Code prétraitement"];
+    });
 }
 
-// --- NAVIGATION / RENDU ---
+// --- RENDU ACCUEIL ---
 function renderHome() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <header class="app-header">
+        <div class="container">
             <h1>VLEP Mission</h1>
-            <div class="version">v3.8 - © Quentin THOMAS</div>
-        </header>
-        <main class="container">
-            <div class="card">
-                <h2>Nouvelle Mission</h2>
-                <p>Commencez par créer une mission ou reprenez un projet existant.</p>
-                <button id="btnNewMission" class="btn btn-primary">Créer une Mission</button>
+            <button id="btnNew" class="btn btn-primary">Nouvelle Mission</button>
+            <div class="mission-list">
+                ${state.missions.map(m => `
+                    <div class="card" onclick="window.viewMission('${m.id}')">
+                        <h3>${m.entreprise}</h3>
+                        <p>${m.gehs.length} GEH(s)</p>
+                    </div>
+                `).join('')}
             </div>
-            
-            <div class="mission-list" id="missionList">
-                </div>
-        </main>
+        </div>
     `;
-    
-    document.getElementById('btnNewMission').onclick = () => createNewMission();
-}
-
-function createNewMission() {
-    const id = generateId();
-    const newMission = {
-        id: id,
-        date: new Date().toLocaleDateString(),
-        entreprise: "Nouvelle Entreprise",
-        gehs: []
+    document.getElementById('btnNew').onclick = () => {
+        const name = prompt("Nom de l'entreprise ?") || "Nouvelle Entreprise";
+        const mission = { id: generateId(), entreprise: name, gehs: [] };
+        state.missions.push(mission);
+        saveData(state.missions);
+        renderHome();
     };
-    state.missions.push(newMission);
-    saveData(state.missions);
-    renderMissionDetail(id);
 }
 
-// --- LOGIQUE DE FUSION (STRUCTURE) ---
-// Cette fonction sera appelée par Claude pour ajouter tes agents
-function addAgentToPrelevement(missionId, gehId, prelevementId, agentData) {
-    const mission = state.missions.find(m => m.id === missionId);
-    // Ici on ajoutera la logique : 
-    // SI (support == existant && debit == existant) -> push dans le tableau agents
-    console.log("Tentative d'ajout d'agent:", agentData["Agent chimique"]);
-}
-
-function renderMissionDetail(id) {
+// --- VUE DÉTAILLÉE DU GEH (AVEC FUSION) ---
+window.viewMission = (id) => {
     const mission = state.missions.find(m => m.id === id);
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="header-action">
-            <button onclick="location.reload()" class="btn-back">← Retour</button>
-            <h2>${mission.entreprise}</h2>
-        </div>
         <div class="container">
-            <div class="card">
-                <h3>Saisie Terrain / Préparation</h3>
-                <p>Ici s'affichera la liste de vos GEH et vos prélèvements.</p>
-                <div id="gehContainer"></div>
-                <button class="btn btn-secondary" id="btnAddGeh">+ Ajouter un GEH</button>
+            <button onclick="location.reload()">← Retour</button>
+            <h2>${mission.entreprise}</h2>
+            <div id="geh-area">
+                ${mission.gehs.map(geh => `
+                    <div class="geh-card">
+                        <h4>${geh.nom}</h4>
+                        <div class="prelev-list">
+                            ${geh.prelevements.map(p => `
+                                <div class="prelev-item">
+                                    <strong>Support: ${p.agents[0]["Support de prélèvement"]}</strong>
+                                    <ul>${p.agents.map(a => `<li>${a["Agent chimique"]}</li>`).join('')}</ul>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="window.showAgentSelector('${mission.id}', '${geh.id}')">Ajouter un Agent</button>
+                    </div>
+                `).join('')}
             </div>
+            <button class="btn" onclick="window.addGEH('${mission.id}')">+ Ajouter un GEH</button>
         </div>
     `;
-}
+};
 
-console.log("Système prêt.");
+// --- LE SÉLECTEUR D'AGENT AVEC FUSION AUTO ---
+window.showAgentSelector = (mId, gId) => {
+    const agentName = prompt("Nom de l'agent (ex: Zinc) ?");
+    const agentData = BUILTIN_DB.find(a => a["Agent chimique"].includes(agentName));
+    
+    if (!agentData) return alert("Agent non trouvé");
+
+    const mission = state.missions.find(m => m.id === mId);
+    const geh = mission.gehs.find(g => g.id === gId);
+
+    // TENTATIVE DE FUSION
+    const existingPrelev = findCompatiblePrelevement(geh, agentData);
+
+    if (existingPrelev) {
+        alert("Fusion automatique : cet agent sera prélevé sur le même support !");
+        existingPrelev.agents.push(agentData);
+    } else {
+        // Nouveau prélèvement (pas de compatibilité trouvée)
+        geh.prelevements.push({
+            id: generateId(),
+            agents: [agentData],
+            pompe: ""
+        });
+    }
+
+    saveData(state.missions);
+    window.viewMission(mId);
+};
+
+window.addGEH = (mId) => {
+    const mission = state.missions.find(m => m.id === mId);
+    mission.gehs.push({ id: generateId(), nom: "GEH " + (mission.gehs.length + 1), prelevements: [] });
+    saveData(state.missions);
+    window.viewMission(mId);
+};
