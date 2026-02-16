@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Diagnostic iOS">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon192.png">
+  <title>Diagnostic iOS PWA</title>
+  <style>
+    body{font-family:sans-serif;padding:20px;background:#000;color:#0f0;}
+    .ok{color:#0f0;} .error{color:#f00;} .warn{color:#fa0;}
+    pre{background:#111;padding:10px;border-radius:4px;overflow-x:auto;font-size:12px;}
+    h2{border-bottom:2px solid #0f0;padding-bottom:5px;margin-top:20px;}
+  </style>
+</head>
+<body>
+  <h1>🔍 Diagnostic iOS PWA</h1>
+  <div id="output"></div>
+
+  <script>
+    var output = document.getElementById('output');
+    var logs = [];
+
+    function log(msg, type){
+      type = type || 'ok';
+      logs.push({msg:msg, type:type});
+      render();
+    }
+
+    function render(){
+      var h = '';
+      logs.forEach(function(l){
+        h += '<div class="'+l.type+'">'+l.msg+'</div>';
+      });
+      output.innerHTML = h;
+    }
+
+    // === 1. Détection mode standalone ===
+    log('<h2>1️⃣ Mode Standalone</h2>');
+    var isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    if(isStandalone){
+      log('✅ App lancée en mode STANDALONE (depuis écran d\'accueil)', 'ok');
+    }else{
+      log('⚠️  App lancée dans le NAVIGATEUR (pas depuis écran d\'accueil)', 'warn');
+    }
+
+    // === 2. Service Worker ===
+    log('<h2>2️⃣ Service Worker</h2>');
+    if('serviceWorker' in navigator){
+      log('✅ Service Worker API disponible', 'ok');
+      
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        if(regs.length > 0){
+          log('✅ Service Worker enregistré: ' + regs.length + ' registration(s)', 'ok');
+          regs.forEach(function(reg, i){
+            log('  - SW #' + (i+1) + ': scope=' + reg.scope + ', state=' + (reg.active ? reg.active.state : 'N/A'));
+          });
+        }else{
+          log('❌ Aucun Service Worker enregistré', 'error');
+        }
+      }).catch(function(e){
+        log('❌ Erreur lecture SW: ' + e.message, 'error');
+      });
+    }else{
+      log('❌ Service Worker API non disponible', 'error');
+    }
+
+    // === 3. LocalStorage ===
+    log('<h2>3️⃣ LocalStorage</h2>');
+    try{
+      localStorage.setItem('test', '123');
+      var val = localStorage.getItem('test');
+      if(val === '123'){
+        log('✅ LocalStorage fonctionne', 'ok');
+        localStorage.removeItem('test');
+      }else{
+        log('❌ LocalStorage retourne une valeur incorrecte', 'error');
+      }
+    }catch(e){
+      log('❌ LocalStorage bloqué: ' + e.message, 'error');
+    }
+
+    // === 4. URLs et chemins ===
+    log('<h2>4️⃣ URLs et Chemins</h2>');
+    log('URL actuelle: <code>' + window.location.href + '</code>');
+    log('Origin: <code>' + window.location.origin + '</code>');
+    log('Pathname: <code>' + window.location.pathname + '</code>');
+
+    // === 5. Manifest ===
+    log('<h2>5️⃣ Manifest</h2>');
+    fetch('manifest.json')
+      .then(function(r){return r.json();})
+      .then(function(manifest){
+        log('✅ Manifest chargé:', 'ok');
+        log('<pre>' + JSON.stringify(manifest, null, 2) + '</pre>');
+      })
+      .catch(function(e){
+        log('❌ Erreur chargement manifest: ' + e.message, 'error');
+      });
+
+    // === 6. Console Errors ===
+    log('<h2>6️⃣ Erreurs Console</h2>');
+    var errors = [];
+    window.addEventListener('error', function(e){
+      errors.push(e.message);
+      log('❌ Erreur JS: ' + e.message, 'error');
+    });
+
+    window.addEventListener('unhandledrejection', function(e){
+      log('❌ Promise rejetée: ' + e.reason, 'error');
+    });
+
+    // === 7. Infos navigateur ===
+    log('<h2>7️⃣ Navigateur</h2>');
+    log('User Agent: <code style="font-size:10px;">' + navigator.userAgent + '</code>');
+    log('Langue: ' + navigator.language);
+    log('Online: ' + (navigator.onLine ? 'Oui' : 'Non'));
+
+    // === 8. Ressources ===
+    log('<h2>8️⃣ Test Chargement Ressources</h2>');
+    var resources = ['main.css', 'app.js', 'state.js', 'icon192.png'];
+    resources.forEach(function(res){
+      fetch(res, {method: 'HEAD'})
+        .then(function(r){
+          if(r.ok){
+            log('✅ ' + res + ' (HTTP ' + r.status + ')', 'ok');
+          }else{
+            log('❌ ' + res + ' (HTTP ' + r.status + ')', 'error');
+          }
+        })
+        .catch(function(e){
+          log('❌ ' + res + ' - Échec: ' + e.message, 'error');
+        });
+    });
+
+    setTimeout(function(){
+      log('<h2>✅ Diagnostic terminé</h2>');
+      log('Si tout est vert sauf "mode standalone", ajoute l\'app à l\'écran d\'accueil et relance.');
+    }, 2000);
+  </script>
+</body>
+</html>
