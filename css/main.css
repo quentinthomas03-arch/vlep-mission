@@ -1,7 +1,7 @@
 /* 
      * VLEP Mission v3.8
-     * © 2025 Quentin THOMAS - Tous droits réservés
-     * Propriété exclusive - Reproduction interdite
+     * Â© 2025 Quentin THOMAS - Tous droits rÃ©servÃ©s
+     * PropriÃ©tÃ© exclusive - Reproduction interdite
      */
     /* === VLEP Mission v3.8 - Design Socotec Blue Refined === */
     :root {
@@ -241,10 +241,48 @@
     .field-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .field-header .label { margin-bottom: 0; }
     /* SVG Icons inline helper */
+    /* RÈGLE GLOBALE POUR TOUS LES SVG - Évite les icônes disproportionnées */
+    svg {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    
+    /* Tailles spécifiques selon contexte */
     .svg-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; vertical-align: middle; }
     .svg-icon svg { width: 14px; height: 14px; }
-    h1>svg,h2>svg,.btn>svg,.section-title>svg,.modal-header h2>svg,label>svg,.back-btn>svg,p>svg,strong>svg,.info-box svg,.condition-label>svg,.copy-btn>svg,.dictation-btn>svg,.prel-arrow>svg{width:16px;height:16px;display:inline-block;vertical-align:middle}
-    h1>svg{width:20px;height:20px}
+    
+    /* Icônes dans les titres */
+    h1 svg { width: 20px; height: 20px; }
+    h2 svg { width: 18px; height: 18px; }
+    
+    /* Icônes dans les boutons */
+    .btn svg { width: 15px; height: 15px; }
+    .btn-icon svg { width: 14px; height: 14px; }
+    
+    /* Icônes dans les éléments de navigation */
+    .nav-icon svg { width: 18px; height: 18px; }
+    .back-btn svg { width: 16px; height: 16px; }
+    
+    /* Icônes dans les accordéons */
+    .accordion-icon svg { width: 16px; height: 16px; }
+    
+    /* Icônes dans les labels */
+    .label svg { width: 14px; height: 14px; }
+    
+    /* Icônes dans les états vides */
+    .empty-state-icon svg { width: 40px; height: 40px; }
+    
+    /* Petites icônes */
+    .copy-btn svg { width: 10px; height: 10px; }
+    .agent-delete svg { width: 14px; height: 14px; }
+    .prel-status svg { width: 13px; height: 13px; }
+    .prel-arrow svg { width: 16px; height: 16px; }
+    .dictation-btn svg { width: 16px; height: 16px; }
+    .search-icon svg { width: 17px; height: 17px; }
+    .close-btn svg { width: 16px; height: 16px; }
     @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     #app{animation:fadeSlideIn .18s ease-out}
     .btn-warning{background:#f59e0b;color:white}
@@ -257,6 +295,140 @@
     .global-timer .timer-btn.reset{background:rgba(255,255,255,.2);color:white}
     .validation-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
     .validation-ok{color:#059669}.validation-warn{color:#d97706}.validation-err{color:#ef4444}
+
+    /* === AUTO-SAVE INDICATOR === */
+    .auto-save-indicator {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 998;
+      background: white;
+      border-radius: 8px;
+      padding: 8px 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .auto-save-indicator.saving {
+      background: #fef3c7;
+      color: #92400e;
+      animation: pulse-save 1s infinite;
+    }
+
+    .auto-save-indicator.pending {
+      background: #fed7aa;
+      color: #c2410c;
+    }
+
+    .auto-save-indicator.saved {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .auto-save-indicator.ready {
+      background: #e0f2fe;
+      color: #0c4a6e;
+    }
+
+    .auto-save-indicator:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    @keyframes pulse-save {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .save-toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      background: #065f46;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: slide-up 0.3s ease-out;
+    }
+
+    .save-toast.error {
+      background: #dc2626;
+    }
+
+    .save-toast.fade-out {
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px);
+      transition: all 0.3s;
+    }
+
+    @keyframes slide-up {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    /* === DRAG & DROP === */
+    .prel-item.drag-over {
+      border-top: 3px solid var(--primary);
+      margin-top: 2px;
+    }
+
+    .prel-item[draggable="true"] {
+      cursor: move;
+    }
+
+    .prel-item[draggable="true"]:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* === OFFLINE INDICATOR === */
+    .offline-indicator {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      background: #dc2626;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      display: none;
+    }
+    
+    .offline-indicator.show {
+      display: block;
+      animation: slide-down 0.3s ease-out;
+    }
+    
+    @keyframes slide-down {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
 
     /* === SPLASH SCREEN === */
     .splash { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(145deg, #c8cdd5 0%, #a8aeb8 30%, #8b929e 60%, #c0c5ce 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease, transform 0.5s ease; }

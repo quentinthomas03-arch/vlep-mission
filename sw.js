@@ -1,69 +1,67 @@
-// Service Worker VLEP Mission v3.6
+// sw.js - Service Worker
 // © 2025 Quentin THOMAS
 
-const CACHE_NAME = 'vlep-mission-v3.9.0';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+const CACHE_NAME = 'vlep-mission-v3.8-cache';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/css/main.css',
+  '/js/state.js',
+  '/js/icons.js',
+  '/js/utils.js',
+  '/js/database.js',
+  '/js/terrain.js',
+  '/js/app.js',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
-// Installation : mise en cache des fichiers
-self.addEventListener('install', event => {
+// Installation
+self.addEventListener('install', function(event) {
+  console.log('[SW] Installation...');
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('[SW] Cache ouvert, mise en cache des assets...');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('[SW] Mise en cache des fichiers');
+        return cache.addAll(urlsToCache);
+      })
+      .catch(function(err){
+        console.log('[SW] Erreur mise en cache:', err);
+      })
   );
-  // Force le nouveau SW à prendre le contrôle immédiatement
-  self.skipWaiting();
 });
 
-// Activation : nettoyage des anciens caches
-self.addEventListener('activate', event => {
+// Activation
+self.addEventListener('activate', function(event) {
+  console.log('[SW] Activation...');
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then(function(cacheNames) {
       return Promise.all(
-        cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => {
-            console.log('[SW] Suppression ancien cache:', name);
-            return caches.delete(name);
-          })
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            console.log('[SW] Suppression ancien cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
       );
     })
   );
-  // Prend le contrôle de toutes les pages immédiatement
-  self.clients.claim();
 });
 
-// Stratégie : Network First (essaie le réseau, sinon cache)
-// Permet de toujours avoir la dernière version quand on est en ligne
-self.addEventListener('fetch', event => {
+// Fetch - Stratégie Cache First
+self.addEventListener('fetch', function(event) {
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Si la réponse réseau est OK, on met à jour le cache
-        if (response && response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
+    caches.match(event.request)
+      .then(function(response) {
+        // Retourner le cache si disponible
+        if (response) {
+          return response;
         }
-        return response;
-      })
-      .catch(() => {
-        // Pas de réseau → on sert depuis le cache
-        return caches.match(event.request);
+        // Sinon, faire la requête réseau
+        return fetch(event.request);
       })
   );
 });
 
-// Écoute les messages pour forcer la mise à jour
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
+console.log('[SW] Service Worker chargé');
