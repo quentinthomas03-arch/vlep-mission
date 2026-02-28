@@ -1,44 +1,9 @@
-<!DOCTYPE html>
-<!--
-═══════════════════════════════════════════════════════════════════════════════
-  VLEP Mission
-  © 2025 Quentin THOMAS - Tous droits réservés
-  
-  CONFIDENTIEL - USAGE STRICTEMENT INTERNE
-  
-  Ce logiciel et son code source sont la propriété exclusive de Quentin THOMAS.
-  Toute reproduction, distribution, modification ou utilisation non autorisée
-  est strictement interdite sans l'accord écrit préalable de l'auteur.
-  
-  Auteur : Quentin THOMAS
-  Création : 2025
-═══════════════════════════════════════════════════════════════════════════════
--->
-<html lang="fr">
-<head>
-   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="VLEP Mission">
-  <meta name="theme-color" content="#2d3039">
-  <meta name="author" content="Quentin THOMAS">
-  <meta name="copyright" content="© 2025 Quentin THOMAS - Tous droits réservés">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
-  <link rel="shortcut icon" href="favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="manifest" href="manifest.json">
-  
-  <title>VLEP Mission  - © Quentin THOMAS</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <style>
-    /* 
-     * VLEP Mission 
-     * © 2025 Quentin THOMAS - Tous droits réservés
-     * Propriété exclusive - Reproduction interdite
+/* 
+     * VLEP Mission v3.8
+     * Ã‚Â© 2025 Quentin THOMAS - Tous droits rÃƒÂ©servÃƒÂ©s
+     * PropriÃƒÂ©tÃƒÂ© exclusive - Reproduction interdite
      */
-    /* === VLEP Mission - Design Socotec Blue Refined === */
+    /* === VLEP Mission v3.8 - Design Socotec Blue Refined === */
     :root {
       --primary: #0066b3;
       --primary-dark: #004d87;
@@ -71,9 +36,6 @@
     h2 { font-size: 15px; color: var(--primary); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
     h2 svg { width: 18px; height: 18px; flex-shrink: 0; }
     .subtitle { color: var(--text-muted); font-size: 12px; }
-    .icon { width: 20px; height: 20px; flex-shrink: 0; }
-    .icon-sm { width: 16px; height: 16px; }
-    .icon-lg { width: 24px; height: 24px; }
     .btn { padding: 11px 16px; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; transition: all 0.25s cubic-bezier(0.4,0,0.2,1); display: flex; align-items: center; justify-content: center; gap: 7px; }
     .btn svg { width: 15px; height: 15px; }
     .btn:active { transform: scale(0.97); }
@@ -202,6 +164,13 @@
     .prel-arrow svg { width: 16px; height: 16px; }
     .prel-reg-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 8px; background: #d1fae5; color: #047857; }
     .prel-nonreg-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 8px; background: #fef3c7; color: #b45309; }
+    .coprel-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 8px; background: #dbeafe; color: #1d4ed8; margin-left: 4px; }
+    .coprel-group { border-left: 3px solid #3b82f6 !important; }
+    .coprel-header { background: linear-gradient(90deg, #dbeafe, #eff6ff); border-radius: 6px 6px 0 0; padding: 6px 8px; }
+    .btn-blue-outline { background: transparent; color: #1d4ed8; border: 2px solid #3b82f6; }
+    .btn-blue-outline:active { background: #dbeafe; }
+    .info-box-blue { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-left-color: #3b82f6; color: #1e40af; }
+    .prel-coprel-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 8px; background: #dbeafe; color: #1d4ed8; margin-left: 2px; }
     .prel-checkbox { width: 22px; height: 22px; border: 1.5px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: white; flex-shrink: 0; }
     .prel-checkbox svg { width: 13px; height: 13px; opacity: 0; }
     .prel-checkbox.checked { background: var(--warning); border-color: var(--warning); }
@@ -279,16 +248,193 @@
     .field-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .field-header .label { margin-bottom: 0; }
     /* SVG Icons inline helper */
+    /* RÃˆGLE GLOBALE POUR TOUS LES SVG - Ã‰vite les icÃ´nes disproportionnÃ©es */
+    svg {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    
+    /* Tailles spÃ©cifiques selon contexte */
     .svg-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; vertical-align: middle; }
     .svg-icon svg { width: 14px; height: 14px; }
+    
+    /* IcÃ´nes dans les titres */
+    h1 svg { width: 20px; height: 20px; }
+    h2 svg { width: 18px; height: 18px; }
+    
+    /* IcÃ´nes dans les boutons */
+    .btn svg { width: 15px; height: 15px; }
+    .btn-icon svg { width: 14px; height: 14px; }
+    
+    /* IcÃ´nes dans les Ã©lÃ©ments de navigation */
+    .nav-icon svg { width: 18px; height: 18px; }
+    .back-btn svg { width: 16px; height: 16px; }
+    
+    /* IcÃ´nes dans les accordÃ©ons */
+    .accordion-icon svg { width: 16px; height: 16px; }
+    
+    /* IcÃ´nes dans les labels */
+    .label svg { width: 14px; height: 14px; }
+    
+    /* IcÃ´nes dans les Ã©tats vides */
+    .empty-state-icon svg { width: 40px; height: 40px; }
+    
+    /* Petites icÃ´nes */
+    .copy-btn svg { width: 10px; height: 10px; }
+    .agent-delete svg { width: 14px; height: 14px; }
+    .prel-status svg { width: 13px; height: 13px; }
+    .prel-arrow svg { width: 16px; height: 16px; }
+    .dictation-btn svg { width: 16px; height: 16px; }
+    .search-icon svg { width: 17px; height: 17px; }
+    .close-btn svg { width: 16px; height: 16px; }
+    @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    #app{animation:fadeSlideIn .18s ease-out}
+    .btn-warning{background:#f59e0b;color:white}
+    .global-timer{position:fixed;bottom:16px;right:16px;z-index:999;background:linear-gradient(135deg,#2d3039,#484c56);color:white;border-radius:16px;padding:8px 14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;user-select:none}
+    .global-timer.running{background:linear-gradient(135deg,#047857,#059669)}
+    .global-timer .timer-display{font-size:16px;letter-spacing:.5px}
+    .global-timer .timer-btn{width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+    .global-timer .timer-btn.start{background:#00b38a;color:white}
+    .global-timer .timer-btn.stop{background:#ef4444;color:white}
+    .global-timer .timer-btn.reset{background:rgba(255,255,255,.2);color:white}
+    .validation-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
+    .validation-ok{color:#059669}.validation-warn{color:#d97706}.validation-err{color:#ef4444}
 
-   /* === HEADER STICKY === */
-.back-btn {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: linear-gradient(180deg, var(--metal-dark) 0%, var(--metal-mid) 100%);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    /* === AUTO-SAVE INDICATOR === */
+    .auto-save-indicator {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 998;
+      background: white;
+      border-radius: 8px;
+      padding: 8px 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .auto-save-indicator.saving {
+      background: #fef3c7;
+      color: #92400e;
+      animation: pulse-save 1s infinite;
+    }
+
+    .auto-save-indicator.pending {
+      background: #fed7aa;
+      color: #c2410c;
+    }
+
+    .auto-save-indicator.saved {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .auto-save-indicator.ready {
+      background: #e0f2fe;
+      color: #0c4a6e;
+    }
+
+    .auto-save-indicator:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    @keyframes pulse-save {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .save-toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      background: #065f46;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: slide-up 0.3s ease-out;
+    }
+
+    .save-toast.error {
+      background: #dc2626;
+    }
+
+    .save-toast.fade-out {
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px);
+      transition: all 0.3s;
+    }
+
+    @keyframes slide-up {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    /* === DRAG & DROP === */
+    .prel-item.drag-over {
+      border-top: 3px solid var(--primary);
+      margin-top: 2px;
+    }
+
+    .prel-item[draggable="true"] {
+      cursor: move;
+    }
+
+    .prel-item[draggable="true"]:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* === OFFLINE INDICATOR === */
+    .offline-indicator {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      background: #dc2626;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      display: none;
+    }
+    
+    .offline-indicator.show {
+      display: block;
+      animation: slide-down 0.3s ease-out;
+    }
+    
+    @keyframes slide-down {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
     }
 
     /* === SPLASH SCREEN === */
@@ -301,57 +447,3 @@
     .splash-copy { position: absolute; bottom: 40px; font-size: 10px; color: var(--metal-mid); letter-spacing: 0.5px; animation: splash-fade 0.6s ease 0.7s forwards; opacity: 0; }
     @keyframes splash-pop { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
     @keyframes splash-fade { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
-  </style>
-</head>
-<body>
-  <!-- SPLASH SCREEN -->
-  <div class="splash" id="splash">
-    <svg class="splash-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#d0d5dd"/><stop offset="50%" style="stop-color:#a8aeb8"/><stop offset="100%" style="stop-color:#9098a4"/></linearGradient></defs>
-      <rect x="20" y="20" width="472" height="472" rx="110" fill="url(#sg)"/>
-      <rect x="22" y="22" width="468" height="468" rx="108" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
-      <polygon points="140,100 205,100 256,300 307,100 372,100 280,370 232,370" fill="#2d3039"/>
-      <rect x="218" y="378" width="76" height="5" rx="2.5" fill="#0066b3"/>
-      <text x="256" y="445" text-anchor="middle" fill="#2d3039" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="800" letter-spacing="6">VLEP</text>
-    </svg>
-    <div class="splash-title">VLEP</div>
-    <div class="splash-bar"></div>
-    <div class="splash-subtitle">MISSION</div>
-    <div class="splash-copy">&copy; 2025 Quentin THOMAS</div>
-  </div>
-  <div class="container" id="app"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <!-- App Container -->
-  <div id="app"></div>
-
-  <!-- XLSX library for Excel export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <!-- Modules JavaScript (ordre important) -->
-  <script src="js/icons.js"></script>
-  <script src="js/database.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/prepa.js"></script>
-  <script src="js/terrain.js"></script>
-  <script src="js/echantillons.js"></script>
-  <script src="js/export-excel.js"></script>
-  <script src="js/database-views.js"></script>
-  <script src="js/quick-entry.js"></script>
-  <script src="js/import-export.js"></script>
-  <script src="js/timers.js"></script>
-  <script src="js/app.js"></script>
-
-  <!-- Service Worker -->
-  <script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('✓ Service Worker OK'))
-      .catch(err => console.log('Service Worker désactivé'));
-  });
-}
-  </script>
-
-</body>
-</html>

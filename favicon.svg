@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="90" fill="#2d3039"></rect>
+  
+  <!-- V de VLEP -->
+  <path d="M 140 130 L 205 130 L 256 360 L 307 130 L 372 130 L 280 440 L 232 440 Z" fill="#0066b3"></path>
+  
+  <!-- Barre bleue accent -->
+  <rect x="218" y="455" width="76" height="8" rx="4" fill="#00a878"></rect>
+</svg></svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Procédure VLEP Mission – Guide utilisateur</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1e293b; font-size: 14px; }
+
+  /* COVER */
+  .cover {
+    background: linear-gradient(135deg, #0f2744 0%, #1a4480 60%, #0066b3 100%);
+    color: white; text-align: center; padding: 60px 40px 50px;
+    page-break-after: always;
+  }
+  .cover .logo { font-size: 64px; font-weight: 900; letter-spacing: -2px; color: #38bdf8; margin-bottom: 8px; }
+  .cover .app-name { font-size: 26px; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; }
+  .cover .version { font-size: 13px; opacity: 0.6; margin-bottom: 40px; }
+  .cover h1 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+  .cover .subtitle { font-size: 16px; opacity: 0.8; max-width: 500px; margin: 0 auto 40px; line-height: 1.6; }
+  .cover .meta { font-size: 12px; opacity: 0.5; margin-top: 40px; }
+
+  /* LAYOUT */
+  .page { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
+  
+  /* SECTION HEADER */
+  .section-title {
+    display: flex; align-items: center; gap: 12px;
+    background: #1a4480; color: white;
+    padding: 14px 20px; border-radius: 10px;
+    font-size: 18px; font-weight: 700;
+    margin: 30px 0 18px; page-break-before: always;
+  }
+  .section-title .num {
+    background: #38bdf8; color: #0f2744;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 900; flex-shrink: 0;
+  }
+  .section-title:first-of-type { page-break-before: avoid; }
+
+  /* STEP */
+  .step {
+    background: white; border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin-bottom: 16px; overflow: hidden;
+    border-left: 4px solid #0066b3;
+  }
+  .step.green { border-left-color: #16a34a; }
+  .step.orange { border-left-color: #ea580c; }
+  .step.blue { border-left-color: #0066b3; }
+  .step.purple { border-left-color: #7c3aed; }
+  .step.teal { border-left-color: #0891b2; }
+
+  .step-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px; background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .step-num {
+    background: #0066b3; color: white;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .step.green .step-num { background: #16a34a; }
+  .step.orange .step-num { background: #ea580c; }
+  .step.purple .step-num { background: #7c3aed; }
+  .step.teal .step-num { background: #0891b2; }
+
+  .step-title { font-weight: 700; font-size: 15px; }
+  .step-where { margin-left: auto; font-size: 11px; background: #e2e8f0; color: #475569; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+
+  .step-body { padding: 14px 18px; line-height: 1.7; }
+  .step-body p { margin-bottom: 8px; }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  /* MOCKUP PHONE */
+  .mockup-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0; }
+  .mockup {
+    background: #1e293b; border-radius: 16px; padding: 10px;
+    flex: 1; min-width: 180px; max-width: 240px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .mockup .screen {
+    background: #0f172a; border-radius: 10px; overflow: hidden;
+    min-height: 160px; padding: 10px;
+  }
+  .mockup .screen-title {
+    color: white; font-size: 11px; font-weight: 700;
+    border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .mockup .screen-label { color: #94a3b8; font-size: 10px; margin-bottom: 4px; }
+  .mockup .screen-btn {
+    background: #0066b3; color: white; border-radius: 6px;
+    padding: 5px 8px; font-size: 10px; margin-bottom: 4px;
+    display: block; text-align: center; font-weight: 600;
+  }
+  .mockup .screen-btn.green { background: #16a34a; }
+  .mockup .screen-btn.gray { background: #334155; }
+  .mockup .screen-btn.orange { background: #ea580c; }
+  .mockup .screen-card {
+    background: #1e293b; border-radius: 6px; padding: 6px 8px;
+    margin-bottom: 4px; font-size: 10px; color: #e2e8f0;
+    border-left: 3px solid #0066b3;
+  }
+  .mockup .screen-card.green { border-left-color: #16a34a; }
+  .mockup .screen-card.orange { border-left-color: #f97316; }
+  .mockup .screen-input {
+    background: #1e293b; border: 1px solid #334155; border-radius: 4px;
+    padding: 4px 6px; font-size: 10px; color: #94a3b8;
+    margin-bottom: 4px; width: 100%;
+  }
+  .mockup .badge {
+    display: inline-block; font-size: 9px; padding: 2px 5px;
+    border-radius: 10px; margin-left: 4px;
+  }
+  .mockup .badge.blue { background: #1d4ed8; color: white; }
+  .mockup .badge.green { background: #16a34a; color: white; }
+  .mockup .badge.orange { background: #ea580c; color: white; }
+
+  /* TIPS */
+  .tip {
+    border-radius: 8px; padding: 12px 14px; margin: 10px 0;
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 13px; line-height: 1.5;
+  }
+  .tip.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+  .tip.warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+  .tip.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+  .tip.danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .tip .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* FLOW ARROWS */
+  .flow {
+    display: flex; align-items: center; gap: 6px;
+    flex-wrap: wrap; margin: 12px 0; padding: 10px 14px;
+    background: #f1f5f9; border-radius: 8px;
+  }
+  .flow-step {
+    background: white; border: 1.5px solid #cbd5e1;
+    border-radius: 6px; padding: 5px 10px;
+    font-size: 11px; font-weight: 600; color: #334155;
+    white-space: nowrap;
+  }
+  .flow-arrow { color: #94a3b8; font-size: 16px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+  th { background: #1a4480; color: white; padding: 8px 12px; text-align: left; }
+  td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f8fafc; }
+
+  /* GLOSSARY */
+  .glossary-item { padding: 8px 0; border-bottom: 1px solid #e2e8f0; display: flex; gap: 12px; }
+  .glossary-term { font-weight: 700; color: #0066b3; min-width: 100px; flex-shrink: 0; }
+
+  /* PRINT */
+  @media print {
+    body { background: white; }
+    .page { padding: 15px; }
+    .section-title { page-break-before: always; }
+    .section-title:first-of-type { page-break-before: avoid; }
+    .cover { page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="logo">V</div>
+  <div class="app-name">VLEP MISSION</div>
+  <div class="version">Version 3.8 · Application mobile terrain</div>
+  <h1>Guide d'utilisation</h1>
+  <div class="subtitle">Procédure pas à pas pour la préparation et la réalisation des missions de mesures d'exposition aux agents chimiques</div>
+  <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:30px;">
+    <div style="background:rgba(255,255,255,0.1);border-radius:10px;padding:14px 22px;">
+      <div style="font-size:22px;margin-bottom:4px;">📋</div>
+      <div style="font-size:12px;">Préparation mission</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.1);border-radius:10px;padding:14px 22px;">
+      <div style="font-size:22px;margin-bottom:4px;">📡</div>
+      <div style="font-size:12px;">Saisie terrain</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.1);border-radius:10px;padding:14px 22px;">
+      <div style="font-size:22px;margin-bottom:4px;">📊</div>
+      <div style="font-size:12px;">Export Excel</div>
+    </div>
+  </div>
+  <div class="meta">Document à usage interne · Hygiène industrielle</div>
+</div>
+
+<!-- PAGE 1 : VUE GLOBALE -->
+<div class="page">
+
+  <div class="section-title" style="page-break-before:avoid;">
+    <div class="num">0</div>
+    Vue d'ensemble du workflow
+  </div>
+
+  <div class="flow" style="flex-direction:column;gap:8px;">
+    <div style="font-size:12px;font-weight:700;color:#475569;margin-bottom:4px;">PHASE 1 – AU BUREAU (Préparation)</div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <div class="flow-step" style="border-color:#0066b3;color:#0066b3;">1. Nouvelle mission</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#0066b3;color:#0066b3;">2. GEH</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#0066b3;color:#0066b3;">3. Agents chimiques</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#0066b3;color:#0066b3;">4. Affectations</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#16a34a;color:#16a34a;background:#f0fdf4;">5. ✓ Validation</div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:#475569;margin:8px 0 4px;">PHASE 2 – SUR LE TERRAIN</div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <div class="flow-step" style="border-color:#7c3aed;color:#7c3aed;">6. Ouvrir mission</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#7c3aed;color:#7c3aed;">7. Démarrer prélèvement</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#7c3aed;color:#7c3aed;">8. Saisir données</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#7c3aed;color:#7c3aed;">9. Arrêter</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#0891b2;color:#0891b2;background:#ecfeff;">10. Export Excel</div>
+    </div>
+  </div>
+
+  <div class="tip info">
+    <div class="icon">💡</div>
+    <div>L'application fonctionne <strong>100% hors connexion</strong> une fois installée. Toutes les données sont enregistrées localement sur votre appareil. Pensez à exporter vos données régulièrement.</div>
+  </div>
+
+  <!-- GLOSSAIRE -->
+  <div style="background:white;border-radius:10px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-top:16px;">
+    <div style="font-weight:700;font-size:14px;color:#1a4480;margin-bottom:12px;">📖 Glossaire rapide</div>
+    <div class="glossary-item">
+      <div class="glossary-term">GEH</div>
+      <div>Groupe d'Exposition Homogène – ensemble de travailleurs ayant des expositions similaires</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">VLEP</div>
+      <div>Valeur Limite d'Exposition Professionnelle – seuil réglementaire (8h) ou court terme (CT)</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Co-prélèvement</div>
+      <div>Plusieurs agents chimiques analysés sur le même support physique (même pompe, même débit)</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Fusion</div>
+      <div>Plusieurs prélèvements distincts regroupés pour un même opérateur (supports différents)</div>
+    </div>
+    <div class="glossary-item" style="border:none;">
+      <div class="glossary-term">Support</div>
+      <div>Milieu de prélèvement : tube charbon actif, tube gel de silice, filtre, etc.</div>
+    </div>
+  </div>
+
+  <!-- ======================== -->
+  <!-- SECTION 1 : PRÉPARATION -->
+  <!-- ======================== -->
+
+  <div class="section-title">
+    <div class="num">1</div>
+    Phase de préparation (bureau)
+  </div>
+
+  <div class="step blue">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Créer une nouvelle mission</div>
+      <div class="step-where">🏠 Accueil → Préparation</div>
+    </div>
+    <div class="step-body">
+      <p>Depuis l'écran d'accueil, appuyez sur <strong>Préparation</strong> puis sur <strong>+ Nouvelle mission</strong>.</p>
+      <p>Renseignez les informations générales :</p>
+      <div class="mockup-row">
+        <div class="mockup">
+          <div class="screen">
+            <div class="screen-title">📋 Nouvelle mission</div>
+            <div class="screen-label">Client / Site *</div>
+            <div class="screen-input">Ex : Société Martin – Usine A</div>
+            <div class="screen-label">Préleveur *</div>
+            <div class="screen-input">Ex : Dupont Jean</div>
+            <div class="screen-label">N° Débitmètre</div>
+            <div class="screen-input">Ex : DM-042</div>
+            <div class="screen-label">N° Contrat</div>
+            <div class="screen-input">Ex : 2025-147</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <table>
+            <tr><th>Champ</th><th>Obligatoire</th></tr>
+            <tr><td>Client / Site</td><td>✅ Oui</td></tr>
+            <tr><td>Préleveur</td><td>✅ Oui</td></tr>
+            <tr><td>N° Débitmètre</td><td>Non</td></tr>
+            <tr><td>N° Contrat</td><td>Non</td></tr>
+            <tr><td>Commentaire</td><td>Non</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step blue">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Définir les GEH</div>
+      <div class="step-where">Prépa → GEH</div>
+    </div>
+    <div class="step-body">
+      <p>Ajoutez chaque Groupe d'Exposition Homogène avec <strong>+ Ajouter un GEH</strong>.</p>
+      <p>Pour chaque GEH, renseignez : <strong>nom</strong> et éventuellement le <strong>nombre de personnes</strong> concernées.</p>
+      <div class="mockup-row">
+        <div class="mockup">
+          <div class="screen">
+            <div class="screen-title">👥 GEH</div>
+            <div class="screen-card">GEH 1 – Peintres</div>
+            <div class="screen-card">GEH 2 – Soudeurs</div>
+            <div class="screen-card green">GEH 3 – Manutentionnaires</div>
+            <div class="screen-btn" style="margin-top:8px;">+ Ajouter un GEH</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div class="tip warning">
+            <div class="icon">⚠️</div>
+            <div>Définissez d'abord TOUS les GEH avant de passer aux agents chimiques. L'ordre ici détermine la numérotation finale.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step blue">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Sélectionner les agents chimiques</div>
+      <div class="step-where">Prépa → Agents</div>
+    </div>
+    <div class="step-body">
+      <p>Utilisez la <strong>barre de recherche</strong> pour trouver chaque agent chimique dans la base de données intégrée. Appuyez sur l'agent pour l'ajouter à la mission.</p>
+      <div class="mockup-row">
+        <div class="mockup">
+          <div class="screen">
+            <div class="screen-title">🧪 Agents chimiques</div>
+            <div class="screen-input">🔍 Rechercher un agent...</div>
+            <div style="font-size:9px;color:#64748b;margin:4px 0;">Résultats :</div>
+            <div class="screen-card" style="border-left-color:#f97316;">Toluène · CAS 108-88-3</div>
+            <div class="screen-card" style="border-left-color:#16a34a;">Xylènes · CAS 1330-20-7</div>
+            <div class="screen-card" style="border-left-color:#0066b3;">Acétone · CAS 67-64-1</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <p>Chaque agent de la base contient automatiquement :</p>
+          <ul style="padding-left:16px;margin-top:6px;line-height:1.8;font-size:13px;">
+            <li>VLEP 8h et CT</li>
+            <li>Type de support requis</li>
+            <li>Débits min/max</li>
+            <li>Codes analytiques (SCOLA)</li>
+            <li>Laboratoire sous-traitant</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step blue">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Affecter les agents aux GEH</div>
+      <div class="step-where">Prépa → Affectations</div>
+    </div>
+    <div class="step-body">
+      <p>Pour chaque combinaison agent + GEH, cochez le type de mesure à réaliser :</p>
+      <table>
+        <tr><th>Type</th><th>Description</th><th>Sous-prélèvements auto</th></tr>
+        <tr><td><strong>8h Réglementaire</strong></td><td>Valeur limite légale contraignante</td><td>3 prélèvements</td></tr>
+        <tr><td><strong>8h Non-réglementaire</strong></td><td>Valeur admise / indicative</td><td>1 prélèvement</td></tr>
+        <tr><td><strong>CT</strong></td><td>Court terme (15 min)</td><td>1 prélèvement</td></tr>
+      </table>
+      <div class="tip info">
+        <div class="icon">💡</div>
+        <div><strong>Co-prélèvement intelligent :</strong> si plusieurs agents d'un même GEH partagent le même type de support et le même code prétraitement, l'appli propose de les regrouper sur un seul support physique.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step green">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">Valider la mission</div>
+      <div class="step-where">Prépa → Valider</div>
+    </div>
+    <div class="step-body">
+      <p>Appuyez sur <strong>✓ Valider la mission</strong>. L'appli génère automatiquement l'ensemble des prélèvements à réaliser selon vos affectations.</p>
+      <div class="tip success">
+        <div class="icon">✅</div>
+        <div>La mission passe en statut <strong>"Terrain"</strong> et apparaît dans la liste des missions terrain. Elle est prête à être utilisée sur site.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== -->
+  <!-- SECTION 2 : TERRAIN -->
+  <!-- ======================== -->
+
+  <div class="section-title">
+    <div class="num">2</div>
+    Phase terrain (sur site)
+  </div>
+
+  <div class="step purple">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div class="step-title">Ouvrir la mission sur le terrain</div>
+      <div class="step-where">🏠 Accueil → Terrain</div>
+    </div>
+    <div class="step-body">
+      <p>Depuis l'accueil, appuyez sur <strong>Terrain</strong> puis sélectionnez la mission dans la liste. Vous accédez à la vue récapitulative avec tous les prélèvements à réaliser.</p>
+      <div class="mockup-row">
+        <div class="mockup">
+          <div class="screen">
+            <div class="screen-title">📡 Mission terrain</div>
+            <div style="font-size:9px;color:#64748b;margin-bottom:6px;">Société Martin – Usine A</div>
+            <div class="screen-card">
+              Toluène · GEH 1 · 8h Régl.<br>
+              <span style="font-size:9px;color:#94a3b8;">⏱ Arrêté · Préleveur: Martin P.</span>
+            </div>
+            <div class="screen-card orange">
+              Xylènes · GEH 1 · 8h Régl.<br>
+              <span style="font-size:9px;color:#f97316;">▶ En cours · 02:14:32</span>
+            </div>
+            <div class="screen-card green">
+              Acétone · GEH 2 · CT<br>
+              <span style="font-size:9px;color:#4ade80;">✓ Terminé</span>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <p><strong>Codes couleur des prélèvements :</strong></p>
+          <div style="margin-top:8px;line-height:2;">
+            <div>⚪ <strong>Gris</strong> : non démarré</div>
+            <div>🟠 <strong>Orange</strong> : en cours (chronomètre actif)</div>
+            <div>🟢 <strong>Vert</strong> : terminé et complété</div>
+            <div>🔵 <strong>Bleu</strong> : co-prélèvement (agents groupés)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step purple">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div class="step-title">Démarrer un prélèvement</div>
+      <div class="step-where">Terrain → Prélèvement</div>
+    </div>
+    <div class="step-body">
+      <p>Appuyez sur un prélèvement dans la liste pour l'ouvrir. Saisissez le <strong>débit initial</strong> et le <strong>numéro de pompe</strong> avant de démarrer.</p>
+      <p>Appuyez sur <strong>▶ Démarrer</strong> pour lancer le chronomètre.</p>
+      <div class="tip warning">
+        <div class="icon">⏱</div>
+        <div>Le chronomètre continue même si vous sortez de l'écran ou mettez l'appli en arrière-plan. Vous pouvez naviguer librement entre les prélèvements.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step purple">
+    <div class="step-header">
+      <div class="step-num">8</div>
+      <div class="step-title">Saisir les données de prélèvement</div>
+      <div class="step-where">Terrain → Formulaire</div>
+    </div>
+    <div class="step-body">
+      <p>Pour chaque prélèvement (ou sous-prélèvement J1/J2/J3 pour les 8h réglementaires), renseignez :</p>
+      <table>
+        <tr><th>Champ</th><th>Description</th><th>Alerte auto</th></tr>
+        <tr><td><strong>Opérateur</strong></td><td>Nom du travailleur suivi</td><td>—</td></tr>
+        <tr><td><strong>Date</strong></td><td>Date du prélèvement</td><td>—</td></tr>
+        <tr><td><strong>N° Pompe</strong></td><td>Identifiant de la pompe</td><td>—</td></tr>
+        <tr><td><strong>Réf. échantillon</strong></td><td>Référence labo du support</td><td>—</td></tr>
+        <tr><td><strong>Débit initial</strong></td><td>En L/min, avant prélèvement</td><td>—</td></tr>
+        <tr><td><strong>Débit final</strong></td><td>En L/min, après prélèvement</td><td>🔴 si variation &gt; 5%</td></tr>
+      </table>
+      <div class="tip danger">
+        <div class="icon">🔴</div>
+        <div>Si la <strong>variation de débit dépasse 5%</strong> entre initial et final, un avertissement rouge s'affiche. Ce prélèvement sera à noter dans le rapport.</div>
+      </div>
+      <div class="tip info">
+        <div class="icon">🎤</div>
+        <div><strong>Dictée vocale :</strong> appuyez sur l'icône micro à côté d'un champ texte pour dicter la valeur à la voix, utile quand les mains sont occupées.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step purple">
+    <div class="step-header">
+      <div class="step-num">8b</div>
+      <div class="step-title">Co-prélèvement – cas particulier</div>
+      <div class="step-where">Terrain → Co-prélèvement 🔵</div>
+    </div>
+    <div class="step-body">
+      <p>Quand plusieurs agents sont sur le <strong>même support physique</strong> (co-prélèvement), le formulaire est simplifié :</p>
+      <div class="mockup-row">
+        <div class="mockup">
+          <div class="screen">
+            <div class="screen-title">🔵 Co-prélèvement</div>
+            <div style="font-size:9px;color:#60a5fa;margin-bottom:6px;">Toluène + Xylènes + Benzène</div>
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;margin-bottom:3px;">SUPPORT COMMUN</div>
+            <div class="screen-input">N° Pompe : 042</div>
+            <div class="screen-input">Débit initial : 0,1 L/min</div>
+            <div class="screen-input">Débit final : 0,1 L/min</div>
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;margin:6px 0 3px;">PAR AGENT</div>
+            <div class="screen-input">Réf. Toluène : 2025-001</div>
+            <div class="screen-input">Réf. Xylènes : 2025-002</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <ul style="padding-left:16px;line-height:2;font-size:13px;">
+            <li>Une seule pompe pour tous les agents</li>
+            <li>Débits saisis une seule fois</li>
+            <li>Une <strong>référence échantillon distincte</strong> par agent (pour le labo)</li>
+            <li>Badge bleu 🔵 visible dans la liste</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step purple">
+    <div class="step-header">
+      <div class="step-num">9</div>
+      <div class="step-title">Arrêter le prélèvement</div>
+      <div class="step-where">Terrain → Formulaire</div>
+    </div>
+    <div class="step-body">
+      <p>À la fin du prélèvement, saisissez le <strong>débit final</strong> puis appuyez sur <strong>⬛ Arrêter</strong>.</p>
+      <p>Le chronomètre s'arrête et le temps est enregistré. Cochez <strong>"Terminé"</strong> une fois toutes les données saisies.</p>
+      <div class="tip success">
+        <div class="icon">✅</div>
+        <div>Utilisez le bouton <strong>"J-1"</strong> pour copier automatiquement les données du jour précédent (opérateur, numéro de pompe) sur les prélèvements multi-jours.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step purple">
+    <div class="step-header">
+      <div class="step-num">9b</div>
+      <div class="step-title">Saisir les conditions ambiantes</div>
+      <div class="step-where">Terrain → Conditions</div>
+    </div>
+    <div class="step-body">
+      <p>Depuis la vue mission, accédez à <strong>🌡 Conditions</strong> pour enregistrer par jour de prélèvement :</p>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:6px;font-size:13px;">
+        <div>🌡️ Température (°C) · Initial / Final</div>
+        <div>📊 Pression (hPa) · Initial / Final</div>
+        <div>💧 Humidité (%) · Initial / Final</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== -->
+  <!-- SECTION 3 : EXPORT -->
+  <!-- ======================== -->
+
+  <div class="section-title">
+    <div class="num">3</div>
+    Export et finalisation
+  </div>
+
+  <div class="step teal">
+    <div class="step-header">
+      <div class="step-num">10</div>
+      <div class="step-title">Exporter vers Excel</div>
+      <div class="step-where">Terrain → Échantillons → Export Excel</div>
+    </div>
+    <div class="step-body">
+      <p>Depuis la vue mission terrain, appuyez sur <strong>📋 Échantillons</strong> puis sur <strong>⬇ Export Excel</strong>.</p>
+      <p>Le fichier généré contient :</p>
+      <table>
+        <tr><th>Feuille Excel</th><th>Contenu</th></tr>
+        <tr><td>Prélèvements</td><td>Tous les prélèvements avec opérateurs, débits, références, durées</td></tr>
+        <tr><td>Conditions</td><td>T°, pression, humidité par jour</td></tr>
+        <tr><td>Échantillons</td><td>Liste analytique avec codes SCOLA, supports, prétraitements</td></tr>
+        <tr><td>Blancs terrain</td><td>Liste des blancs avec références</td></tr>
+      </table>
+      <div class="tip info">
+        <div class="icon">📁</div>
+        <div>Le fichier Excel est téléchargé directement sur votre appareil. Pensez à le transférer vers votre réseau ou à l'envoyer par mail dès que vous avez une connexion.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step teal">
+    <div class="step-header">
+      <div class="step-num">11</div>
+      <div class="step-title">Ajouter des blancs terrain</div>
+      <div class="step-where">Terrain → Échantillons → + Blanc terrain</div>
+    </div>
+    <div class="step-body">
+      <p>Un blanc terrain est un support non exposé utilisé comme témoin. Pour l'ajouter :</p>
+      <p>Appuyez sur <strong>+ Blanc terrain</strong>, sélectionnez l'agent chimique concerné, saisissez la référence de l'échantillon et la date.</p>
+      <p>Les blancs apparaissent dans la liste des échantillons et sont intégrés à l'export Excel.</p>
+    </div>
+  </div>
+
+  <!-- ======================== -->
+  <!-- SECTION 4 : CONSEILS -->
+  <!-- ======================== -->
+
+  <div class="section-title">
+    <div class="num">4</div>
+    Conseils pratiques & astuces
+  </div>
+
+  <div style="background:white;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-bottom:16px;">
+
+    <div style="font-weight:700;color:#1a4480;margin-bottom:12px;font-size:14px;">📱 Installation de l'appli (PWA)</div>
+    <p style="font-size:13px;line-height:1.7;margin-bottom:8px;">Pour installer l'application sur votre téléphone sans passer par un store :</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-weight:600;margin-bottom:4px;">Sur Android (Chrome)</div>
+        <ol style="padding-left:16px;line-height:1.8;">
+          <li>Ouvrir l'URL dans Chrome</li>
+          <li>Menu ⋮ → "Ajouter à l'écran d'accueil"</li>
+          <li>Confirmer l'installation</li>
+        </ol>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-weight:600;margin-bottom:4px;">Sur iPhone (Safari)</div>
+        <ol style="padding-left:16px;line-height:1.8;">
+          <li>Ouvrir l'URL dans Safari</li>
+          <li>Bouton partage □↑ → "Sur l'écran d'accueil"</li>
+          <li>Confirmer l'installation</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+
+    <div class="tip success" style="flex-direction:column;gap:6px;">
+      <div style="font-weight:700;">✅ Bonnes pratiques</div>
+      <ul style="padding-left:14px;line-height:1.8;font-size:12px;">
+        <li>Préparer la mission la veille</li>
+        <li>Exporter l'Excel en fin de journée</li>
+        <li>Saisir les conditions ambiantes matin et soir</li>
+        <li>Vérifier la variation de débit avant de décrocher</li>
+      </ul>
+    </div>
+
+    <div class="tip danger" style="flex-direction:column;gap:6px;">
+      <div style="font-weight:700;">❌ À éviter</div>
+      <ul style="padding-left:14px;line-height:1.8;font-size:12px;">
+        <li>Vider le cache du navigateur en cours de mission</li>
+        <li>Utiliser le mode navigation privée</li>
+        <li>Fermer l'appli sans avoir exporté</li>
+        <li>Modifier une mission validée sans précaution</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div style="background:white;border-radius:10px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.07);">
+    <div style="font-weight:700;color:#1a4480;margin-bottom:12px;font-size:14px;">⚡ Import depuis tableau de devis (Prépa automatique)</div>
+    <p style="font-size:13px;line-height:1.7;">Pour les missions importantes, vous pouvez importer directement depuis un tableau Excel de devis. L'appli reconnaît plusieurs formats et génère automatiquement les GEH, agents et affectations.</p>
+    <p style="font-size:13px;line-height:1.7;margin-top:6px;">Accès : <strong>Préparation → Nouvelle mission → ⚡ Prépa automatique</strong></p>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="text-align:center;margin-top:30px;padding:20px;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0;">
+    VLEP Mission v3.8 · Guide d'utilisation interne · Hygiène industrielle<br>
+    Pour toute question, contacter votre responsable hygiène industrielle
+  </div>
+
+</div>
+</body>
+</html>

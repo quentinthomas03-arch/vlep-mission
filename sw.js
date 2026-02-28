@@ -1,69 +1,101 @@
-// Service Worker VLEP Mission v3.6
+// sw.js - Service Worker
 // © 2025 Quentin THOMAS
 
-const CACHE_NAME = 'vlep-mission-v3.9.0';
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'vlep-mission-v3.8-modular-fix1';
+const VERSION = '3.8.1'; // Incrémenter à chaque mise à jour
+const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  // Modules JavaScript
+  './js/icons.js',
+  './js/database.js',
+  './js/state.js',
+  './js/prepa.js',
+  './js/terrain.js',
+  './js/echantillons.js',
+  './js/export-excel.js',
+  './js/database-views.js',
+  './js/quick-entry.js',
+  './js/import-export.js',
+  './js/timers.js',
+  './js/app.js',
+  // Bibliothèque externe
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
-// Installation : mise en cache des fichiers
-self.addEventListener('install', event => {
+// Installation
+self.addEventListener('install', function(event) {
+  console.log('[SW] Installation v' + VERSION);
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('[SW] Cache ouvert, mise en cache des assets...');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('[SW] Mise en cache des fichiers');
+        return cache.addAll(urlsToCache);
+      })
+      .then(function() {
+        console.log('[SW] Tous les fichiers mis en cache avec succès');
+        return self.skipWaiting(); // Active immédiatement
+      })
+      .catch(function(err){
+        console.error('[SW] Erreur mise en cache:', err);
+      })
   );
-  // Force le nouveau SW à prendre le contrôle immédiatement
-  self.skipWaiting();
 });
 
-// Activation : nettoyage des anciens caches
-self.addEventListener('activate', event => {
+// Activation
+self.addEventListener('activate', function(event) {
+  console.log('[SW] Activation v' + VERSION);
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then(function(cacheNames) {
       return Promise.all(
-        cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => {
-            console.log('[SW] Suppression ancien cache:', name);
-            return caches.delete(name);
-          })
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            console.log('[SW] Suppression ancien cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
       );
     })
+    .then(function() {
+      console.log('[SW] Prise de contrôle des clients');
+      return self.clients.claim(); // Prend le contrôle immédiatement
+    })
+    .then(function() {
+      // Notifier tous les clients qu'une mise à jour est disponible
+      return self.clients.matchAll().then(function(clients) {
+        clients.forEach(function(client) {
+          client.postMessage({
+            type: 'UPDATE_AVAILABLE',
+            version: VERSION
+          });
+        });
+      });
+    })
   );
-  // Prend le contrôle de toutes les pages immédiatement
-  self.clients.claim();
 });
 
-// Stratégie : Network First (essaie le réseau, sinon cache)
-// Permet de toujours avoir la dernière version quand on est en ligne
-self.addEventListener('fetch', event => {
+// Fetch - Stratégie Network First pour le développement
+self.addEventListener('fetch', function(event) {
   event.respondWith(
     fetch(event.request)
-      .then(response => {
-        // Si la réponse réseau est OK, on met à jour le cache
+      .then(function(response) {
+        // Si la requête réseau réussit, mettre en cache
         if (response && response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then(function(cache) {
+            cache.put(event.request, responseToCache);
           });
         }
         return response;
       })
-      .catch(() => {
-        // Pas de réseau → on sert depuis le cache
+      .catch(function() {
+        // Si le réseau échoue, utiliser le cache
         return caches.match(event.request);
       })
   );
 });
 
-// Écoute les messages pour forcer la mise à jour
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
+console.log('[SW] Service Worker chargé v' + VERSION);
