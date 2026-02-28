@@ -1,9 +1,9 @@
 // timers.js - Timers CT et dictée vocale
-// Ã‚© 2025 Quentin THOMAS
-// ChronomÃƒÂ¨tres CT 15min, dictée vocale améliorée
+// © 2025 Quentin THOMAS
+// Chronomètres CT 15min, dictée vocale améliorée
 
 // ===================================================
-// DICTÃƒâ€°E VOCALE - Version améliorée
+// DICTÉE VOCALE - Version améliorée
 // Corrections : bug de duplication, affichage live,
 // auto-relance, commandes ponctuation
 // ===================================================
@@ -22,8 +22,8 @@ var PONCTUATION_COMMANDS = [
   { pattern: /\bdeuxpoints\b/gi,       replacement: ': ' },
   { pattern: /\bdeux points\b/gi,      replacement: ': ' },
   { pattern: /\bpoint\b/gi,            replacement: '. ' },
-  { pattern: /\bouvrir parenthÃƒÂ¨se\b/gi,replacement: '(' },
-  { pattern: /\bfermer parenthÃƒÂ¨se\b/gi,replacement: ')' },
+  { pattern: /\bouvrir parenthèse\b/gi,replacement: '(' },
+  { pattern: /\bfermer parenthèse\b/gi,replacement: ')' },
 ];
 
 function applyPonctuationCommands(text) {
@@ -54,7 +54,7 @@ function showDictationPanel(prelId, subIdx) {
     '<div style="display:flex;align-items:center;gap:10px;">',
       '<div id="dictation-dot" style="width:14px;height:14px;border-radius:50%;background:#ef4444;animation:dictPulse 1s infinite;flex-shrink:0;"></div>',
       '<span style="font-weight:700;font-size:14px;">Dictée en cours...</span>',
-      '<button onclick="stopDictation();" style="margin-left:auto;background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;">â¹ Stop</button>',
+      '<button onclick="stopDictation();" style="margin-left:auto;background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;">⏹ Stop</button>',
     '</div>',
     '<div id="dictation-interim" style="',
       'background:#0f172a;border-radius:8px;padding:10px 12px;',
@@ -100,7 +100,7 @@ function removeDictationPanel() {
 
 function stopDictation() {
   if (!activeDictation) return;
-  activeDictation.stopped = true; // empÃƒÂªcher l'auto-relance
+  activeDictation.stopped = true; // empêcher l'auto-relance
   activeDictation.recognition.stop();
 }
 
@@ -113,13 +113,13 @@ function toggleDictation(prelId, subIdx) {
 
   var key = prelId + '_' + subIdx;
 
-  // Si dictée active sur ce mÃƒÂªme champ â†’ stop
+  // Si dictée active sur ce même champ → stop
   if (activeDictation && activeDictation.key === key) {
     stopDictation();
     return;
   }
 
-  // Si dictée active sur un autre champ â†’ stopper proprement d'abord
+  // Si dictée active sur un autre champ → stopper proprement d'abord
   if (activeDictation) {
     activeDictation.stopped = true;
     activeDictation.recognition.stop();
@@ -134,8 +134,8 @@ function startDictationSession(prelId, subIdx, key) {
 
   var textarea = document.getElementById('obs-' + prelId + '-' + subIdx);
 
-  // Texte existant avant de commencer Ãƒ  dicter
-  // On sépare le texte déjÃƒ  validé du nouveau contenu dicté
+  // Texte existant avant de commencer à dicter
+  // On sépare le texte déjà validé du nouveau contenu dicté
   var confirmedText = textarea ? textarea.value : '';
   // Séparateur si texte préexistant
   if (confirmedText && !confirmedText.endsWith(' ') && !confirmedText.endsWith('\n')) {
@@ -159,7 +159,7 @@ function startDictationSession(prelId, subIdx, key) {
 
   activeDictation = session;
 
-  // â”€â”€â”€ GESTIONNAIRE PRINCIPAL : résultats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ═══ GESTIONNAIRE PRINCIPAL : résultats ═══════════════════════════
   recognition.onresult = function(event) {
     var interimTranscript = '';
     var newFinalText = '';
@@ -180,7 +180,7 @@ function startDictationSession(prelId, subIdx, key) {
     // Accumuler le texte final validé
     if (newFinalText) {
       session.confirmedText += newFinalText;
-      // Mettre Ãƒ  jour le champ et sauvegarder
+      // Mettre à jour le champ et sauvegarder
       if (textarea) {
         textarea.value = session.confirmedText;
       }
@@ -193,16 +193,16 @@ function startDictationSession(prelId, subIdx, key) {
       textarea.value = displayText;
     }
 
-    // Mettre Ãƒ  jour le panel visuel
+    // Mettre à jour le panel visuel
     updateDictationPanel(interimTranscript || newFinalText, !interimTranscript);
   };
 
-  // â”€â”€â”€ FIN DE SESSION : auto-relance si pas stoppé volontairement â”€â”€â”€
+  // ═══ FIN DE SESSION : auto-relance si pas stoppé volontairement ═══
   recognition.onend = function() {
     var btn = document.getElementById('dict-btn-' + prelId + '-' + subIdx);
 
     if (session.stopped) {
-      // ArrÃƒÂªt volontaire
+      // Arrêt volontaire
       activeDictation = null;
       if (btn) btn.classList.remove('recording');
       removeDictationPanel();
@@ -215,7 +215,7 @@ function startDictationSession(prelId, subIdx, key) {
       return;
     }
 
-    // Auto-relance aprÃƒÂ¨s silence (comportement Android Chrome)
+    // Auto-relance après silence (comportement Android Chrome)
     // Petit délai pour éviter l'erreur "already started"
     setTimeout(function() {
       if (!session.stopped && activeDictation && activeDictation.key === key) {
@@ -232,7 +232,7 @@ function startDictationSession(prelId, subIdx, key) {
     }, 200);
   };
 
-  // â”€â”€â”€ ERREURS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ═══ ERREURS ════════════════════════════════════════════════════════
   recognition.onerror = function(event) {
     var btn = document.getElementById('dict-btn-' + prelId + '-' + subIdx);
 
@@ -242,7 +242,7 @@ function startDictationSession(prelId, subIdx, key) {
     }
 
     if (event.error === 'aborted') {
-      // ArrÃƒÂªt propre, géré par onend
+      // Arrêt propre, géré par onend
       return;
     }
 
@@ -382,16 +382,16 @@ function getTimerDisplay(prelId, subIdx) {
   return [
     '<div class="ct-timer-box" style="background:' + (isOver ? '#fef2f2' : '#f0fdf4') + ';border:2px solid ' + (isOver ? '#ef4444' : '#22c55e') + ';border-radius:10px;padding:12px;margin:8px 0;">',
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">',
-        '<span style="font-weight:700;color:' + (isOver ? '#ef4444' : '#16a34a') + ';">â± Chrono CT</span>',
+        '<span style="font-weight:700;color:' + (isOver ? '#ef4444' : '#16a34a') + ';">⏱ Chrono CT</span>',
         '<span id="ct-timer-' + key + '" style="font-size:24px;font-weight:700;font-family:monospace;color:' + (isOver ? '#ef4444' : '#16a34a') + ';">' + formatCTTime(elapsed) + '</span>',
       '</div>',
       '<div style="background:#e5e7eb;border-radius:4px;height:6px;margin-bottom:10px;">',
         '<div style="background:' + (isOver ? '#ef4444' : '#22c55e') + ';height:6px;border-radius:4px;width:' + pct.toFixed(1) + '%;transition:width 1s;"></div>',
       '</div>',
-      (isOver ? '<div style="font-size:11px;color:#ef4444;font-weight:700;text-align:center;margin-bottom:8px;">âš ï¸ 15 min dépassées</div>' : '<div style="font-size:11px;color:#6b7280;text-align:center;margin-bottom:8px;">Durée max CT : 15 min</div>'),
-      '<button class="btn btn-danger" style="width:100%;" onclick="stopCTTimer(' + prelId + ',' + subIdx + ');">â¹ Arrêter</button>',
+      (isOver ? '<div style="font-size:11px;color:#ef4444;font-weight:700;text-align:center;margin-bottom:8px;">⚠️ 15 min dépassées</div>' : '<div style="font-size:11px;color:#6b7280;text-align:center;margin-bottom:8px;">Durée max CT : 15 min</div>'),
+      '<button class="btn btn-danger" style="width:100%;" onclick="stopCTTimer(' + prelId + ',' + subIdx + ');">⏹ Arrêter</button>',
     '</div>'
   ].join('');
 }
 
-console.log('âœ” Timers chargé');
+console.log('✓ Timers chargé');
