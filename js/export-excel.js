@@ -122,15 +122,15 @@ function createRegSheet(m,prels){
   // Ligne 28 : Prise en compte des EPI
   aoa.push(['Prise en compte des Equipements de Protection Individuelle','']);
   
-  // Ligne 29 : type EPI (vide)
+  // Ligne 29 : type EPI
   var row29=['type d\'EPI',''];
   for(var i=0;i<prels.length;i++){
-    row29.push('');
+    row29.push(prels[i].sub.epiType||'sans objet');
     row29.push('');
   }
   aoa.push(row29);
   
-  // Ligne 30 : facteur de protection (vide)
+  // Ligne 30 : facteur de protection (calculé par VLOOKUP dans la macro)
   var row30=['facteur de protection assigné (FPA)',''];
   for(var i=0;i<prels.length;i++){
     row30.push('');
@@ -138,10 +138,11 @@ function createRegSheet(m,prels){
   }
   aoa.push(row30);
   
-  // Ligne 31 : durée de port EPI (vide)
+  // Ligne 31 : durée de port EPI
   var row31=['durée de port de l\'EPI (min)',''];
   for(var i=0;i<prels.length;i++){
-    row31.push('');
+    var epiD=prels[i].sub.epiDuree;
+    row31.push((prels[i].sub.epiType||'sans objet')==='sans objet'?0:(epiD||0));
     row31.push('');
   }
   aoa.push(row31);
@@ -487,15 +488,37 @@ function createNonRegSheet(m,prels){
     aoa.push(rowFin);
   }
   
-  // Lignes 32-39 : Durées, exposition, EPI (vides)
-  for(var lnum=32;lnum<=39;lnum++){
+  // Lignes 32-35 : Durées, exposition (calculées par la macro)
+  for(var lnum=32;lnum<=35;lnum++){
     var rowEmpty=['',''];
-    for(var i=0;i<prels.length;i++){
-      rowEmpty.push('');
-      rowEmpty.push('');
-    }
+    for(var i=0;i<prels.length;i++){rowEmpty.push('');rowEmpty.push('');}
     aoa.push(rowEmpty);
   }
+  
+  // Ligne 36 : Prise en compte des EPI
+  aoa.push(['Prise en compte des Equipements de Protection Individuelle','']);
+  
+  // Ligne 37 : type EPI
+  var row37nonreg=['type d\'EPI',''];
+  for(var i=0;i<prels.length;i++){
+    row37nonreg.push(prels[i].sub.epiType||'sans objet');
+    row37nonreg.push('');
+  }
+  aoa.push(row37nonreg);
+  
+  // Ligne 38 : FPA (calculé par VLOOKUP dans la macro)
+  var row38nonreg=['facteur de protection assigné (FPA)',''];
+  for(var i=0;i<prels.length;i++){row38nonreg.push('');row38nonreg.push('');}
+  aoa.push(row38nonreg);
+  
+  // Ligne 39 : durée de port EPI
+  var row39nonreg=['durée de port de l\'EPI (min)',''];
+  for(var i=0;i<prels.length;i++){
+    var epiD2=prels[i].sub.epiDuree;
+    row39nonreg.push((prels[i].sub.epiType||'sans objet')==='sans objet'?0:(epiD2||0));
+    row39nonreg.push('');
+  }
+  aoa.push(row39nonreg);
   
   // Ligne 40 : Conditions ambiantes
   aoa.push(['Conditions ambiantes lors des prélèvements','']);

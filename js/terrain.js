@@ -295,7 +295,7 @@ function addPrelTerrain(){
   };
   
   for(var i=0;i<subCount;i++){
-    var sub={id:generateId(),operateur:'',date:'',plages:[{debut:'',fin:''}],observations:'',completed:false,agentData:{}};
+    var sub={id:generateId(),operateur:'',date:'',plages:[{debut:'',fin:''}],observations:'',completed:false,agentData:{},epiType:'sans objet',epiDuree:''};
     d.agents.forEach(function(a){
       sub.agentData[a.name]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:''};
     });
@@ -687,6 +687,25 @@ function renderSubPrelForm(p,sb,idx){
   if(d)h+='<div class="duration-box"><span style="display:inline-flex;width:16px;height:16px;">'+ICONS.clock+'</span> Durée : '+d+'</div>';
   
   h+='<div class="field"><label class="label">Observations</label><div style="display:flex;gap:6px;align-items:flex-start;"><textarea class="input" style="flex:1;" rows="2" id="obs-'+p.id+'-'+idx+'" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'observations\',this.value);">'+escapeHtml(sb.observations||'')+'</textarea><button class="dictation-btn" id="dict-btn-'+p.id+'-'+idx+'" onclick="toggleDictation('+p.id+','+idx+');" title="Dictée vocale">'+ICONS.mic+'</button></div></div>';
+
+  // EPI respiratoire
+  var epiVal=sb.epiType||'sans objet';
+  var isAutre=(epiVal!=='sans objet'&&epiVal!=='FFP3'&&epiVal!=='TH3');
+  h+='<div class="field"><label class="label">EPI respiratoire</label>';
+  h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">';
+  ['sans objet','FFP3','TH3','Autre'].forEach(function(opt){
+    var isSelected=(opt==='Autre'?isAutre:(epiVal===opt));
+    h+='<button type="button" class="btn btn-small '+(isSelected?'btn-primary':'btn-gray')+'" onclick="selectEPI('+p.id+','+idx+',\''+opt+'\');">'+opt+'</button>';
+  });
+  h+='</div>';
+  if(isAutre){
+    h+='<input type="text" class="input" style="margin-bottom:6px;" value="'+escapeHtml(epiVal)+'" placeholder="Ex: masque complet P3" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiType\',this.value);">';
+  }
+  if(epiVal!=='sans objet'){
+    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><input type="text" inputmode="numeric" class="input" style="width:100px;" value="'+escapeHtml(String(sb.epiDuree||'0'))+'" placeholder="0" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiDuree\',this.value);"></div>';
+  }
+  h+='</div>';
+
   h+='<button class="btn btn-success" onclick="toggleSubComplete('+p.id+','+idx+');">'+(sb.completed?'✓ Complété - Modifier':'✓ Valider')+'</button></div>';
   return h;
 }
@@ -831,6 +850,21 @@ function getDureeTotale(pl){
   });
   if(mn<=0)return'';
   return Math.floor(mn/60)+'h'+(mn%60<10?'0':'')+(mn%60);
+}
+
+function selectEPI(pid,idx,opt){
+  var m=getCurrentMission();if(!m)return;
+  var p=m.prelevements.find(function(x){return x.id===pid;});
+  if(!p||!p.subPrelevements[idx])return;
+  var sb=p.subPrelevements[idx];
+  if(opt==='Autre'){
+    sb.epiType='';
+  }else{
+    sb.epiType=opt;
+    if(opt==='sans objet')sb.epiDuree='';
+  }
+  saveData('vlep_missions_v3',state.missions);
+  render();
 }
 
 function toggleSubComplete(pid,idx){
