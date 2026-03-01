@@ -1,5 +1,5 @@
 // import-export.js - Import/Export JSON et QR Code
-// Â© 2025 Quentin THOMAS
+// © 2025 Quentin THOMAS
 // Sauvegarde/restauration missions, partage QR
 
 // ===== EXPORT / IMPORT MISSION JSON =====
@@ -11,7 +11,7 @@ function exportMissionJSON(id){
   var blob=new Blob([json],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  var safeName=(m.clientSite||'mission').replace(/[^a-zA-Z0-9àâäéèêëïîôùûüçÀÂÄÉÈÊËÏÎÃ”ÙÛÜÇ _-]/g,'').replace(/\s+/g,'_').substring(0,40);
+  var safeName=(m.clientSite||'mission').replace(/[^a-zA-Z0-9àâäéèêëïîôùûüçÀÂÄÉÈÊËÏÎÔÙÛÜÇ _-]/g,'').replace(/\s+/g,'_').substring(0,40);
   a.href=url;
   a.download='VLEP_Mission_'+safeName+'_'+String(m.id).slice(-6)+'.json';
   document.body.appendChild(a);
@@ -205,4 +205,4 @@ function doImportQR(){
 }
 
 
-console.log('âœ“ Import/Export chargé');
+console.log('✓ Import/Export chargé');

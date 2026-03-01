@@ -1,7 +1,7 @@
 /* 
      * VLEP Mission v3.8
-     * Ã‚Â© 2025 Quentin THOMAS - Tous droits rÃƒÂ©servÃƒÂ©s
-     * PropriÃƒÂ©tÃƒÂ© exclusive - Reproduction interdite
+     * © 2025 Quentin THOMAS - Tous droits réservés
+     * Propriété exclusive - Reproduction interdite
      */
     /* === VLEP Mission v3.8 - Design Socotec Blue Refined === */
     :root {
@@ -248,7 +248,7 @@
     .field-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .field-header .label { margin-bottom: 0; }
     /* SVG Icons inline helper */
-    /* RÃˆGLE GLOBALE POUR TOUS LES SVG - Ã‰vite les icÃ´nes disproportionnÃ©es */
+    /* RÈGLE GLOBALE POUR TOUS LES SVG - Évite les icônes disproportionnées */
     svg {
       width: 16px;
       height: 16px;
@@ -257,32 +257,32 @@
       flex-shrink: 0;
     }
     
-    /* Tailles spÃ©cifiques selon contexte */
+    /* Tailles spécifiques selon contexte */
     .svg-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; vertical-align: middle; }
     .svg-icon svg { width: 14px; height: 14px; }
     
-    /* IcÃ´nes dans les titres */
+    /* Icônes dans les titres */
     h1 svg { width: 20px; height: 20px; }
     h2 svg { width: 18px; height: 18px; }
     
-    /* IcÃ´nes dans les boutons */
+    /* Icônes dans les boutons */
     .btn svg { width: 15px; height: 15px; }
     .btn-icon svg { width: 14px; height: 14px; }
     
-    /* IcÃ´nes dans les Ã©lÃ©ments de navigation */
+    /* Icônes dans les éléments de navigation */
     .nav-icon svg { width: 18px; height: 18px; }
     .back-btn svg { width: 16px; height: 16px; }
     
-    /* IcÃ´nes dans les accordÃ©ons */
+    /* Icônes dans les accordéons */
     .accordion-icon svg { width: 16px; height: 16px; }
     
-    /* IcÃ´nes dans les labels */
+    /* Icônes dans les labels */
     .label svg { width: 14px; height: 14px; }
     
-    /* IcÃ´nes dans les Ã©tats vides */
+    /* Icônes dans les états vides */
     .empty-state-icon svg { width: 40px; height: 40px; }
     
-    /* Petites icÃ´nes */
+    /* Petites icônes */
     .copy-btn svg { width: 10px; height: 10px; }
     .agent-delete svg { width: 14px; height: 14px; }
     .prel-status svg { width: 13px; height: 13px; }

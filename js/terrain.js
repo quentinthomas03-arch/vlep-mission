@@ -21,7 +21,7 @@ function renderTerrainMission(){
   if(!m){state.view='terrain-list';render();return'';}
   var h='<div class="sticky-header"><button class="back-btn" onclick="state.view=\'terrain-list\';state.currentMissionId=null;render();">'+ICONS.arrowLeft+' Liste</button><div style="display:flex;justify-content:space-between;align-items:center;"><div style="color:white;font-weight:700;font-size:14px;">'+escapeHtml(m.clientSite)+'</div><div class="row" style="gap:4px;"><button class="btn btn-gray btn-small btn-icon" onclick="unvalidateMissionFromTerrain();" title="Repasser en prépa" style="background:rgba(255,255,255,0.15);color:white;border:none;">'+ICONS.arrowLeft+'</button><button class="btn btn-danger btn-icon" onclick="deleteMissionTerrain();" style="width:24px;height:24px;">'+ICONS.trash+'</button></div></div></div>';
   h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' â€¢ <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+'</p></div>';
-  h+='<div class="row mb-12"><button class="btn btn-gray" onclick="state.view=\'conditions\';render();">'+ICONS.thermometer+' Conditions</button><button class="btn btn-blue" onclick="state.view=\'liste-echantillons\';render();">'+ICONS.list+' Ã‰chantillons</button></div>';
+  h+='<div class="row mb-12"><button class="btn btn-gray" onclick="state.view=\'conditions\';render();">'+ICONS.thermometer+' Conditions</button><button class="btn btn-blue" onclick="state.view=\'liste-echantillons\';render();">'+ICONS.list+' Échantillons</button></div>';
   h+='<div class="row mb-12"><button class="btn btn-gray" onclick="exportMissionJSON('+m.id+');">'+ICONS.download+' Export JSON</button></div>';
   
   // Boutons d'ajout
@@ -88,7 +88,7 @@ function deleteMissionTerrain(){
 
 // ===== AJOUT/SUPPRESSION TERRAIN =====
 function renderAddGehTerrainModal(){
-  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>+ Ajouter un GEH</h2><button class="close-btn" onclick="state.showModal=null;render();">Ã—</button></div>';
+  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>+ Ajouter un GEH</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div>';
   h+='<div class="field"><label class="label">Nom du GEH *</label><input type="text" class="input" id="new-geh-name" placeholder="Ex: Atelier peinture"></div>';
   h+='<div class="row"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-primary" onclick="addGehTerrain();">Ajouter</button></div></div></div>';
   return h;
@@ -139,7 +139,7 @@ function deletePrelTerrain(prelId){
 
 function renderAddPrelTerrainModal(){
   var m=getCurrentMission();
-  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;state.newPrelData=null;render();}"><div class="modal-content" style="max-height:90vh;"><div class="modal-header"><h2>+ Ajouter un prélèvement</h2><button class="close-btn" onclick="state.showModal=null;state.newPrelData=null;render();">Ã—</button></div>';
+  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;state.newPrelData=null;render();}"><div class="modal-content" style="max-height:90vh;"><div class="modal-header"><h2>+ Ajouter un prélèvement</h2><button class="close-btn" onclick="state.showModal=null;state.newPrelData=null;render();">×</button></div>';
   
   if(!state.newPrelData){
     state.newPrelData={gehId:null,agents:[],type:'8h',isReg:true,agentSearch:''};
@@ -186,7 +186,7 @@ function renderAddPrelTerrainModal(){
   if(d.agents.length>0){
     h+='<div class="info-box mt-8"><strong>Agents sélectionnés :</strong><div style="margin-top:4px;">';
     d.agents.forEach(function(a,i){
-      h+='<span style="display:inline-block;background:#e5e7eb;padding:2px 8px;border-radius:4px;margin:2px;font-size:12px;">'+escapeHtml(a.name)+' <span style="cursor:pointer;color:#ef4444;" onclick="removeNewPrelAgent('+i+');">Ã—</span></span>';
+      h+='<span style="display:inline-block;background:#e5e7eb;padding:2px 8px;border-radius:4px;margin:2px;font-size:12px;">'+escapeHtml(a.name)+' <span style="cursor:pointer;color:#ef4444;" onclick="removeNewPrelAgent('+i+');">×</span></span>';
     });
     h+='</div></div>';
   }
@@ -203,7 +203,7 @@ function renderAddPrelTerrainModal(){
 function renderSmartFusionModal(){
   if(!state.fusionGroups||state.fusionGroups.length===0)return'';
   
-  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;state.fusionGroups=null;render();}"><div class="modal-content" style="max-height:90vh;overflow-y:auto;"><div class="modal-header"><h2>'+ICONS.zap+' Fusion intelligente</h2><button class="close-btn" onclick="state.showModal=null;state.fusionGroups=null;render();">Ã—</button></div>';
+  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;state.fusionGroups=null;render();}"><div class="modal-content" style="max-height:90vh;overflow-y:auto;"><div class="modal-header"><h2>'+ICONS.zap+' Fusion intelligente</h2><button class="close-btn" onclick="state.showModal=null;state.fusionGroups=null;render();">×</button></div>';
   
   var selectedCount=state.fusionGroups.filter(function(g){return g.selected;}).length;
   
@@ -654,7 +654,7 @@ function renderSubPrelForm(p,sb,idx){
       
       h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
       h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
-      if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">ÃŽâ€ '+variation.toFixed(1)+'%</span>';}
+      if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
       h+='</div>';
       
       h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';

@@ -1,22 +1,22 @@
-// state.js - Ãƒâ€°tat global de l'application
-// Ã‚Â© 2025 Quentin THOMAS
+// state.js - État global de l'application
+// © 2025 Quentin THOMAS
 
 // Couleurs pour les agents chimiques
 var AGENT_COLORS=['#00a878','#0f4c81','#e63946','#7c3aed','#f59e0b','#0891b2','#c026d3','#65a30d','#0284c7','#db2777','#4f46e5','#059669','#d97706','#7c2d12','#1d4ed8'];
 
-// Nombre de GEH par dÃƒÂ©faut lors de crÃƒÂ©ation mission
+// Nombre de GEH par défaut lors de création mission
 var DEFAULT_GEH_COUNT=5;
 
-// Ãƒâ€°tat global de l'application
+// État global de l'application
 var state={
   _author:'Quentin THOMAS',
-  _copyright:'Ã‚Â© 2025 Quentin THOMAS',
+  _copyright:'© 2025 Quentin THOMAS',
   
   // Navigation
   view:'home',
   showModal:null,
   
-  // DonnÃƒÂ©es
+  // Données
   missions:[],
   agentsDB:[],
   
@@ -43,17 +43,17 @@ var state={
   quickGehId:null,
   quickMission:null,
   
-  // Ãƒâ€°chantillons
+  // Échantillons
   echantillonSort:'date',
   
   // Blancs
   blancAgentSearch:'',
   blancAgents:[],
   
-  // PrÃƒÂ©paration
+  // Préparation
   newPrelData:null,
   
-  // Co-prÃ©lÃ¨vement
+  // Co-prélèvement
   coPrelTargetPid:null,
   coPrelDetectedGroups:null,
   coPrelEditGroups:null,
@@ -103,7 +103,7 @@ function lightenColor(h,p){
   return'#'+(0x1000000+r*0x10000+g*0x100+b).toString(16).slice(1);
 }
 
-// === CHARGEMENT DONNÃƒâ€°ES ===
+// === CHARGEMENT DONNÉES ===
 
 function loadData(){
   try{
@@ -123,7 +123,7 @@ function repairMissions(){
         if(!p.agents)p.agents=[];
       });
     }
-    // Migration : dÃƒÂ©placer isReg vers isReg8h et isRegCT
+    // Migration : déplacer isReg vers isReg8h et isRegCT
     if(m.affectations){
       for(var an in m.affectations){
         var af=m.affectations[an];
@@ -196,7 +196,7 @@ function hasVLEPCT(n){
   return v!=='' && v!=='-';
 }
 
-// === CRÃƒâ€°ATION MISSION ===
+// === CRÉATION MISSION ===
 
 function createEmptyMission(){
   var g=[];
@@ -217,4 +217,4 @@ function createEmptyMission(){
   };
 }
 
-console.log('Ã¢Å“â€œ State chargÃƒÂ©');
+console.log('✓ State chargé');

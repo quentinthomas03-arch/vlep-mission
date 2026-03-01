@@ -106,7 +106,7 @@ function renderQuickEntry(){
   
   // Modal ajout manuel
   if(state.showModal==='quickAddManual'){
-    h+='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>Ajouter agent</h2><button class="close-btn" onclick="state.showModal=null;render();">?</button></div><div class="field"><label class="label">Nom de l\'agent</label><input type="text" class="input" id="quick-manual-name" placeholder="Ex: Benzène"></div><div class="row"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-primary" onclick="addQuickManualAgent();">Ajouter</button></div></div></div>';
+    h+='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>Ajouter agent</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div><div class="field"><label class="label">Nom de l\'agent</label><input type="text" class="input" id="quick-manual-name" placeholder="Ex: Benzène"></div><div class="row"><button class="btn btn-gray" onclick="state.showModal=null;render();">Annuler</button><button class="btn btn-primary" onclick="addQuickManualAgent();">Ajouter</button></div></div></div>';
   }
   
   return h;
@@ -274,4 +274,4 @@ function createQuickMission(){
 }
 
 
-console.log('?? Quick entry chargé');
+console.log('\u2713 Quick entry chargé');

@@ -68,7 +68,7 @@ if ('serviceWorker' in navigator) {
             // Notification discrète
             var banner = document.createElement('div');
             banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#0066b3;color:white;padding:12px;text-align:center;font-size:13px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
-            banner.innerHTML = '🔄 Mise à jour disponible... Rechargement automatique dans 2s';
+            banner.innerHTML = '\u21bb Mise à jour disponible... Rechargement automatique dans 2s';
             document.body.appendChild(banner);
             
             // Rechargement automatique après 2 secondes
@@ -142,4 +142,4 @@ window.addEventListener('popstate', function(event) {
 // Ajouter un état initial dans l'historique pour capturer le bouton retour
 history.pushState({view: state.view}, '', '');
 
-console.log('✓ App chargé');
+console.log('\u2713 App chargé');
