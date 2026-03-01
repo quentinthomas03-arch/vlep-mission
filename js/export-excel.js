@@ -1,6 +1,6 @@
 // export-excel.js - Export Excel et validation
 // © 2025 Quentin THOMAS
-// Validation pré-export, création fichier Excel (3 feuilles)
+// Validation pré-export, création fichier Excel (2 feuilles REG/NON REG + Échantillons)
 
 function createRegSheet(m,prels){
   var aoa=[];
@@ -849,65 +849,6 @@ function createEchantillonsSheet(m, regPrels, nonRegPrels){
     {wch: 18}, // Type
     {wch: 18}, // Priorité
     {wch: 30}  // Matrice
-  ];
-  
-  return ws;
-}
-
-// Feuille Relevé d'activité
-function createActiviteSheet(m){
-  var aoa=[];
-  
-  // En-tête
-  aoa.push(['Relevé d\'activité - '+m.clientSite]);
-  aoa.push(['Préleveur: '+(m.preleveur||''),'','Débitmètre: '+(m.debitmetre||'')]);
-  aoa.push([]);
-  
-  // En-tête tableau
-  aoa.push(['GEH','Opérateur','Agent(s) chimique(s)','Type','Date','Plage horaire','Durée','Observations']);
-  
-  // Données
-  m.prelevements.forEach(function(p){
-    p.subPrelevements.forEach(function(sb,si){
-      var agentNames=p.agents.map(function(a){return a.name;}).join(', ');
-      var plagesStr='';
-      var dureeTotale=0;
-      if(sb.plages){
-        plagesStr=sb.plages.filter(function(pl){return pl.debut||pl.fin;}).map(function(pl){
-          return(pl.debut||'?')+' - '+(pl.fin||'?');
-        }).join(' / ');
-        sb.plages.forEach(function(pl){
-          if(pl.debut&&pl.fin){
-            var d=pl.debut.split(':'),f=pl.fin.split(':');
-            var diff=(parseInt(f[0])*60+parseInt(f[1]))-(parseInt(d[0])*60+parseInt(d[1]));
-            if(diff>0)dureeTotale+=diff;
-          }
-        });
-      }
-      var dureeStr=dureeTotale>0?(Math.floor(dureeTotale/60)+'h'+(dureeTotale%60<10?'0':'')+(dureeTotale%60)):'';
-      
-      aoa.push([
-        p.gehNum+' - '+(p.gehName||''),
-        sb.operateur||'',
-        agentNames,
-        p.type+(p.isReglementaire?' (Régl.)':' (Non-régl.)'),
-        formatDateFR(sb.date)||'',
-        plagesStr,
-        dureeStr,
-        sb.observations||''
-      ]);
-    });
-  });
-  
-  var ws=XLSX.utils.aoa_to_sheet(aoa);
-  
-  // Fusions en-tête
-  if(!ws['!merges'])ws['!merges']=[];
-  ws['!merges'].push({s:{r:0,c:0},e:{r:0,c:7}});
-  
-  // Largeurs
-  ws['!cols']=[
-    {wch:25},{wch:18},{wch:30},{wch:15},{wch:12},{wch:25},{wch:10},{wch:30}
   ];
   
   return ws;

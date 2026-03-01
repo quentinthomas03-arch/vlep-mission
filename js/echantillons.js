@@ -51,7 +51,7 @@ function renderListeEchantillons(){
   if(!m.blancs)m.blancs=[];
   
   var h='<button class="back-btn" onclick="state.view=\'terrain-mission\';render();">'+ICONS.arrowLeft+' Mission</button><div class="card"><h2>'+ICONS.list+' Liste échantillons</h2><p class="subtitle">'+escapeHtml(m.clientSite)+'</p></div>';
-  h+='<div class="row mb-12"><button class="btn btn-success" onclick="state.showModal=\'addBlanc\';state.blancAgentSearch=\'\';state.blancAgents=[];render();">+ Blanc terrain</button><button class="btn btn-primary" onclick="exportExcel();">'+ICONS.download+' Export Excel</button></div>';
+  h+='<div class="row mb-12"><button class="btn btn-success" onclick="state.showModal=\'addBlanc\';state.blancAgentSearch=\'\';state.blancAgents=[];render();">+ Blanc terrain</button><button class="btn btn-primary" onclick="exportExcel();">'+ICONS.download+' Export Excel</button><button class="btn btn-primary" onclick="exportActiviteWord();" style="background:#0f4c81;">'+ICONS.download+' Export Activité Word</button></div>';
   h+='<div class="row mb-12"><span style="font-size:13px;margin-right:8px;">Trier par :</span><button class="btn btn-small '+(state.echantillonSort==='date'?'btn-blue':'btn-gray')+'" onclick="state.echantillonSort=\'date\';render();">Date</button><button class="btn btn-small '+(state.echantillonSort==='agent'?'btn-blue':'btn-gray')+'" onclick="state.echantillonSort=\'agent\';render();">Agent</button></div>';
   
   // FIX #2: Regrouper par référence échantillon
@@ -303,10 +303,6 @@ function exportExcel(){
   // Créer la feuille Échantillons
   var wsEchantillons=createEchantillonsSheet(m,regPrels,nonRegPrels);
   XLSX.utils.book_append_sheet(wb,wsEchantillons,'Échantillons');
-  
-  // Créer la feuille Relevé d'activité
-  var wsActivite=createActiviteSheet(m);
-  XLSX.utils.book_append_sheet(wb,wsActivite,'Relevé activité');
   
   var fn=(m.clientSite||'Mission').replace(/[^a-zA-Z0-9àâäéèêëïîôùûüç\\s-]/g,'')+'_supports.xlsx';
   XLSX.writeFile(wb,fn);

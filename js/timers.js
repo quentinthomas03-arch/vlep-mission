@@ -1,9 +1,9 @@
-// timers.js - Timers CT et dictÃ©e vocale
-// Ãƒâ€šÂ© 2025 Quentin THOMAS
-// ChronomÃƒÆ’Ã‚Â¨tres CT 15min, dictÃ©e vocale amÃ©liorÃ©e
+// timers.js - Timers CT et dictée vocale
+// © 2025 Quentin THOMAS
+// Chronomètres CT 15min, dictée vocale améliorée
 
 // ===================================================
-// DICTÃƒÆ’Ã¢â‚¬Â°E VOCALE - Version amÃ©liorÃ©e
+// DICTÉE VOCALE - Version améliorée
 // Corrections : bug de duplication, affichage live,
 // auto-relance, commandes ponctuation
 // ===================================================
@@ -22,8 +22,8 @@ var PONCTUATION_COMMANDS = [
   { pattern: /\bdeuxpoints\b/gi,       replacement: ': ' },
   { pattern: /\bdeux points\b/gi,      replacement: ': ' },
   { pattern: /\bpoint\b/gi,            replacement: '. ' },
-  { pattern: /\bouvrir parenthÃƒÆ’Ã‚Â¨se\b/gi,replacement: '(' },
-  { pattern: /\bfermer parenthÃƒÆ’Ã‚Â¨se\b/gi,replacement: ')' },
+  { pattern: /\bouvrir parenthèse\b/gi,replacement: '(' },
+  { pattern: /\bfermer parenthèse\b/gi,replacement: ')' },
 ];
 
 function applyPonctuationCommands(text) {
@@ -35,7 +35,7 @@ function applyPonctuationCommands(text) {
   return text;
 }
 
-// Afficher le panel de dictÃ©e flottant
+// Afficher le panel de dictée flottant
 function showDictationPanel(prelId, subIdx) {
   var existing = document.getElementById('dictation-panel');
   if (existing) existing.remove();
@@ -53,7 +53,7 @@ function showDictationPanel(prelId, subIdx) {
   panel.innerHTML = [
     '<div style="display:flex;align-items:center;gap:10px;">',
       '<div id="dictation-dot" style="width:14px;height:14px;border-radius:50%;background:#ef4444;animation:dictPulse 1s infinite;flex-shrink:0;"></div>',
-      '<span style="font-weight:700;font-size:14px;">DictÃ©e en cours...</span>',
+      '<span style="font-weight:700;font-size:14px;">Dictée en cours...</span>',
       '<button onclick="stopDictation();" style="margin-left:auto;background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;">⏹ Stop</button>',
     '</div>',
     '<div id="dictation-interim" style="',
@@ -71,7 +71,7 @@ function showDictationPanel(prelId, subIdx) {
 
   document.body.appendChild(panel);
 
-  // Injecter l'animation CSS si pas encore prÃ©sente
+  // Injecter l'animation CSS si pas encore présente
   if (!document.getElementById('dictation-css')) {
     var style = document.createElement('style');
     style.id = 'dictation-css';
@@ -100,26 +100,26 @@ function removeDictationPanel() {
 
 function stopDictation() {
   if (!activeDictation) return;
-  activeDictation.stopped = true; // empÃƒÆ’Ã‚Âªcher l'auto-relance
+  activeDictation.stopped = true; // empêcher l'auto-relance
   activeDictation.recognition.stop();
 }
 
 function toggleDictation(prelId, subIdx) {
   var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    alert('La dictÃ©e vocale n\'est pas supportÃ©e par votre navigateur.\n\nUtilisez Chrome sur Android pour cette fonctionnalitÃ©.');
+    alert('La dictée vocale n\'est pas supportée par votre navigateur.\n\nUtilisez Chrome sur Android pour cette fonctionnalité.');
     return;
   }
 
   var key = prelId + '_' + subIdx;
 
-  // Si dictÃ©e active sur ce mÃƒÆ’Ã‚Âªme champ Ã¢â€ â€™ stop
+  // Si dictée active sur ce même champ → stop
   if (activeDictation && activeDictation.key === key) {
     stopDictation();
     return;
   }
 
-  // Si dictÃ©e active sur un autre champ Ã¢â€ â€™ stopper proprement d'abord
+  // Si dictée active sur un autre champ → stopper proprement d'abord
   if (activeDictation) {
     activeDictation.stopped = true;
     activeDictation.recognition.stop();
@@ -134,10 +134,10 @@ function startDictationSession(prelId, subIdx, key) {
 
   var textarea = document.getElementById('obs-' + prelId + '-' + subIdx);
 
-  // Texte existant avant de commencer ÃƒÆ’  dicter
-  // On sÃ©pare le texte dÃ©jÃƒÆ’  validÃ© du nouveau contenu dictÃ©
+  // Texte existant avant de commencer à dicter
+  // On sépare le texte déjà validé du nouveau contenu dicté
   var confirmedText = textarea ? textarea.value : '';
-  // SÃ©parateur si texte prÃ©existant
+  // Séparateur si texte préexistant
   if (confirmedText && !confirmedText.endsWith(' ') && !confirmedText.endsWith('\n')) {
     confirmedText += ' ';
   }
@@ -153,13 +153,13 @@ function startDictationSession(prelId, subIdx, key) {
     prelId: prelId,
     subIdx: subIdx,
     recognition: recognition,
-    confirmedText: confirmedText, // texte validÃ© dÃ©finitivement
+    confirmedText: confirmedText, // texte validé définitivement
     stopped: false
   };
 
   activeDictation = session;
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ GESTIONNAIRE PRINCIPAL : rÃ©sultats Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+  // ââ€â‚¬ââ€â‚¬ââ€â‚¬ GESTIONNAIRE PRINCIPAL : résultats ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬
   recognition.onresult = function(event) {
     var interimTranscript = '';
     var newFinalText = '';
@@ -169,40 +169,40 @@ function startDictationSession(prelId, subIdx, key) {
       var transcript = result[0].transcript;
 
       if (result.isFinal) {
-        // RÃ©sultat dÃ©finitif : appliquer les commandes de ponctuation
+        // Résultat définitif : appliquer les commandes de ponctuation
         newFinalText += applyPonctuationCommands(transcript);
       } else {
-        // RÃ©sultat interimaire : affichage uniquement, pas de ponctuation
+        // Résultat interimaire : affichage uniquement, pas de ponctuation
         interimTranscript += transcript;
       }
     }
 
-    // Accumuler le texte final validÃ©
+    // Accumuler le texte final validé
     if (newFinalText) {
       session.confirmedText += newFinalText;
-      // Mettre ÃƒÆ’  jour le champ et sauvegarder
+      // Mettre à jour le champ et sauvegarder
       if (textarea) {
         textarea.value = session.confirmedText;
       }
       updateSubFieldWithAutoDate(prelId, subIdx, 'observations', session.confirmedText);
     }
 
-    // Afficher : texte confirmÃ© + interim en cours
+    // Afficher : texte confirmé + interim en cours
     var displayText = session.confirmedText + interimTranscript;
     if (textarea) {
       textarea.value = displayText;
     }
 
-    // Mettre ÃƒÆ’  jour le panel visuel
+    // Mettre à jour le panel visuel
     updateDictationPanel(interimTranscript || newFinalText, !interimTranscript);
   };
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ FIN DE SESSION : auto-relance si pas stoppÃ© volontairement Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+  // ââ€â‚¬ââ€â‚¬ââ€â‚¬ FIN DE SESSION : auto-relance si pas stoppé volontairement ââ€â‚¬ââ€â‚¬ââ€â‚¬
   recognition.onend = function() {
     var btn = document.getElementById('dict-btn-' + prelId + '-' + subIdx);
 
     if (session.stopped) {
-      // ArrÃƒÆ’Ã‚Âªt volontaire
+      // Arrêt volontaire
       activeDictation = null;
       if (btn) btn.classList.remove('recording');
       removeDictationPanel();
@@ -215,14 +215,14 @@ function startDictationSession(prelId, subIdx, key) {
       return;
     }
 
-    // Auto-relance aprÃƒÆ’Ã‚Â¨s silence (comportement Android Chrome)
-    // Petit dÃ©lai pour Ã©viter l'erreur "already started"
+    // Auto-relance après silence (comportement Android Chrome)
+    // Petit délai pour éviter l'erreur "already started"
     setTimeout(function() {
       if (!session.stopped && activeDictation && activeDictation.key === key) {
         try {
           recognition.start();
         } catch(e) {
-          // Si Ã©chec de relance, crÃ©er une nouvelle session
+          // Si échec de relance, créer une nouvelle session
           activeDictation = null;
           if (btn) btn.classList.remove('recording');
           removeDictationPanel();
@@ -232,22 +232,22 @@ function startDictationSession(prelId, subIdx, key) {
     }, 200);
   };
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ ERREURS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+  // ââ€â‚¬ââ€â‚¬ââ€â‚¬ ERREURS ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬ââ€â‚¬
   recognition.onerror = function(event) {
     var btn = document.getElementById('dict-btn-' + prelId + '-' + subIdx);
 
     if (event.error === 'no-speech') {
-      // Silence : normal sur le terrain, on laisse l'auto-relance gÃ©rer
+      // Silence : normal sur le terrain, on laisse l'auto-relance gérer
       return;
     }
 
     if (event.error === 'aborted') {
-      // ArrÃƒÆ’Ã‚Âªt propre, gÃ©rÃ© par onend
+      // Arrêt propre, géré par onend
       return;
     }
 
     if (event.error === 'not-allowed') {
-      alert('Microphone refusÃ©. VÃ©rifiez les permissions dans les rÃ©glages Chrome.');
+      alert('Microphone refusé. Vérifiez les permissions dans les réglages Chrome.');
       session.stopped = true;
       activeDictation = null;
       if (btn) btn.classList.remove('recording');
@@ -256,26 +256,26 @@ function startDictationSession(prelId, subIdx, key) {
     }
 
     if (event.error === 'network') {
-      // Erreur rÃ©seau : tenter de relancer
+      // Erreur réseau : tenter de relancer
       return;
     }
 
     // Autres erreurs : afficher et stopper
-    console.warn('DictÃ©e - erreur:', event.error);
+    console.warn('Dictée - erreur:', event.error);
     session.stopped = true;
     activeDictation = null;
     if (btn) btn.classList.remove('recording');
     removeDictationPanel();
   };
 
-  // DÃ©marrer
+  // Démarrer
   try {
     recognition.start();
     var btn = document.getElementById('dict-btn-' + prelId + '-' + subIdx);
     if (btn) btn.classList.add('recording');
     showDictationPanel(prelId, subIdx);
   } catch(e) {
-    console.error('Impossible de dÃ©marrer la dictÃ©e:', e);
+    console.error('Impossible de démarrer la dictée:', e);
     activeDictation = null;
   }
 }
@@ -299,7 +299,7 @@ function startCTTimer(prelId, subIdx) {
   var key = prelId + '_' + subIdx;
   if (ctTimers[key]) return;
 
-  // Auto-remplir l'heure de dÃ©but dans la premiÃ¨re plage
+  // Auto-remplir l'heure de début dans la première plage
   var heureDebut = getCurrentTimeHHMM();
   var m = getCurrentMission();
   if (m) {
@@ -307,7 +307,7 @@ function startCTTimer(prelId, subIdx) {
     if (p && p.subPrelevements[subIdx]) {
       var sb = p.subPrelevements[subIdx];
       if (!sb.plages || sb.plages.length === 0) sb.plages = [{debut: '', fin: ''}];
-      // Remplir la derniÃ¨re plage sans dÃ©but
+      // Remplir la dernière plage sans début
       var targetPlage = sb.plages[sb.plages.length - 1];
       if (!targetPlage.debut) {
         targetPlage.debut = heureDebut;
@@ -341,7 +341,7 @@ function stopCTTimer(prelId, subIdx) {
   clearInterval(ctTimers[key].interval);
   delete ctTimers[key];
 
-  // Auto-remplir l'heure de fin dans la derniÃ¨re plage
+  // Auto-remplir l'heure de fin dans la dernière plage
   var heureFin = getCurrentTimeHHMM();
   var m = getCurrentMission();
   if (m) {
@@ -388,10 +388,10 @@ function getTimerDisplay(prelId, subIdx) {
       '<div style="background:#e5e7eb;border-radius:4px;height:6px;margin-bottom:10px;">',
         '<div style="background:' + (isOver ? '#ef4444' : '#22c55e') + ';height:6px;border-radius:4px;width:' + pct.toFixed(1) + '%;transition:width 1s;"></div>',
       '</div>',
-      (isOver ? '<div style="font-size:11px;color:#ef4444;font-weight:700;text-align:center;margin-bottom:8px;">Ã¢Å¡Â Ã¯Â¸Â 15 min dÃ©passÃ©es</div>' : '<div style="font-size:11px;color:#6b7280;text-align:center;margin-bottom:8px;">DurÃ©e max CT : 15 min</div>'),
+      (isOver ? '<div style="font-size:11px;color:#ef4444;font-weight:700;text-align:center;margin-bottom:8px;">⚠️ 15 min dépassées</div>' : '<div style="font-size:11px;color:#6b7280;text-align:center;margin-bottom:8px;">Durée max CT : 15 min</div>'),
       '<button class="btn btn-danger" style="width:100%;" onclick="stopCTTimer(' + prelId + ',' + subIdx + ');">⏹ Arrêter</button>',
     '</div>'
   ].join('');
 }
 
-console.log('Ã¢Å“â€ Timers chargÃ©');
+console.log('✓ Timers chargé');

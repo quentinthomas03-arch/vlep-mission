@@ -1,8 +1,8 @@
 // sw.js - Service Worker
-// © 2025 Quentin THOMAS
+// Â© 2025 Quentin THOMAS
 
-const CACHE_NAME = 'vlep-mission-v3.8-modular-fix1';
-const VERSION = '3.8.1'; // Incrémenter à chaque mise à jour
+const CACHE_NAME = 'vlep-mission-v3.8-modular-fix2';
+const VERSION = '3.8.2'; // Incrémenter à chaque mise à jour
 const urlsToCache = [
   './',
   './index.html',
@@ -21,8 +21,10 @@ const urlsToCache = [
   './js/quick-entry.js',
   './js/import-export.js',
   './js/timers.js',
+  './js/docx.iife.js',
+  './js/export-word.js',
   './js/app.js',
-  // Bibliothèque externe
+  // BibliothÃ¨que externe
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
@@ -36,8 +38,8 @@ self.addEventListener('install', function(event) {
         return cache.addAll(urlsToCache);
       })
       .then(function() {
-        console.log('[SW] Tous les fichiers mis en cache avec succès');
-        return self.skipWaiting(); // Active immédiatement
+        console.log('[SW] Tous les fichiers mis en cache avec succÃ¨s');
+        return self.skipWaiting(); // Active immÃ©diatement
       })
       .catch(function(err){
         console.error('[SW] Erreur mise en cache:', err);
@@ -60,11 +62,11 @@ self.addEventListener('activate', function(event) {
       );
     })
     .then(function() {
-      console.log('[SW] Prise de contrôle des clients');
-      return self.clients.claim(); // Prend le contrôle immédiatement
+      console.log('[SW] Prise de contrÃ´le des clients');
+      return self.clients.claim(); // Prend le contrÃ´le immÃ©diatement
     })
     .then(function() {
-      // Notifier tous les clients qu'une mise à jour est disponible
+      // Notifier tous les clients qu'une mise Ã  jour est disponible
       return self.clients.matchAll().then(function(clients) {
         clients.forEach(function(client) {
           client.postMessage({
@@ -77,12 +79,12 @@ self.addEventListener('activate', function(event) {
   );
 });
 
-// Fetch - Stratégie Network First pour le développement
+// Fetch - StratÃ©gie Network First pour le dÃ©veloppement
 self.addEventListener('fetch', function(event) {
   event.respondWith(
     fetch(event.request)
       .then(function(response) {
-        // Si la requête réseau réussit, mettre en cache
+        // Si la requÃªte rÃ©seau rÃ©ussit, mettre en cache
         if (response && response.status === 200) {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then(function(cache) {
@@ -92,10 +94,10 @@ self.addEventListener('fetch', function(event) {
         return response;
       })
       .catch(function() {
-        // Si le réseau échoue, utiliser le cache
+        // Si le rÃ©seau Ã©choue, utiliser le cache
         return caches.match(event.request);
       })
   );
 });
 
-console.log('[SW] Service Worker chargé v' + VERSION);
+console.log('[SW] Service Worker chargÃ© v' + VERSION);
