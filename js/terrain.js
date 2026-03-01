@@ -689,7 +689,7 @@ function renderSubPrelForm(p,sb,idx){
   h+='<div class="field"><label class="label">Observations</label><div style="display:flex;gap:6px;align-items:flex-start;"><textarea class="input" style="flex:1;" rows="2" id="obs-'+p.id+'-'+idx+'" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'observations\',this.value);">'+escapeHtml(sb.observations||'')+'</textarea><button class="dictation-btn" id="dict-btn-'+p.id+'-'+idx+'" onclick="toggleDictation('+p.id+','+idx+');" title="Dictée vocale">'+ICONS.mic+'</button></div></div>';
 
   // EPI respiratoire
-  var epiVal=sb.epiType||'sans objet';
+  var epiVal=(sb.epiType!==undefined&&sb.epiType!==null)?sb.epiType:'sans objet';
   var isAutre=(epiVal!=='sans objet'&&epiVal!=='FFP3'&&epiVal!=='TH3');
   h+='<div class="field"><label class="label">EPI respiratoire</label>';
   h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">';
