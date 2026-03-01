@@ -15,7 +15,8 @@ function exportActiviteWord() {
   try {
     var doc = buildActiviteDoc(m);
     docx.Packer.toBlob(doc).then(function(blob) {
-      var fn = sanitizeFilename(m.clientSite || 'Mission') + '_activite.docx';
+      var rawName = (m.clientSite || 'Mission').replace(/[^a-zA-Z0-9\u00e0\u00e2\u00e4\u00e9\u00e8\u00ea\u00eb\u00ef\u00ee\u00f4\u00f9\u00fb\u00fc\u00e7\s-]/g, '').trim();
+      var fn = rawName + '_activite.docx';
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
