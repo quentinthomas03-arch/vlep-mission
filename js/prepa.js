@@ -17,8 +17,8 @@ function renderHome(){
   h+='<div class="nav-item" onclick="state.view=\'db-terrain\';render();"><div class="nav-icon orange">'+ICONS.search+'</div><div class="nav-label">Base de données</div><div class="nav-count">'+state.agentsDB.length+'</div></div></div>';
   h+='<input type="file" id="import-mission-input" accept=".json" style="display:none;" onchange="handleImportMission(event);">';
   if(state.showModal==='importChoice'){state.showModal=null;triggerImportMission();}
-  h+='<div style="margin-top:12px;text-align:center;"><button class="btn btn-gray" onclick="window.open(\'procedure_vlep_mission.html\',\'_blank\');">🎓 Tutoriel — Guide d\'utilisation</button></div>';
-  h+='<div class="version-info">Version 3.6 © 2025 Quentin THOMAS</div>';
+  h+='<div style="margin-top:12px;text-align:center;"><button class="btn btn-gray" onclick="state.view=\'tutoriel\';render();">🎓 Tutoriel — Guide d\'utilisation</button></div>';
+  h+='<div class="version-info">Version 1.0 © 2025 Quentin THOMAS</div>';
   return h;
 }
 
@@ -940,3 +940,80 @@ function toggleGehAffect(an,gid,t){
 
 
 console.log('? Prépa chargé');
+
+
+// ═══════════════════════════════════════════════════════════
+// TUTORIEL - Guide d'utilisation intégré
+// ═══════════════════════════════════════════════════════════
+function renderTutoriel(){
+  var h='<button class="back-btn" onclick="state.view=\'home\';render();">'+ICONS.arrowLeft+' Accueil</button>';
+  h+='<div class="card" style="border-left:4px solid #0066b3;">';
+  h+='<h1 style="color:#0066b3;">🎓 Guide d\'utilisation</h1>';
+  h+='<p class="subtitle">VLEP Mission — Workflow complet</p>';
+  h+='</div>';
+
+  var sections=[
+    {
+      num:'1',color:'#0066b3',title:'Préparation (au bureau)',
+      steps:[
+        {t:'Créer une mission',d:'Accueil → Préparation mission → Nouvelle mission. Saisissez le client/site, le préleveur et le numéro de débitmètre.'},
+        {t:'Ajouter les GEH',d:'Dans la mission → GEH → Ajouter. Donnez un numéro et un intitulé à chaque Groupe d'Exposition Homogène.'},
+        {t:'Ajouter les agents chimiques',d:'Agents → Rechercher dans la base de données (459 agents). Cochez 8h et/ou CT selon le type de prélèvement.'},
+        {t:'Créer les affectations',d:'Affectations → Pour chaque agent, sélectionnez les GEH concernés. Choisissez Réglementaire ou Non-réglementaire.'},
+        {t:'Valider la mission',d:'Bouton Valider → L'appli génère automatiquement tous les prélèvements. La mission passe en statut Validée.'}
+      ]
+    },
+    {
+      num:'2',color:'#16a34a',title:'Terrain (sur site)',
+      steps:[
+        {t:'Ouvrir la mission',d:'Accueil → Saisie terrain → sélectionner la mission validée.'},
+        {t:'Saisir les données de prélèvement',d:'Cliquer sur un prélèvement → Onglet du sous-prélèvement concerné. Saisir : opérateur, date, n° pompe, débits initial/final, plages horaires. Le pavé numérique s'ouvre automatiquement au clic.'},
+        {t:'EPI respiratoire',d:'Sélectionner sans objet / FFP3 / TH3 / Autre. Si EPI : saisir la durée de port en minutes.'},
+        {t:'Plages horaires',d:'Ajouter autant de plages que nécessaire (début → fin). La durée totale se calcule automatiquement.'},
+        {t:'Valider le prélèvement',d:'Bouton ✓ Valider en bas de chaque prélèvement. Un ✓ apparaît dans l'onglet quand c'est complété.'},
+        {t:'Co-prélèvement (indicateur bleu)',d:'Plusieurs agents sur le même support physique. Les indicateurs bleus signalent cette situation automatiquement.'}
+      ]
+    },
+    {
+      num:'3',color:'#ea580c',title:'Conditions ambiantes',
+      steps:[
+        {t:'Accès',d:'Dans la vue mission terrain → bouton Conditions ambiantes.'},
+        {t:'Saisir les mesures',d:'Température, pression atmosphérique et humidité relative — initial et final pour chaque jour. Le pavé numérique s'ouvre au clic sur chaque champ.'},
+        {t:'Fréquence',d:'Une entrée par jour de prélèvement. Cliquer + Ajouter condition pour chaque nouvelle journée.'}
+      ]
+    },
+    {
+      num:'4',color:'#7c3aed',title:'Export Excel (vers la macro)',
+      steps:[
+        {t:'Accès',d:'Mission terrain → Liste échantillons → Export Excel.'},
+        {t:'Contenu de l'export',d:'Feuille REG : prélèvements réglementaires. Feuille NON REG : prélèvements non-réglementaires. Feuille Échantillons : récapitulatif.'},
+        {t:'Copier dans la macro',d:'Ouvrir le fichier Excel exporté. Copier-coller chaque section dans les cellules bleues de la macro accréditée de la société. Les EPI et FPA sont pré-remplis pour que le VLOOKUP fonctionne automatiquement.'},
+        {t:'Résultats labo',d:'Les résultats d'analyse sont à saisir directement dans la macro (cellules dédiées non gérées par l'appli).'}
+      ]
+    },
+    {
+      num:'5',color:'#0891b2',title:'Fonctions utiles',
+      steps:[
+        {t:'Bouton J-1',d:'Copie automatiquement la valeur du prélèvement précédent (opérateur, n° pompe). Évite la ressaisie sur plusieurs jours.'},
+        {t:'Fusion intelligente',d:'Regroupe automatiquement les prélèvements du même opérateur sur plusieurs jours en un seul prélèvement multi-jours.'},
+        {t:'Base de données',d:'Accueil → Base de données. Recherche parmi 459 agents chimiques avec tous les paramètres : débit, support, conservation, VLEP.'},
+        {t:'Import/Export JSON',d:'Partager une mission entre appareils via le bouton Partager (QR code ou fichier JSON).'},
+        {t:'Installation PWA',d:'Sur Android Chrome : menu → Ajouter à l'écran d'accueil. Sur iOS Safari : partager → Sur l'écran d'accueil. L'appli fonctionne ensuite hors ligne.'}
+      ]
+    }
+  ];
+
+  sections.forEach(function(sec){
+    h+='<div style="background:'+sec.color+';color:white;border-radius:10px;padding:12px 16px;margin-top:16px;display:flex;align-items:center;gap:10px;">';
+    h+='<div style="background:rgba(255,255,255,0.25);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;flex-shrink:0;">'+sec.num+'</div>';
+    h+='<span style="font-weight:700;font-size:15px;">'+sec.title+'</span></div>';
+    sec.steps.forEach(function(step,si){
+      h+='<div style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-top:6px;overflow:hidden;border-left:3px solid '+sec.color+';">';
+      h+='<div style="padding:10px 14px;"><div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:3px;">'+(si+1)+'. '+step.t+'</div>';
+      h+='<div style="font-size:12px;color:#475569;line-height:1.5;">'+step.d+'</div></div></div>';
+    });
+  });
+
+  h+='<div style="text-align:center;margin-top:20px;margin-bottom:8px;color:#94a3b8;font-size:11px;">VLEP Mission v1.0 © 2025 Quentin THOMAS</div>';
+  return h;
+}

@@ -19,6 +19,7 @@ function render(){
     case'db-full':h=renderDbFull();break;
     case'liste-echantillons':h=renderListeEchantillons();break;
     case'quick-entry':h=renderQuickEntry();break;
+    case'tutoriel':h=renderTutoriel();break;
     default:h=renderHome();
   }
   document.getElementById('app').innerHTML=h;
@@ -130,6 +131,8 @@ window.addEventListener('popstate', function(event) {
     state.view = 'terrain-mission';
   } else if (state.view.startsWith('db-') || state.view === 'quick-entry') {
     // Depuis base de données ou saisie rapide, retour à l'accueil
+    state.view = 'home';
+  } else if (state.view === 'tutoriel') {
     state.view = 'home';
   } else {
     // Par défaut, retour à l'accueil

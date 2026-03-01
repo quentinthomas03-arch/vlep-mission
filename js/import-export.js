@@ -6,7 +6,7 @@
 function exportMissionJSON(id){
   var m=state.missions.find(function(x){return x.id===id;});
   if(!m){alert('Mission introuvable');return;}
-  var exportData={_format:'VLEP_Mission_JSON',_version:'3.6',_exportDate:new Date().toISOString(),_author:'Quentin THOMAS',mission:JSON.parse(JSON.stringify(m))};
+  var exportData={_format:'VLEP_Mission_JSON',_version:'1.0',_exportDate:new Date().toISOString(),_author:'Quentin THOMAS',mission:JSON.parse(JSON.stringify(m))};
   var json=JSON.stringify(exportData,null,2);
   var blob=new Blob([json],{type:'application/json'});
   var url=URL.createObjectURL(blob);
@@ -98,7 +98,7 @@ function renderQRCodeModal(){
   var m=state.missions.find(function(x){return x.id===state.qrMissionId;});
   if(!m)return'';
   
-  var missionJson=JSON.stringify({_format:'VLEP_Mission_JSON',_version:'3.6',mission:JSON.parse(JSON.stringify(m))});
+  var missionJson=JSON.stringify({_format:'VLEP_Mission_JSON',_version:'1.0',mission:JSON.parse(JSON.stringify(m))});
   var dataSize=missionJson.length;
   var isTooBig=dataSize>2500;
   
@@ -138,7 +138,7 @@ function generateQRCode(id){
   // Nettoyer pour réduire la taille
   if(missionCopy.agentColors)delete missionCopy.agentColors;
   
-  var json=JSON.stringify({_f:'VLEP',_v:'3.6',m:missionCopy});
+  var json=JSON.stringify({_f:'VLEP',_v:'1.0',m:missionCopy});
   
   if(json.length>2500){
     container.innerHTML='<div style="color:var(--danger);font-size:12px;padding:20px;">Données trop volumineuses pour un QR code ('+(json.length/1024).toFixed(1)+' Ko)</div>';
