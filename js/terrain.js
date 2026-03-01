@@ -1,3 +1,90 @@
+// ═══════════════════════════════════════════════════════════
+// PAVÉ NUMÉRIQUE CUSTOM - remplace clavier natif
+// ═══════════════════════════════════════════════════════════
+var _kpCallback = null;
+var _kpValue = '';
+var _kpDecimal = false;
+
+function openKeypad(currentVal, callback, allowDecimal) {
+  _kpCallback = callback;
+  _kpValue = String(currentVal || '');
+  _kpDecimal = (allowDecimal !== false);
+  _renderKeypad();
+}
+
+function _renderKeypad() {
+  var existing = document.getElementById('custom-keypad-overlay');
+  if (existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'custom-keypad-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;flex-direction:column;justify-content:flex-end;';
+  var disp = _kpValue === '' ? '0' : _kpValue;
+  var dotBtn = _kpDecimal
+    ? '<button ontouchstart="_kpPress(\'.\');event.preventDefault();" onclick="_kpPress(\'.\');" style="'+_kpStyle('#334155')+'">.</button>'
+    : '<div></div>';
+  overlay.innerHTML =
+    '<div style="flex:1;" onclick="_closeKeypad();"></div>' +
+    '<div style="background:#1e293b;border-radius:16px 16px 0 0;padding:16px;box-shadow:0 -4px 24px rgba(0,0,0,0.4);">' +
+    '<div style="background:#0f172a;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">' +
+    '<span id="kp-display" style="font-size:32px;font-weight:700;color:#38bdf8;min-width:60px;">' + disp + '</span>' +
+    '<button ontouchstart="_kpClear();event.preventDefault();" onclick="_kpClear();" style="background:#475569;border:none;color:#e2e8f0;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;">C</button>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;">' +
+    _kpBtn('7') + _kpBtn('8') + _kpBtn('9') +
+    _kpBtn('4') + _kpBtn('5') + _kpBtn('6') +
+    _kpBtn('1') + _kpBtn('2') + _kpBtn('3') +
+    dotBtn + _kpBtn('0') +
+    '<button ontouchstart="_kpBack();event.preventDefault();" onclick="_kpBack();" style="'+_kpStyle('#475569')+'">⌫</button>' +
+    '</div>' +
+    '<button ontouchstart="_kpConfirm();event.preventDefault();" onclick="_kpConfirm();" style="width:100%;background:#0066b3;border:none;color:white;font-size:17px;font-weight:700;border-radius:12px;padding:18px;cursor:pointer;touch-action:manipulation;">✓ Valider</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function _kpStyle(bg) {
+  return 'background:'+bg+';border:none;color:white;font-size:24px;font-weight:600;border-radius:12px;padding:18px;cursor:pointer;touch-action:manipulation;';
+}
+
+function _kpBtn(d) {
+  return '<button ontouchstart="_kpPress(\''+d+'\');event.preventDefault();" onclick="_kpPress(\''+d+'\');" style="'+_kpStyle('#334155')+'">'+d+'</button>';
+}
+
+function _kpPress(d) {
+  if (d === '.') {
+    if (_kpValue.indexOf('.') !== -1) return;
+    if (_kpValue === '') _kpValue = '0';
+    _kpValue += '.';
+  } else {
+    if (_kpValue === '0') _kpValue = d; else _kpValue += d;
+  }
+  var el = document.getElementById('kp-display');
+  if (el) el.textContent = _kpValue || '0';
+}
+
+function _kpBack() {
+  _kpValue = _kpValue.slice(0, -1);
+  var el = document.getElementById('kp-display');
+  if (el) el.textContent = _kpValue || '0';
+}
+
+function _kpClear() {
+  _kpValue = '';
+  var el = document.getElementById('kp-display');
+  if (el) el.textContent = '0';
+}
+
+function _kpConfirm() {
+  var val = _kpValue;
+  _closeKeypad();
+  if (_kpCallback) { _kpCallback(val); _kpCallback = null; }
+}
+
+function _closeKeypad() {
+  var el = document.getElementById('custom-keypad-overlay');
+  if (el) el.remove();
+  _kpCallback = null;
+}
+
 // terrain.js - Saisie terrain
 // © 2025 Quentin THOMAS
 // Liste missions, prélèvements, fusion, défusion, timers
@@ -650,10 +737,10 @@ function renderSubPrelForm(p,sb,idx){
       // N° Pompe avec bouton copier J-1
       h+='<div class="multi-agent-row"><label>N° Pompe';
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
-      h+='</label><input type="text" inputmode="numeric" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
+      h+='</label><input type="text" readonly class="kp-field" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onclick="(function(){var pid='+p.id+',i='+idx+',an=\''+escapeJs(aname)+'\';openKeypad(ad.numPompe||\'\',function(v){updateAgentDataWithAutoDate(pid,i,an,\'numPompe\',v);render();},false);})()"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" inputmode="decimal" class="debit-input '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" oninput="handleDebitInput(this);" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" readonly class="debit-input kp-field '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onclick="(function(){var pid='+p.id+',i='+idx+',an=\''+escapeJs(aname)+'\';openKeypad(ad.debitInitial||\'\',function(v){updateAgentDataWithAutoDate(pid,i,an,\'debitInitial\',v);renderDebitVariation(pid,i,an);render();},true);})()"></div>';
+      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" readonly class="debit-input kp-field '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onclick="(function(){var pid='+p.id+',i='+idx+',an=\''+escapeJs(aname)+'\';openKeypad(ad.debitFinal||\'\',function(v){updateAgentDataWithAutoDate(pid,i,an,\'debitFinal\',v);renderDebitVariation(pid,i,an);render();},true);})()">'+
       if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
       h+='</div>';
       
@@ -702,7 +789,7 @@ function renderSubPrelForm(p,sb,idx){
     h+='<input type="text" class="input" style="margin-bottom:6px;" value="'+escapeHtml(epiVal)+'" placeholder="Ex: masque complet P3" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiType\',this.value);">';
   }
   if(epiVal!=='sans objet'){
-    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><input type="text" inputmode="numeric" class="input" style="width:100px;" value="'+escapeHtml(String(sb.epiDuree||'0'))+'" placeholder="0" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiDuree\',this.value);"></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><input type="text" readonly class="input kp-field" style="width:100px;" value="'+escapeHtml(String(sb.epiDuree||'0'))+'" placeholder="0" onclick="(function(){var pid='+p.id+',i='+idx+';openKeypad(sb.epiDuree||\'0\',function(v){updateSubFieldWithAutoDate(pid,i,\'epiDuree\',v);render();},false);})()"></div>';
   }
   h+='</div>';
 
