@@ -17,7 +17,7 @@ function renderHome(){
   h+='<div class="nav-item" onclick="state.view=\'db-terrain\';render();"><div class="nav-icon orange">'+ICONS.search+'</div><div class="nav-label">Base de données</div><div class="nav-count">'+state.agentsDB.length+'</div></div></div>';
   h+='<input type="file" id="import-mission-input" accept=".json" style="display:none;" onchange="handleImportMission(event);">';
   if(state.showModal==='importChoice'){state.showModal=null;triggerImportMission();}
-  h+='<div class="version-info">Version 3.6 © 2025 Quentin THOMAS</div>';
+  h+='<div class="version-info">Version 3.8 © 2025 Quentin THOMAS</div>';
   return h;
 }
 
