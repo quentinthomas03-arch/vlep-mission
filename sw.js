@@ -6,7 +6,6 @@ const VERSION = '1.0'; // Incrémenter à chaque mise à jour
 const urlsToCache = [
   './',
   './index.html',
-  './procedure_vlep_mission.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -25,8 +24,6 @@ const urlsToCache = [
   './js/docx.iife.js',
   './js/export-word.js',
   './js/app.js',
-  // BibliothÃ¨que externe
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
 // Installation
