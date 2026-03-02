@@ -85,6 +85,39 @@ function _closeKeypad() {
   _kpCallback = null;
 }
 
+// ═══════════════════════════════════════════════════════════
+// DÉCLENCHEUR UNIVERSEL iOS/Android via data-attributes
+// Évite les problèmes onclick sur readonly inputs iOS Safari
+// ═══════════════════════════════════════════════════════════
+function _openKpFromEl(el, event) {
+  if (event) event.preventDefault();
+  var pid   = parseInt(el.getAttribute('data-pid'));
+  var idx   = parseInt(el.getAttribute('data-idx'));
+  var an    = el.getAttribute('data-an');       // agent name (peut être null)
+  var field = el.getAttribute('data-field');
+  var dec   = el.getAttribute('data-decimal') === '1';
+  var m = getCurrentMission();
+  if (!m) return;
+  var p = m.prelevements.find(function(x){ return x.id === pid; });
+  if (!p) return;
+  var sub = p.subPrelevements[idx];
+  var currentVal = '';
+  if (an) {
+    currentVal = (sub.agentData && sub.agentData[an] && sub.agentData[an][field]) ? sub.agentData[an][field] : '';
+  } else {
+    currentVal = sub[field] || '';
+  }
+  openKeypad(currentVal, function(v) {
+    if (an) {
+      updateAgentDataWithAutoDate(pid, idx, an, field, v);
+    } else {
+      updateSubFieldWithAutoDate(pid, idx, field, v);
+    }
+    if (field === 'debitInitial' || field === 'debitFinal') renderDebitVariation(pid, idx, an);
+    render();
+  }, dec);
+}
+
 // terrain.js - Saisie terrain
 // © 2025 Quentin THOMAS
 // Liste missions, prélèvements, fusion, défusion, timers
@@ -737,10 +770,10 @@ function renderSubPrelForm(p,sb,idx){
       // N° Pompe avec bouton copier J-1
       h+='<div class="multi-agent-row"><label>N° Pompe';
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
-      h+='</label><input type="text" readonly class="kp-field" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onclick="(function(){var pid='+p.id+',i='+idx+',an=\''+escapeJs(aname)+'\';openKeypad(ad.numPompe||\'\',function(v){updateAgentDataWithAutoDate(pid,i,an,\'numPompe\',v);render();},false);})()"></div>';
+      h+='</label><input type="text" readonly class="kp-field" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" data-pid="'+p.id+'" data-idx="'+idx+'" data-an="'+escapeHtml(aname)+'" data-field="numPompe" data-decimal="0" ontouchstart="_openKpFromEl(this,event);" onclick="_openKpFromEl(this,event);"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" readonly class="debit-input kp-field '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onclick="(function(){var pid='+p.id+',i='+idx+',an=\''+escapeJs(aname)+'\';openKeypad(ad.debitInitial||\'\',function(v){updateAgentDataWithAutoDate(pid,i,an,\'debitInitial\',v);renderDebitVariation(pid,i,an);render();},true);})()"></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" readonly class="debit-input kp-field '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onclick="(function(){var pid='+p.id+',i='+idx+',an=\''+escapeJs(aname)+'\';openKeypad(ad.debitFinal||\'\',function(v){updateAgentDataWithAutoDate(pid,i,an,\'debitFinal\',v);renderDebitVariation(pid,i,an);render();},true);})()">';
+      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" readonly class="debit-input kp-field '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" data-pid="'+p.id+'" data-idx="'+idx+'" data-an="'+escapeHtml(aname)+'" data-field="debitInitial" data-decimal="1" ontouchstart="_openKpFromEl(this,event);" onclick="_openKpFromEl(this,event);"></div>';
+      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" readonly class="debit-input kp-field '+(hasWarning?'warning':'')+'" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" data-pid="'+p.id+'" data-idx="'+idx+'" data-an="'+escapeHtml(aname)+'" data-field="debitFinal" data-decimal="1" ontouchstart="_openKpFromEl(this,event);" onclick="_openKpFromEl(this,event);">';
       if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
       h+='</div>';
       
@@ -789,7 +822,7 @@ function renderSubPrelForm(p,sb,idx){
     h+='<input type="text" class="input" style="margin-bottom:6px;" value="'+escapeHtml(epiVal)+'" placeholder="Ex: masque complet P3" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiType\',this.value);">';
   }
   if(epiVal!=='sans objet'){
-    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><input type="text" readonly class="input kp-field" style="width:100px;" value="'+escapeHtml(String(sb.epiDuree||'0'))+'" placeholder="0" onclick="(function(){var pid='+p.id+',i='+idx+';openKeypad(sb.epiDuree||\'0\',function(v){updateSubFieldWithAutoDate(pid,i,\'epiDuree\',v);render();},false);})()"></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><input type="text" readonly class="input kp-field" style="width:100px;" value="'+escapeHtml(String(sb.epiDuree||'0'))+'" placeholder="0" data-pid="'+p.id+'" data-idx="'+idx+'" data-field="epiDuree" data-decimal="0" ontouchstart="_openKpFromEl(this,event);" onclick="_openKpFromEl(this,event);"></div>';
   }
   h+='</div>';
 
