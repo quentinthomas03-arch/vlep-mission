@@ -957,20 +957,20 @@ function renderTutoriel(){
       num:'1',color:'#0066b3',title:'Préparation (au bureau)',
       steps:[
         {t:'Créer une mission',d:'Accueil → Préparation mission → Nouvelle mission. Saisissez le client/site, le préleveur et le numéro de débitmètre.'},
-        {t:'Ajouter les GEH',d:'Dans la mission → GEH → Ajouter. Donnez un numéro et un intitulé à chaque Groupe d'Exposition Homogène.'},
+        {t:'Ajouter les GEH',d:'Dans la mission → GEH → Ajouter. Donnez un numéro et un intitulé à chaque Groupe d\'Exposition Homogène.'},
         {t:'Ajouter les agents chimiques',d:'Agents → Rechercher dans la base de données (459 agents). Cochez 8h et/ou CT selon le type de prélèvement.'},
         {t:'Créer les affectations',d:'Affectations → Pour chaque agent, sélectionnez les GEH concernés. Choisissez Réglementaire ou Non-réglementaire.'},
-        {t:'Valider la mission',d:'Bouton Valider → L'appli génère automatiquement tous les prélèvements. La mission passe en statut Validée.'}
+        {t:'Valider la mission',d:'Bouton Valider → L\'appli génère automatiquement tous les prélèvements. La mission passe en statut Validée.'}
       ]
     },
     {
       num:'2',color:'#16a34a',title:'Terrain (sur site)',
       steps:[
         {t:'Ouvrir la mission',d:'Accueil → Saisie terrain → sélectionner la mission validée.'},
-        {t:'Saisir les données de prélèvement',d:'Cliquer sur un prélèvement → Onglet du sous-prélèvement concerné. Saisir : opérateur, date, n° pompe, débits initial/final, plages horaires. Le pavé numérique s'ouvre automatiquement au clic.'},
+        {t:'Saisir les données de prélèvement',d:'Cliquer sur un prélèvement → Onglet du sous-prélèvement concerné. Saisir : opérateur, date, n° pompe, débits initial/final, plages horaires. Le pavé numérique s\'ouvre automatiquement au clic.'},
         {t:'EPI respiratoire',d:'Sélectionner sans objet / FFP3 / TH3 / Autre. Si EPI : saisir la durée de port en minutes.'},
         {t:'Plages horaires',d:'Ajouter autant de plages que nécessaire (début → fin). La durée totale se calcule automatiquement.'},
-        {t:'Valider le prélèvement',d:'Bouton ✓ Valider en bas de chaque prélèvement. Un ✓ apparaît dans l'onglet quand c'est complété.'},
+        {t:'Valider le prélèvement',d:'Bouton ✓ Valider en bas de chaque prélèvement. Un ✓ apparaît dans l\'onglet quand c\'est complété.'},
         {t:'Co-prélèvement (indicateur bleu)',d:'Plusieurs agents sur le même support physique. Les indicateurs bleus signalent cette situation automatiquement.'}
       ]
     },
@@ -978,7 +978,7 @@ function renderTutoriel(){
       num:'3',color:'#ea580c',title:'Conditions ambiantes',
       steps:[
         {t:'Accès',d:'Dans la vue mission terrain → bouton Conditions ambiantes.'},
-        {t:'Saisir les mesures',d:'Température, pression atmosphérique et humidité relative — initial et final pour chaque jour. Le pavé numérique s'ouvre au clic sur chaque champ.'},
+        {t:'Saisir les mesures',d:'Température, pression atmosphérique et humidité relative — initial et final pour chaque jour. Le pavé numérique s\'ouvre au clic sur chaque champ.'},
         {t:'Fréquence',d:'Une entrée par jour de prélèvement. Cliquer + Ajouter condition pour chaque nouvelle journée.'}
       ]
     },
@@ -986,9 +986,9 @@ function renderTutoriel(){
       num:'4',color:'#7c3aed',title:'Export Excel (vers la macro)',
       steps:[
         {t:'Accès',d:'Mission terrain → Liste échantillons → Export Excel.'},
-        {t:'Contenu de l'export',d:'Feuille REG : prélèvements réglementaires. Feuille NON REG : prélèvements non-réglementaires. Feuille Échantillons : récapitulatif.'},
+        {t:'Contenu de l\'export',d:'Feuille REG : prélèvements réglementaires. Feuille NON REG : prélèvements non-réglementaires. Feuille Échantillons : récapitulatif.'},
         {t:'Copier dans la macro',d:'Ouvrir le fichier Excel exporté. Copier-coller chaque section dans les cellules bleues de la macro accréditée de la société. Les EPI et FPA sont pré-remplis pour que le VLOOKUP fonctionne automatiquement.'},
-        {t:'Résultats labo',d:'Les résultats d'analyse sont à saisir directement dans la macro (cellules dédiées non gérées par l'appli).'}
+        {t:'Résultats labo',d:'Les résultats d\'analyse sont à saisir directement dans la macro (cellules dédiées non gérées par l\'appli).'}
       ]
     },
     {
@@ -998,7 +998,7 @@ function renderTutoriel(){
         {t:'Fusion intelligente',d:'Regroupe automatiquement les prélèvements du même opérateur sur plusieurs jours en un seul prélèvement multi-jours.'},
         {t:'Base de données',d:'Accueil → Base de données. Recherche parmi 459 agents chimiques avec tous les paramètres : débit, support, conservation, VLEP.'},
         {t:'Import/Export JSON',d:'Partager une mission entre appareils via le bouton Partager (QR code ou fichier JSON).'},
-        {t:'Installation PWA',d:'Sur Android Chrome : menu → Ajouter à l'écran d'accueil. Sur iOS Safari : partager → Sur l'écran d'accueil. L'appli fonctionne ensuite hors ligne.'}
+        {t:'Installation PWA',d:'Sur Android Chrome : menu → Ajouter à l\'écran d\'accueil. Sur iOS Safari : partager → Sur l\'écran d\'accueil. L\'appli fonctionne ensuite hors ligne.'}
       ]
     }
   ];
