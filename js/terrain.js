@@ -1,123 +1,3 @@
-// ═══════════════════════════════════════════════════════════
-// PAVÉ NUMÉRIQUE CUSTOM - remplace clavier natif
-// ═══════════════════════════════════════════════════════════
-var _kpCallback = null;
-var _kpValue = '';
-var _kpDecimal = false;
-
-function openKeypad(currentVal, callback, allowDecimal) {
-  _kpCallback = callback;
-  _kpValue = String(currentVal || '');
-  _kpDecimal = (allowDecimal !== false);
-  _renderKeypad();
-}
-
-function _renderKeypad() {
-  var existing = document.getElementById('custom-keypad-overlay');
-  if (existing) existing.remove();
-  var overlay = document.createElement('div');
-  overlay.id = 'custom-keypad-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;flex-direction:column;justify-content:flex-end;';
-  var disp = _kpValue === '' ? '0' : _kpValue;
-  var dotBtn = _kpDecimal
-    ? '<button ontouchstart="_kpPress(\'.\');event.preventDefault();" onclick="_kpPress(\'.\');" style="'+_kpStyle('#334155')+'">.</button>'
-    : '<div></div>';
-  overlay.innerHTML =
-    '<div style="flex:1;" onclick="_closeKeypad();"></div>' +
-    '<div style="background:#1e293b;border-radius:16px 16px 0 0;padding:16px;box-shadow:0 -4px 24px rgba(0,0,0,0.4);">' +
-    '<div style="background:#0f172a;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">' +
-    '<span id="kp-display" style="font-size:32px;font-weight:700;color:#38bdf8;min-width:60px;">' + disp + '</span>' +
-    '<button ontouchstart="_kpClear();event.preventDefault();" onclick="_kpClear();" style="background:#475569;border:none;color:#e2e8f0;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;">C</button>' +
-    '</div>' +
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;">' +
-    _kpBtn('7') + _kpBtn('8') + _kpBtn('9') +
-    _kpBtn('4') + _kpBtn('5') + _kpBtn('6') +
-    _kpBtn('1') + _kpBtn('2') + _kpBtn('3') +
-    dotBtn + _kpBtn('0') +
-    '<button ontouchstart="_kpBack();event.preventDefault();" onclick="_kpBack();" style="'+_kpStyle('#475569')+'">⌫</button>' +
-    '</div>' +
-    '<button ontouchstart="_kpConfirm();event.preventDefault();" onclick="_kpConfirm();" style="width:100%;background:#0066b3;border:none;color:white;font-size:17px;font-weight:700;border-radius:12px;padding:18px;cursor:pointer;touch-action:manipulation;">✓ Valider</button>' +
-    '</div>';
-  document.body.appendChild(overlay);
-}
-
-function _kpStyle(bg) {
-  return 'background:'+bg+';border:none;color:white;font-size:24px;font-weight:600;border-radius:12px;padding:18px;cursor:pointer;touch-action:manipulation;';
-}
-
-function _kpBtn(d) {
-  return '<button ontouchstart="_kpPress(\''+d+'\');event.preventDefault();" onclick="_kpPress(\''+d+'\');" style="'+_kpStyle('#334155')+'">'+d+'</button>';
-}
-
-function _kpPress(d) {
-  if (d === '.') {
-    if (_kpValue.indexOf('.') !== -1) return;
-    if (_kpValue === '') _kpValue = '0';
-    _kpValue += '.';
-  } else {
-    if (_kpValue === '0') _kpValue = d; else _kpValue += d;
-  }
-  var el = document.getElementById('kp-display');
-  if (el) el.textContent = _kpValue || '0';
-}
-
-function _kpBack() {
-  _kpValue = _kpValue.slice(0, -1);
-  var el = document.getElementById('kp-display');
-  if (el) el.textContent = _kpValue || '0';
-}
-
-function _kpClear() {
-  _kpValue = '';
-  var el = document.getElementById('kp-display');
-  if (el) el.textContent = '0';
-}
-
-function _kpConfirm() {
-  var val = _kpValue;
-  _closeKeypad();
-  if (_kpCallback) { _kpCallback(val); _kpCallback = null; }
-}
-
-function _closeKeypad() {
-  var el = document.getElementById('custom-keypad-overlay');
-  if (el) el.remove();
-  _kpCallback = null;
-}
-
-// ═══════════════════════════════════════════════════════════
-// DÉCLENCHEUR UNIVERSEL iOS/Android via data-attributes
-// Évite les problèmes onclick sur readonly inputs iOS Safari
-// ═══════════════════════════════════════════════════════════
-function _openKpFromEl(el, event) {
-  if (event) event.preventDefault();
-  var pid   = parseInt(el.getAttribute('data-pid'));
-  var idx   = parseInt(el.getAttribute('data-idx'));
-  var an    = el.getAttribute('data-an');       // agent name (peut être null)
-  var field = el.getAttribute('data-field');
-  var dec   = el.getAttribute('data-decimal') === '1';
-  var m = getCurrentMission();
-  if (!m) return;
-  var p = m.prelevements.find(function(x){ return x.id === pid; });
-  if (!p) return;
-  var sub = p.subPrelevements[idx];
-  var currentVal = '';
-  if (an) {
-    currentVal = (sub.agentData && sub.agentData[an] && sub.agentData[an][field]) ? sub.agentData[an][field] : '';
-  } else {
-    currentVal = sub[field] || '';
-  }
-  openKeypad(currentVal, function(v) {
-    if (an) {
-      updateAgentDataWithAutoDate(pid, idx, an, field, v);
-    } else {
-      updateSubFieldWithAutoDate(pid, idx, field, v);
-    }
-    if (field === 'debitInitial' || field === 'debitFinal') renderDebitVariation(pid, idx, an);
-    render();
-  }, dec);
-}
-
 // terrain.js - Saisie terrain
 // © 2025 Quentin THOMAS
 // Liste missions, prélèvements, fusion, défusion, timers
@@ -770,12 +650,12 @@ function renderSubPrelForm(p,sb,idx){
       // N° Pompe avec bouton copier J-1
       h+='<div class="multi-agent-row"><label>N° Pompe';
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
-      h+='</label><div style="flex:1;padding:6px 8px;border:1.5px solid #b3d0ee;border-radius:7px;font-size:13px;background:#f0f6ff;cursor:pointer;min-height:32px;min-width:0;display:flex;align-items:center;color:#1c1e24;-webkit-tap-highlight-color:rgba(0,102,179,0.15);user-select:none;" data-pid="'+p.id+'" data-idx="'+idx+'" data-an="'+escapeHtml(aname)+'" data-field="numPompe" data-decimal="0" ontouchstart="_openKpFromEl(this,event);" onclick="_openKpFromEl(this,event);">'+(ad.numPompe||'<span style="color:#aab4bf;">Ex: 123</span>')+'</div></div>';
+      h+='</label><input type="tel" class="input" style="flex:1;" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><div style="flex:1;padding:6px 8px;border:1.5px solid '+(hasWarning?'#f97316':'#b3d0ee')+';border-radius:7px;font-size:13px;background:'+(hasWarning?'#fff7ed':'#f0f6ff')+';cursor:pointer;min-height:32px;min-width:0;display:flex;align-items:center;color:#1c1e24;-webkit-tap-highlight-color:rgba(0,102,179,0.15);user-select:none;" data-pid="'+p.id+'" data-idx="'+idx+'" data-an="'+escapeHtml(aname)+'" data-field="debitInitial" data-decimal="1" ontouchstart="_openKpFromEl(this,event);" onclick="_openKpFromEl(this,event);">'+(ad.debitInitial||'<span style="color:#aab4bf;">L/min</span>')+'</div></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><div style="flex:1;padding:6px 8px;border:1.5px solid '+(hasWarning?'#f97316':'#b3d0ee')+';border-radius:7px;font-size:13px;background:'+(hasWarning?'#fff7ed':'#f0f6ff')+';cursor:pointer;min-height:32px;min-width:0;display:flex;align-items:center;color:#1c1e24;-webkit-tap-highlight-color:rgba(0,102,179,0.15);user-select:none;" data-pid="'+p.id+'" data-idx="'+idx+'" data-an="'+escapeHtml(aname)+'" data-field="debitFinal" data-decimal="1" ontouchstart="_openKpFromEl(this,event);" onclick="_openKpFromEl(this,event);">'+(ad.debitFinal||'<span style="color:#aab4bf;">L/min</span>')+'';
+      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="number" inputmode="decimal" step="0.01" min="0" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
+      h+='<div class="multi-agent-row"><label>Débit final</label><input type="number" inputmode="decimal" step="0.01" min="0" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
       if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
-      h+='</div></div>';
+      h+='</div>';
       
       h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';
       h+='</div></div>';
@@ -822,7 +702,7 @@ function renderSubPrelForm(p,sb,idx){
     h+='<input type="text" class="input" style="margin-bottom:6px;" value="'+escapeHtml(epiVal)+'" placeholder="Ex: masque complet P3" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiType\',this.value);">';
   }
   if(epiVal!=='sans objet'){
-    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><div style="width:100px;padding:6px 8px;border:1.5px solid #b3d0ee;border-radius:7px;font-size:13px;background:#f0f6ff;cursor:pointer;min-height:32px;display:flex;align-items:center;color:#1c1e24;-webkit-tap-highlight-color:rgba(0,102,179,0.15);user-select:none;" data-pid="'+p.id+'" data-idx="'+idx+'" data-field="epiDuree" data-decimal="0" ontouchstart="_openKpFromEl(this,event);" onclick="_openKpFromEl(this,event);">'+(sb.epiDuree||'0')+'</div></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><input type="number" inputmode="numeric" min="0" class="input" style="width:100px;" value="'+escapeHtml(String(sb.epiDuree||'0'))+'" placeholder="0" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiDuree\',this.value);"></div>';
   }
   h+='</div>';
 
