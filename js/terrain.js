@@ -650,10 +650,10 @@ function renderSubPrelForm(p,sb,idx){
       // N° Pompe avec bouton copier J-1
       h+='<div class="multi-agent-row"><label>N° Pompe';
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
-      h+='</label><input type="tel" class="input" style="flex:1;" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
+      h+='</label><input type="text" class="input" style="flex:1;" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+ escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="number" inputmode="decimal" step="0.01" min="0" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><input type="number" inputmode="decimal" step="0.01" min="0" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+ escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+ escapeJs(aname)+'\');"></div>';
+      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+ escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+ escapeJs(aname)+'\');">';
       if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
       h+='</div>';
       
@@ -702,7 +702,7 @@ function renderSubPrelForm(p,sb,idx){
     h+='<input type="text" class="input" style="margin-bottom:6px;" value="'+escapeHtml(epiVal)+'" placeholder="Ex: masque complet P3" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiType\',this.value);">';
   }
   if(epiVal!=='sans objet'){
-    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><input type="number" inputmode="numeric" min="0" class="input" style="width:100px;" value="'+escapeHtml(String(sb.epiDuree||'0'))+'" placeholder="0" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiDuree\',this.value);"></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;"><label style="white-space:nowrap;font-size:13px;">Durée de port (min)</label><input type="text" class="input" style="width:100px;" value="'+escapeHtml(String(sb.epiDuree||'0'))+'" placeholder="0" onchange="updateSubFieldWithAutoDate('+p.id+','+idx+',\'epiDuree\',this.value);"></div>';
   }
   h+='</div>';
 
