@@ -20,7 +20,7 @@ function renderTerrainMission(){
   var m=getCurrentMission();
   if(!m){state.view='terrain-list';render();return'';}
   var h='<div class="sticky-header"><button class="back-btn" onclick="state.view=\'terrain-list\';state.currentMissionId=null;render();">'+ICONS.arrowLeft+' Liste</button><div style="display:flex;justify-content:space-between;align-items:center;"><div style="color:white;font-weight:700;font-size:14px;">'+escapeHtml(m.clientSite)+'</div><div class="row" style="gap:4px;"><button class="btn btn-gray btn-small btn-icon" onclick="unvalidateMissionFromTerrain();" title="Repasser en prépa" style="background:rgba(255,255,255,0.15);color:white;border:none;">'+ICONS.arrowLeft+'</button><button class="btn btn-danger btn-icon" onclick="deleteMissionTerrain();" style="width:24px;height:24px;">'+ICONS.trash+'</button></div></div></div>';
-  h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' • <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+'</p></div>';
+  h+='<div class="card" style="margin-top:4px;"><p class="subtitle"><span class="svg-icon">'+ICONS.user+'</span> '+escapeHtml(m.preleveur||'-')+' • <span class="svg-icon">'+ICONS.tool+'</span> '+escapeHtml(m.debitmetre||'-')+(m.tachymetre?' • <span class="svg-icon">'+ICONS.tool+'</span> Tachym. '+escapeHtml(m.tachymetre):'')+' </p></div>';
   h+='<div class="row mb-12"><button class="btn btn-gray" onclick="state.view=\'conditions\';render();">'+ICONS.thermometer+' Conditions</button><button class="btn btn-blue" onclick="state.view=\'liste-echantillons\';render();">'+ICONS.list+' Échantillons</button></div>';
   h+='<div class="row mb-12"><button class="btn btn-gray" onclick="exportMissionJSON('+m.id+');">'+ICONS.download+' Export JSON</button></div>';
   
@@ -589,6 +589,18 @@ function openPrel(pid){
   render();
 }
 
+function isTachymetreAgent(agentName){
+  var ag=getAgentFromDB(agentName);
+  if(!ag)return false;
+  var sup=(ag['Support de prélèvement']||'').toLowerCase();
+  return sup.indexOf('mousse')!==-1||sup.indexOf('coupelle rotative')!==-1;
+}
+
+function calcTachyVariation(vitesse,ref){
+  if(!vitesse||!ref||isNaN(parseFloat(vitesse))||isNaN(parseFloat(ref)))return null;
+  return Math.abs(parseFloat(vitesse)-parseFloat(ref));
+}
+
 function calcDebitVariation(di,df){
   if(!di||!df||isNaN(parseFloat(di))||isNaN(parseFloat(df)))return null;
   var dI=parseFloat(di);
@@ -643,8 +655,16 @@ function renderSubPrelForm(p,sb,idx){
       var aname=a.name||'Agent inconnu';
       if(!sb.agentData[aname])sb.agentData[aname]={refEchantillon:'',numPompe:'',debitInitial:'',debitFinal:''};
       var ad=sb.agentData[aname];
-      var variation=calcDebitVariation(ad.debitInitial,ad.debitFinal);
-      var hasWarning=variation!==null&&variation>5;
+      var isTachy=isTachymetreAgent(aname);
+      var variation=isTachy?null:calcDebitVariation(ad.debitInitial,ad.debitFinal);
+      var hasWarning=false;
+      if(!isTachy){
+        hasWarning=variation!==null&&variation>5;
+      }else{
+        var ecartI=calcTachyVariation(ad.debitInitial,ad.debitRef);
+        var ecartF=calcTachyVariation(ad.debitFinal,ad.debitRef);
+        hasWarning=(ecartI!==null&&ecartI>200)||(ecartF!==null&&ecartF>200);
+      }
       
       // Co-prélèvement : détection groupe
       var grpIdx=getCoPrelGroupIndex(sb,aname);
@@ -674,10 +694,25 @@ function renderSubPrelForm(p,sb,idx){
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
       h+='</label><input type="text" class="input" style="flex:1;" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
-      if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
-      h+='</div>';
+      if(isTachy){
+        var ecartI=calcTachyVariation(ad.debitInitial,ad.debitRef);
+        var ecartF=calcTachyVariation(ad.debitFinal,ad.debitRef);
+        var warnI=ecartI!==null&&ecartI>200;
+        var warnF=ecartF!==null&&ecartF>200;
+        h+='<div class="multi-agent-row"><label>Vitesse réf. (tr/min)</label><input type="text" class="input" style="flex:1;" value="'+escapeHtml(ad.debitRef||'')+'" placeholder="tr/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitRef\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
+        h+='<div class="multi-agent-row"><label>Vitesse initiale (tr/min)</label><input type="text" class="input '+(warnI?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="tr/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+        if(ecartI!==null){h+='<span class="debit-variation '+(warnI?'warning':'')+'">Δ '+ecartI.toFixed(0)+' tr/min</span>';}
+        h+='</div>';
+        h+='<div class="multi-agent-row"><label>Vitesse finale (tr/min)</label><input type="text" class="input '+(warnF?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="tr/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+        if(ecartF!==null){h+='<span class="debit-variation '+(warnF?'warning':'')+'">Δ '+ecartF.toFixed(0)+' tr/min</span>';}
+        h+='</div>';
+        if(hasWarning){h+='<div style="color:#dc2626;font-size:11px;padding:4px 0;">⚠️ Écart > 200 tr/min par rapport à la vitesse de référence</div>';}
+      }else{
+        h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
+        h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+        if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
+        h+='</div>';
+      }
       
       h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';
       h+='</div></div>';

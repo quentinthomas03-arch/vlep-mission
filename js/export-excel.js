@@ -44,12 +44,13 @@ function createRegSheet(m,prels){
   
   // Lignes 10-11 : pompe + débitmètre
   var row10=['n° d\'identification','pompe'];
-  var row11=['','Débimetre'];
+  var row11=['','Déb./Tachym.'];
   for(var i=0;i<prels.length;i++){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
+    var isTachy=isTachymetreAgent(prels[i].agent);
     row10.push(ad&&ad.numPompe?ad.numPompe:'');
     row10.push('');
-    row11.push(m.debitmetre||'');
+    row11.push(isTachy?(m.tachymetre||''):(m.debitmetre||''));
     row11.push('');
   }
   aoa.push(row10);
@@ -215,18 +216,25 @@ function createRegSheet(m,prels){
   // Ligne 44 : Vérification débit
   aoa.push(['Volume prélevé avec pompe - Vérification du débit','']);
   
-  // Lignes 45-46 : Débits initial et final
-  var row45=['débit initial de la pompe (L/min) DM',''];
-  var row46=['débit final de la pompe (L/min) DM',''];
+  // Lignes 45-46 : Débits initial et final (ou vitesses si tachymètre)
+  var row45=['débit initial pompe (L/min) / vitesse initiale (tr/min)',''];
+  var row46=['débit final pompe (L/min) / vitesse finale (tr/min)',''];
+  var row46b=['vitesse de référence (tr/min)',''];
+  var hasAnyTachy=false;
   for(var i=0;i<prels.length;i++){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
+    var isTachy=isTachymetreAgent(prels[i].agent);
+    if(isTachy)hasAnyTachy=true;
     row45.push(ad&&ad.debitInitial?ad.debitInitial:'');
     row45.push('');
     row46.push(ad&&ad.debitFinal?ad.debitFinal:'');
     row46.push('');
+    row46b.push(isTachy&&ad&&ad.debitRef?ad.debitRef:'');
+    row46b.push('');
   }
   aoa.push(row45);
   aoa.push(row46);
+  if(hasAnyTachy)aoa.push(row46b);
   
   // Lignes 47-48 : Débit moyen et volume (vides, calculés après)
   var row47=['débit moyen de la pompe (L/min)',''];
@@ -427,14 +435,15 @@ function createNonRegSheet(m,prels){
   }
   aoa.push(row5);
   
-  // Lignes 6-7 : pompe + débitmètre
+  // Lignes 6-7 : pompe + débitmètre/tachymètre
   var row6=['n° d\'identification','pompe'];
-  var row7=['','débitmètre'];
+  var row7=['','Déb./Tachym.'];
   for(var i=0;i<prels.length;i++){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
+    var isTachy=isTachymetreAgent(prels[i].agent);
     row6.push(ad&&ad.numPompe?ad.numPompe:'');
     row6.push('');
-    row7.push(m.debitmetre||'');
+    row7.push(isTachy?(m.tachymetre||''):(m.debitmetre||''));
     row7.push('');
   }
   aoa.push(row6);
@@ -604,18 +613,25 @@ function createNonRegSheet(m,prels){
   // Ligne 54 : Vérification débit
   aoa.push(['Volume prélevé avec pompe - Vérification du débit','']);
   
-  // Lignes 55-56 : Débits initial et final
-  var row55=['débit initial de la pompe (L/min)',''];
-  var row56=['débit final de la pompe (L/min)',''];
+  // Lignes 55-56 : Débits initial et final (ou vitesses si tachymètre)
+  var row55=['débit initial pompe (L/min) / vitesse initiale (tr/min)',''];
+  var row56=['débit final pompe (L/min) / vitesse finale (tr/min)',''];
+  var row56b=['vitesse de référence (tr/min)',''];
+  var hasAnyTachyCT=false;
   for(var i=0;i<prels.length;i++){
     var ad=prels[i].sub.agentData?prels[i].sub.agentData[prels[i].agent]:null;
+    var isTachy=isTachymetreAgent(prels[i].agent);
+    if(isTachy)hasAnyTachyCT=true;
     row55.push(ad&&ad.debitInitial?ad.debitInitial:'');
     row55.push('');
     row56.push(ad&&ad.debitFinal?ad.debitFinal:'');
     row56.push('');
+    row56b.push(isTachy&&ad&&ad.debitRef?ad.debitRef:'');
+    row56b.push('');
   }
   aoa.push(row55);
   aoa.push(row56);
+  if(hasAnyTachyCT)aoa.push(row56b);
   
   // Lignes 57-73 : débit moyen, volume, vérification DLS, résultats labo (vides)
   for(var lnum=57;lnum<=73;lnum++){
