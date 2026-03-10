@@ -55,6 +55,8 @@ var state={
   
   // Co-prélèvement
   coPrelTargetPid:null,
+  coPrelTargetSubIdx:null,
+  coPrelTargetAgent:null,
   coPrelDetectedGroups:null,
   coPrelEditGroups:null,
   

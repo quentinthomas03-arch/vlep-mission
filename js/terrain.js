@@ -614,6 +614,7 @@ function renderTerrainPrel(){
     h+='</div>';
   }
   h+=renderSubPrelForm(p,p.subPrelevements[state.activeSubIndex],state.activeSubIndex);
+  if(state.showModal==='linkAgent')h+=renderLinkAgentModal();
   return h;
 }
 
@@ -645,19 +646,40 @@ function renderSubPrelForm(p,sb,idx){
       var variation=calcDebitVariation(ad.debitInitial,ad.debitFinal);
       var hasWarning=variation!==null&&variation>5;
       
-      h+='<div class="multi-agent-item"><div class="multi-agent-header"><div class="multi-agent-color" style="background:'+(a.color||'#3b82f6')+';"></div><div class="multi-agent-name">'+escapeHtml(aname)+'</div></div><div class="multi-agent-fields">';
+      // Co-prélèvement : détection groupe
+      var grpIdx=getCoPrelGroupIndex(sb,aname);
+      var isLinked=grpIdx!==-1;
+      var grpMembers=isLinked?sb.coPrelGroups[grpIdx]:[];
+      var hasOtherAgents=p.agents.length>1;
+      
+      var borderStyle=isLinked?'border:2px solid #0891b2;border-radius:8px;margin-bottom:8px;':'border:1px solid var(--border);border-radius:8px;margin-bottom:8px;';
+      h+='<div class="multi-agent-item" style="'+borderStyle+'">';
+      h+='<div class="multi-agent-header" style="'+(isLinked?'background:#e0f2fe;border-radius:6px 6px 0 0;padding:6px 8px;':'padding:6px 8px;')+'">';
+      h+='<div class="multi-agent-color" style="background:'+(a.color||'#3b82f6')+';"></div>';
+      h+='<div class="multi-agent-name">'+escapeHtml(aname)+'</div>';
+      if(hasOtherAgents){
+        if(isLinked){
+          var autresMembres=grpMembers.filter(function(n){return n!==aname;}).map(escapeHtml).join(', ');
+          h+='<span style="font-size:11px;color:#0891b2;font-weight:600;margin-left:4px;">🔗 '+autresMembres+'</span>';
+          h+='<button class="btn btn-small" style="margin-left:auto;font-size:11px;padding:2px 6px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;" onclick="unlinkAgentFromSupport('+p.id+','+idx+',\''+escapeJs(aname)+'\');">Délier</button>';
+        }else{
+          h+='<button class="btn btn-small btn-blue" style="margin-left:auto;font-size:11px;padding:2px 8px;" onclick="showLinkAgentModal('+p.id+','+idx+',\''+escapeJs(aname)+'\');">🔗 Même support</button>';
+        }
+      }
+      h+='</div>';
+      h+='<div class="multi-agent-fields" style="padding:6px 8px;">';
       
       // N° Pompe avec bouton copier J-1
       h+='<div class="multi-agent-row"><label>N° Pompe';
       if(canCopyFromPrevious)h+='<button class="copy-btn" onclick="copyAgentDataFromPrevious('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\');">J-1</button>';
-      h+='</label><input type="text" class="input" style="flex:1;" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+ escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
+      h+='</label><input type="text" class="input" style="flex:1;" value="'+escapeHtml(ad.numPompe||'')+'" placeholder="Ex: 123" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'numPompe\',this.value);"></div>';
       
-      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+ escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+ escapeJs(aname)+'\');"></div>';
-      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+ escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+ escapeJs(aname)+'\');">';
+      h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
+      h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
       if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
       h+='</div>';
       
-      h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataWithAutoDate('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';
+      h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';
       h+='</div></div>';
     });
   }
@@ -888,5 +910,133 @@ function updateMissionStatus(m){
 }
 
 // FIX #7: Conditions ambiantes responsive mobile
+
+// ===== CO-PRÉLÈVEMENT : MÊME SUPPORT =====
+
+function getCoPrelGroupIndex(sb,agentName){
+  if(!sb.coPrelGroups)return -1;
+  for(var i=0;i<sb.coPrelGroups.length;i++){
+    if(sb.coPrelGroups[i].indexOf(agentName)!==-1)return i;
+  }
+  return -1;
+}
+
+function getCoPrelGroupMembers(sb,agentName){
+  var idx=getCoPrelGroupIndex(sb,agentName);
+  if(idx===-1)return [];
+  return sb.coPrelGroups[idx];
+}
+
+function linkAgentsOnSupport(pid,subIdx,agentName,targetName){
+  var m=getCurrentMission();if(!m)return;
+  var p=m.prelevements.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var sb=p.subPrelevements[subIdx];
+  if(!sb.coPrelGroups)sb.coPrelGroups=[];
+  var gi1=getCoPrelGroupIndex(sb,agentName);
+  var gi2=getCoPrelGroupIndex(sb,targetName);
+  if(gi1===-1&&gi2===-1){
+    sb.coPrelGroups.push([agentName,targetName]);
+  }else if(gi1!==-1&&gi2===-1){
+    sb.coPrelGroups[gi1].push(targetName);
+  }else if(gi1===-1&&gi2!==-1){
+    sb.coPrelGroups[gi2].push(agentName);
+  }else if(gi1!==gi2){
+    var merged=sb.coPrelGroups[gi1].concat(sb.coPrelGroups[gi2]);
+    var hi=Math.max(gi1,gi2);var lo=Math.min(gi1,gi2);
+    sb.coPrelGroups.splice(hi,1);
+    sb.coPrelGroups.splice(lo,1);
+    sb.coPrelGroups.push(merged);
+  }
+  // Synchro des données depuis agentName vers targetName
+  if(!sb.agentData)sb.agentData={};
+  if(!sb.agentData[agentName])sb.agentData[agentName]={};
+  if(!sb.agentData[targetName])sb.agentData[targetName]={};
+  var src=sb.agentData[agentName];
+  ['numPompe','debitInitial','debitFinal','refEchantillon'].forEach(function(f){
+    if(src[f])sb.agentData[targetName][f]=src[f];
+  });
+  saveData('vlep_missions_v3',state.missions);
+  state.showModal=null;
+  render();
+}
+
+function unlinkAgentFromSupport(pid,subIdx,agentName){
+  var m=getCurrentMission();if(!m)return;
+  var p=m.prelevements.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var sb=p.subPrelevements[subIdx];
+  if(!sb.coPrelGroups)return;
+  var gi=getCoPrelGroupIndex(sb,agentName);
+  if(gi===-1)return;
+  var pos=sb.coPrelGroups[gi].indexOf(agentName);
+  if(pos!==-1)sb.coPrelGroups[gi].splice(pos,1);
+  if(sb.coPrelGroups[gi].length<2)sb.coPrelGroups.splice(gi,1);
+  saveData('vlep_missions_v3',state.missions);
+  render();
+}
+
+function updateAgentDataSynced(pid,idx,an,f,v){
+  var m=getCurrentMission();if(!m)return;
+  var p=m.prelevements.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var sb=p.subPrelevements[idx];
+  if(!sb.agentData)sb.agentData={};
+  if(!sb.agentData[an])sb.agentData[an]={};
+  sb.agentData[an][f]=v;
+  var members=getCoPrelGroupMembers(sb,an);
+  var inGroup=members.length>1;
+  if(inGroup){
+    members.forEach(function(mn){
+      if(mn!==an){
+        if(!sb.agentData[mn])sb.agentData[mn]={};
+        sb.agentData[mn][f]=v;
+      }
+    });
+  }
+  autoFillDate(p,idx);
+  saveData('vlep_missions_v3',state.missions);
+  if(inGroup)render();
+}
+
+function showLinkAgentModal(pid,subIdx,agentName){
+  state.coPrelTargetPid=pid;
+  state.coPrelTargetSubIdx=subIdx;
+  state.coPrelTargetAgent=agentName;
+  state.showModal='linkAgent';
+  render();
+}
+
+function renderLinkAgentModal(){
+  var pid=state.coPrelTargetPid;
+  var subIdx=state.coPrelTargetSubIdx;
+  var agentName=state.coPrelTargetAgent;
+  var m=getCurrentMission();if(!m)return'';
+  var p=m.prelevements.find(function(x){return x.id===pid;});
+  if(!p)return'';
+  var sb=p.subPrelevements[subIdx];
+  var otherAgents=p.agents.filter(function(a){return a.name!==agentName;});
+  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>🔗 Même support</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div>';
+  h+='<div class="info-box mb-12"><p>Lier <strong>'+escapeHtml(agentName)+'</strong> avec :</p></div>';
+  if(otherAgents.length===0){
+    h+='<p style="color:#6b7280;text-align:center;padding:16px;">Aucun autre agent dans ce prélèvement</p>';
+  }else{
+    otherAgents.forEach(function(a){
+      var grpMembers=getCoPrelGroupMembers(sb,agentName);
+      var alreadyLinked=grpMembers.indexOf(a.name)!==-1;
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">';
+      h+='<div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:'+(a.color||'#3b82f6')+';"></div><span>'+escapeHtml(a.name)+'</span></div>';
+      if(alreadyLinked){
+        h+='<span style="color:#0891b2;font-size:12px;font-weight:600;">✓ Déjà lié</span>';
+      }else{
+        h+='<button class="btn btn-blue btn-small" onclick="linkAgentsOnSupport('+pid+','+subIdx+',\''+escapeJs(agentName)+'\',\''+escapeJs(a.name)+'\');">Lier</button>';
+      }
+      h+='</div>';
+    });
+  }
+  h+='<button class="btn btn-gray mt-12" style="width:100%;" onclick="state.showModal=null;render();">Fermer</button>';
+  h+='</div></div>';
+  return h;
+}
 
 console.log('✓ Terrain chargé');
