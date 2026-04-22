@@ -962,6 +962,35 @@ function getCoPrelGroupMembers(sb,agentName){
   return sb.coPrelGroups[idx];
 }
 
+// Détection : deux agents partagent le même support physique si
+// Code support identique (non vide) ET Code prétraitement identique (vides acceptés)
+function agentsShareSamePhysicalSupport(name1,name2){
+  if(typeof getAgentFromDB!=='function')return false;
+  var a1=getAgentFromDB(name1);
+  var a2=getAgentFromDB(name2);
+  if(!a1||!a2)return false;
+  var cs1=((a1['Code support']||'')+'').trim();
+  var cs2=((a2['Code support']||'')+'').trim();
+  var cp1=((a1['Code prétraitement']||'')+'').trim();
+  var cp2=((a2['Code prétraitement']||'')+'').trim();
+  return cs1!==''&&cs1===cs2&&cp1===cp2;
+}
+
+function checkMatchingSupports(){
+  var pid=state.coPrelTargetPid;
+  var agentName=state.coPrelTargetAgent;
+  var m=getCurrentMission();if(!m)return;
+  var p=m.prelevements.find(function(x){return x.id===pid;});
+  if(!p)return;
+  if(!state.coPrelSelection)state.coPrelSelection={};
+  p.agents.forEach(function(a){
+    if(a.name!==agentName&&agentsShareSamePhysicalSupport(agentName,a.name)){
+      state.coPrelSelection[a.name]=true;
+    }
+  });
+  render();
+}
+
 function linkAgentsOnSupport(pid,subIdx,agentName,targetName){
   var m=getCurrentMission();if(!m)return;
   var p=m.prelevements.find(function(x){return x.id===pid;});
@@ -1038,6 +1067,21 @@ function showLinkAgentModal(pid,subIdx,agentName){
   state.coPrelTargetPid=pid;
   state.coPrelTargetSubIdx=subIdx;
   state.coPrelTargetAgent=agentName;
+  // Initialise la sélection avec les agents déjà liés au source
+  state.coPrelSelection={};
+  var m=getCurrentMission();
+  if(m){
+    var p=m.prelevements.find(function(x){return x.id===pid;});
+    if(p&&p.subPrelevements[subIdx]){
+      var sb=p.subPrelevements[subIdx];
+      var members=getCoPrelGroupMembers(sb,agentName);
+      members.forEach(function(n){
+        if(n!==agentName)state.coPrelSelection[n]=true;
+      });
+    }
+  }
+  // Propagation par défaut activée (utile pour réglementaire J1/J2/J3)
+  state.coPrelPropagateAll=true;
   state.showModal='linkAgent';
   render();
 }
@@ -1051,27 +1095,132 @@ function renderLinkAgentModal(){
   if(!p)return'';
   var sb=p.subPrelevements[subIdx];
   var otherAgents=p.agents.filter(function(a){return a.name!==agentName;});
-  var h='<div class="modal show" onclick="if(event.target===this){state.showModal=null;render();}"><div class="modal-content"><div class="modal-header"><h2>🔗 Même support</h2><button class="close-btn" onclick="state.showModal=null;render();">×</button></div>';
-  h+='<div class="info-box mb-12"><p>Lier <strong>'+escapeHtml(agentName)+'</strong> avec :</p></div>';
+  var selection=state.coPrelSelection||{};
+  var nbSubs=p.subPrelevements.length;
+  var propagate=state.coPrelPropagateAll!==false;
+  var h='<div class="modal show" onclick="if(event.target===this){closeCoPrelModal();}"><div class="modal-content"><div class="modal-header"><h2>🔗 Même support</h2><button class="close-btn" onclick="closeCoPrelModal();">×</button></div>';
+  h+='<div class="info-box mb-12"><p>Agents partageant le même support physique que <strong>'+escapeHtml(agentName)+'</strong> :</p></div>';
   if(otherAgents.length===0){
     h+='<p style="color:#6b7280;text-align:center;padding:16px;">Aucun autre agent dans ce prélèvement</p>';
+    h+='<button class="btn btn-gray mt-12" style="width:100%;" onclick="closeCoPrelModal();">Fermer</button>';
   }else{
+    // Détection d'agents partageant support + prétraitement (purement informative)
+    var matchCount=0;
     otherAgents.forEach(function(a){
-      var grpMembers=getCoPrelGroupMembers(sb,agentName);
-      var alreadyLinked=grpMembers.indexOf(a.name)!==-1;
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">';
-      h+='<div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:50%;background:'+(a.color||'#3b82f6')+';"></div><span>'+escapeHtml(a.name)+'</span></div>';
-      if(alreadyLinked){
-        h+='<span style="color:#0891b2;font-size:12px;font-weight:600;">✓ Déjà lié</span>';
-      }else{
-        h+='<button class="btn btn-blue btn-small" onclick="linkAgentsOnSupport('+pid+','+subIdx+',\''+escapeJs(agentName)+'\',\''+escapeJs(a.name)+'\');">Lier</button>';
-      }
-      h+='</div>';
+      if(agentsShareSamePhysicalSupport(agentName,a.name))matchCount++;
     });
+    if(matchCount>0){
+      h+='<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;padding:8px 10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;">';
+      h+='<span style="font-size:12px;color:#92400e;">🎯 '+matchCount+' agent'+(matchCount>1?'s':'')+' avec support + prétraitement identiques</span>';
+      h+='<button class="btn btn-small" style="font-size:11px;padding:2px 8px;background:#f59e0b;color:white;border:none;border-radius:4px;" onclick="checkMatchingSupports();">Cocher</button>';
+      h+='</div>';
+    }
+    otherAgents.forEach(function(a){
+      var isChecked=!!selection[a.name];
+      var matches=agentsShareSamePhysicalSupport(agentName,a.name);
+      h+='<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">';
+      h+='<input type="checkbox" '+(isChecked?'checked':'')+' onchange="toggleCoPrelSelection(\''+escapeJs(a.name)+'\');" style="width:20px;height:20px;cursor:pointer;flex-shrink:0;">';
+      h+='<div style="width:10px;height:10px;border-radius:50%;background:'+(a.color||'#3b82f6')+';flex-shrink:0;"></div>';
+      h+='<span style="flex:1;">'+escapeHtml(a.name)+'</span>';
+      if(matches)h+='<span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-weight:600;flex-shrink:0;">🎯 Support identique</span>';
+      h+='</label>';
+    });
+    if(nbSubs>1){
+      h+='<label style="display:flex;align-items:center;gap:10px;padding:12px 0;margin-top:8px;border-top:2px solid var(--border);cursor:pointer;background:#f9fafb;border-radius:4px;padding:12px 8px;">';
+      h+='<input type="checkbox" '+(propagate?'checked':'')+' onchange="toggleCoPrelPropagate();" style="width:20px;height:20px;cursor:pointer;flex-shrink:0;">';
+      h+='<span style="font-size:14px;font-weight:500;">Appliquer à tous les sous-prélèvements (J1 à J'+nbSubs+')</span>';
+      h+='</label>';
+    }
+    var selectedCount=Object.keys(selection).length;
+    h+='<div class="row mt-12" style="gap:8px;">';
+    h+='<button class="btn btn-gray" style="flex:1;" onclick="closeCoPrelModal();">Annuler</button>';
+    h+='<button class="btn btn-blue" style="flex:1;" onclick="applyCoPrelSelection();">✓ Valider ('+selectedCount+')</button>';
+    h+='</div>';
   }
-  h+='<button class="btn btn-gray mt-12" style="width:100%;" onclick="state.showModal=null;render();">Fermer</button>';
   h+='</div></div>';
   return h;
+}
+
+function closeCoPrelModal(){
+  state.showModal=null;
+  state.coPrelSelection=null;
+  state.coPrelPropagateAll=null;
+  render();
+}
+
+function toggleCoPrelSelection(agentName){
+  if(!state.coPrelSelection)state.coPrelSelection={};
+  if(state.coPrelSelection[agentName])delete state.coPrelSelection[agentName];
+  else state.coPrelSelection[agentName]=true;
+  render();
+}
+
+function toggleCoPrelPropagate(){
+  state.coPrelPropagateAll=!(state.coPrelPropagateAll!==false);
+  render();
+}
+
+function applyCoPrelSelection(){
+  var pid=state.coPrelTargetPid;
+  var subIdx=state.coPrelTargetSubIdx;
+  var sourceName=state.coPrelTargetAgent;
+  var selection=state.coPrelSelection||{};
+  var propagateAll=state.coPrelPropagateAll!==false;
+  var m=getCurrentMission();if(!m)return;
+  var p=m.prelevements.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var targets={};
+  Object.keys(selection).forEach(function(n){targets[n]=true;});
+  var subsToUpdate=propagateAll?p.subPrelevements.map(function(_,i){return i;}):[subIdx];
+  subsToUpdate.forEach(function(si){
+    var sb=p.subPrelevements[si];
+    if(!sb.coPrelGroups)sb.coPrelGroups=[];
+    if(!sb.agentData)sb.agentData={};
+    // 1. Groupe actuel du source
+    var currentGi=getCoPrelGroupIndex(sb,sourceName);
+    var currentGroup=currentGi!==-1?sb.coPrelGroups[currentGi].slice():[sourceName];
+    // 2. Retirer les agents désélectionnés (garder source + sélectionnés)
+    var stillLinked=currentGroup.filter(function(n){
+      return n===sourceName||targets[n];
+    });
+    // 3. Ajouter les nouveaux sélectionnés
+    Object.keys(targets).forEach(function(n){
+      if(stillLinked.indexOf(n)===-1){
+        // Si l'agent est dans un autre groupe, l'en retirer d'abord
+        var oldGi=getCoPrelGroupIndex(sb,n);
+        if(oldGi!==-1){
+          var oldGroup=sb.coPrelGroups[oldGi];
+          var pos=oldGroup.indexOf(n);
+          if(pos!==-1)oldGroup.splice(pos,1);
+          if(oldGroup.length<2)sb.coPrelGroups.splice(oldGi,1);
+        }
+        stillLinked.push(n);
+      }
+    });
+    // 4. Supprimer l'ancien groupe du source (recalcul car index peut avoir bougé)
+    currentGi=getCoPrelGroupIndex(sb,sourceName);
+    if(currentGi!==-1)sb.coPrelGroups.splice(currentGi,1);
+    // 5. Créer le nouveau groupe si 2+ membres
+    if(stillLinked.length>=2){
+      sb.coPrelGroups.push(stillLinked);
+      // 6. Sync des données source → cibles (uniquement si source a des données)
+      if(!sb.agentData[sourceName])sb.agentData[sourceName]={};
+      var src=sb.agentData[sourceName];
+      stillLinked.forEach(function(mn){
+        if(mn!==sourceName){
+          if(!sb.agentData[mn])sb.agentData[mn]={};
+          ['numPompe','debitInitial','debitFinal','refEchantillon'].forEach(function(f){
+            if(src[f])sb.agentData[mn][f]=src[f];
+          });
+        }
+      });
+    }
+  });
+  saveData('vlep_missions_v3',state.missions);
+  state.showModal=null;
+  state.coPrelSelection=null;
+  state.coPrelPropagateAll=null;
+  render();
 }
 
 console.log('✓ Terrain chargé');
