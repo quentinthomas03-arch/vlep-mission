@@ -139,16 +139,16 @@ function buildActiviteDoc(m) {
     });
   }
 
-  // r = { operateur, date, heures, agents, vlep, taches }
+  // r = { operateur, date, heures, duree, agents, vlep, epi, taches }
   function makeDataRow(r) {
     return new D.TableRow({
       children: [
         makeDataCell(r.operateur,  COL_WIDTHS[0]),
         makePlageCell(r.date, r.heures, COL_WIDTHS[1]),
-        makeDataCell('',           COL_WIDTHS[2]),  // Durée expo - vide
+        makeDataCell(r.duree || '',COL_WIDTHS[2]),  // Durée expo calculée
         makeDataCell(r.agents,     COL_WIDTHS[3]),
         makeDataCell(r.vlep,       COL_WIDTHS[4]),  // "8h" ou "CT"
-        makeDataCell('',           COL_WIDTHS[5]),  // EPI - vide
+        makeDataCell(r.epi || '',  COL_WIDTHS[5]),  // EPI : type + durée
         makeDataCell('',           COL_WIDTHS[6]),  // Ventilation - vide
         makeDataCell(r.taches,     COL_WIDTHS[7]),
         makeDataCell('',           COL_WIDTHS[8]),  // Observation - vide
@@ -208,12 +208,47 @@ function buildActiviteDoc(m) {
       // Tâches / activité = champ observations du sub-prélèvement
       var taches = sb.observations || sb.activite || '';
 
+      // EPI : type + durée de port si concerné
+      var epiStr = '';
+      var epiType = (sb.epiType || '').trim();
+      if (!epiType || epiType === 'sans objet') {
+        epiStr = 'sans objet';
+      } else {
+        var epiD = parseInt(sb.epiDuree, 10);
+        if (isFinite(epiD) && epiD > 0) {
+          epiStr = epiType + ' (' + epiD + ' min)';
+        } else {
+          epiStr = epiType;
+        }
+      }
+
+      // Durée d'exposition : somme des plages horaires (h:mm)
+      var dureeStr = '';
+      if (sb.plages && sb.plages.length) {
+        var totalMin = 0;
+        sb.plages.forEach(function(pl) {
+          if (!pl.debut || !pl.fin) return;
+          var d = pl.debut.split(':'), f = pl.fin.split(':');
+          if (d.length < 2 || f.length < 2) return;
+          var dm = parseInt(d[0], 10) * 60 + parseInt(d[1], 10);
+          var fm = parseInt(f[0], 10) * 60 + parseInt(f[1], 10);
+          if (isFinite(dm) && isFinite(fm) && fm > dm) totalMin += (fm - dm);
+        });
+        if (totalMin > 0) {
+          var hh = Math.floor(totalMin / 60);
+          var mm = totalMin % 60;
+          dureeStr = hh + 'h' + (mm < 10 ? '0' : '') + mm;
+        }
+      }
+
       gehMap[gehId].rows.push({
         operateur: sb.operateur || '',
         date:      dateStr,
         heures:    plagesStr,
+        duree:     dureeStr,
         agents:    agentNames,
         vlep:      vlepStr,
+        epi:       epiStr,
         taches:    taches
       });
     });

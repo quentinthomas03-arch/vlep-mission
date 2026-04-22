@@ -596,6 +596,104 @@ function isTachymetreAgent(agentName){
   return sup.indexOf('mousse')!==-1||sup.indexOf('coupelle rotative')!==-1;
 }
 
+// Plage de débit recommandée par la base de données (null si inconnu ou tachymètre)
+// ATTENTION: les clés DB contiennent un DOUBLE ESPACE sur 8h : "débit min  8h (L/min)"
+function getDebitRange(agentName,prelType){
+  if(isTachymetreAgent(agentName))return null;
+  var ag=getAgentFromDB(agentName);
+  if(!ag)return null;
+  var minKey,maxKey;
+  if(prelType==='CT'){
+    minKey='débit min CT (L/min)';
+    maxKey='débit max CT (L/min)';
+  }else{
+    minKey='débit min  8h (L/min)';
+    maxKey='débit max  8h (L/min)';
+  }
+  var minV=parseFloat(ag[minKey]);
+  var maxV=parseFloat(ag[maxKey]);
+  if(!isFinite(minV)||!isFinite(maxV))return null;
+  return {min:minV,max:maxV};
+}
+
+function isDebitOutOfRange(value,range){
+  if(!range)return false;
+  var v=parseFloat(value);
+  if(!isFinite(v))return false;
+  return v<range.min||v>range.max;
+}
+
+// Détection des champs manquants pour validation
+function getMissingFields(p,sb){
+  var missing=[];
+  if(!sb.operateur||!sb.operateur.trim())missing.push('Opérateur');
+  if(!sb.date)missing.push('Date');
+  // Au moins une plage complète
+  var hasCompletePlage=false;
+  if(sb.plages&&sb.plages.length){
+    sb.plages.forEach(function(pl){
+      if(pl.debut&&pl.fin)hasCompletePlage=true;
+    });
+  }
+  if(!hasCompletePlage)missing.push('Plage horaire (début + fin)');
+  // Pour chaque agent : N° pompe + débits (ou vitesses pour tachymètre)
+  if(p.agents&&p.agents.length){
+    p.agents.forEach(function(a){
+      var aname=a.name||'Agent inconnu';
+      var ad=(sb.agentData&&sb.agentData[aname])||{};
+      var shortName=aname.length>25?aname.substring(0,25)+'…':aname;
+      if(!ad.numPompe||!(''+ad.numPompe).trim())missing.push('N° Pompe · '+shortName);
+      if(isTachymetreAgent(aname)){
+        if(!ad.debitRef||!(''+ad.debitRef).trim())missing.push('Vitesse réf · '+shortName);
+        if(!ad.debitInitial||!(''+ad.debitInitial).trim())missing.push('Vitesse initiale · '+shortName);
+        if(!ad.debitFinal||!(''+ad.debitFinal).trim())missing.push('Vitesse finale · '+shortName);
+      }else{
+        if(!ad.debitInitial||!(''+ad.debitInitial).trim())missing.push('Débit initial · '+shortName);
+        if(!ad.debitFinal||!(''+ad.debitFinal).trim())missing.push('Débit final · '+shortName);
+      }
+    });
+  }
+  return missing;
+}
+
+function showMissingFieldsModal(pid,idx){
+  state.showModal='missingFields';
+  state.missingFieldsPid=pid;
+  state.missingFieldsIdx=idx;
+  render();
+}
+
+function closeMissingFieldsModal(){
+  state.showModal=null;
+  state.missingFieldsPid=null;
+  state.missingFieldsIdx=null;
+  render();
+}
+
+function renderMissingFieldsModal(){
+  var m=getCurrentMission();if(!m)return '';
+  var p=m.prelevements.find(function(x){return x.id===state.missingFieldsPid;});
+  if(!p)return '';
+  var sb=p.subPrelevements[state.missingFieldsIdx];
+  if(!sb)return '';
+  var missing=getMissingFields(p,sb);
+  var h='<div class="modal show" onclick="if(event.target===this){closeMissingFieldsModal();}"><div class="modal-content">';
+  h+='<div class="modal-header"><h2>⚠️ Champs manquants</h2><button class="close-btn" onclick="closeMissingFieldsModal();">×</button></div>';
+  if(missing.length===0){
+    h+='<p style="color:#16a34a;text-align:center;padding:16px;">✓ Tous les champs requis sont remplis</p>';
+  }else{
+    h+='<p style="margin-bottom:10px;color:#475569;">Pour valider ce prélèvement, renseigner :</p>';
+    h+='<ul style="list-style:none;padding:0;margin:0;">';
+    missing.forEach(function(f){
+      h+='<li style="padding:8px 10px;background:#fef3c7;border-left:3px solid #f59e0b;margin-bottom:4px;border-radius:4px;font-size:13px;color:#92400e;">'+escapeHtml(f)+'</li>';
+    });
+    h+='</ul>';
+  }
+  h+='<button class="btn btn-gray mt-12" style="width:100%;" onclick="closeMissingFieldsModal();">Fermer</button>';
+  h+='</div></div>';
+  return h;
+}
+
 function calcTachyVariation(vitesse,ref){
   if(!vitesse||!ref||isNaN(parseFloat(vitesse))||isNaN(parseFloat(ref)))return null;
   return Math.abs(parseFloat(vitesse)-parseFloat(ref));
@@ -627,6 +725,7 @@ function renderTerrainPrel(){
   }
   h+=renderSubPrelForm(p,p.subPrelevements[state.activeSubIndex],state.activeSubIndex);
   if(state.showModal==='linkAgent')h+=renderLinkAgentModal();
+  if(state.showModal==='missingFields')h+=renderMissingFieldsModal();
   return h;
 }
 
@@ -634,6 +733,13 @@ function renderTerrainPrel(){
 function renderSubPrelForm(p,sb,idx){
   var m=getCurrentMission();
   var canCopyFromPrevious=idx>0;
+  
+  // Feature : pré-remplissage automatique de la date du jour à l'ouverture
+  // (le champ reste pleinement modifiable via updateSubField ci-dessous)
+  if(!sb.date){
+    sb.date=getTodayDate();
+    saveData('vlep_missions_v3',state.missions);
+  }
   
   var h='<div class="card">';
   
@@ -708,10 +814,16 @@ function renderSubPrelForm(p,sb,idx){
         h+='</div>';
         if(hasWarning){h+='<div style="color:#dc2626;font-size:11px;padding:4px 0;">⚠️ Écart > 200 tr/min par rapport à la vitesse de référence</div>';}
       }else{
-        h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
-        h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" class="input '+(hasWarning?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
+        var range=getDebitRange(aname,p.type);
+        var outI=range&&ad.debitInitial?isDebitOutOfRange(ad.debitInitial,range):false;
+        var outF=range&&ad.debitFinal?isDebitOutOfRange(ad.debitFinal,range):false;
+        h+='<div class="multi-agent-row"><label>Débit initial</label><input type="text" class="input '+(hasWarning||outI?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitInitial||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitInitial\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');"></div>';
+        h+='<div class="multi-agent-row"><label>Débit final</label><input type="text" class="input '+(hasWarning||outF?'debit-input warning':'')+'" style="flex:1;" value="'+escapeHtml(ad.debitFinal||'')+'" placeholder="L/min" onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'debitFinal\',this.value);renderDebitVariation('+p.id+','+idx+',\''+escapeJs(aname)+'\');">';
         if(variation!==null){h+='<span class="debit-variation '+(hasWarning?'warning':'')+'">Δ '+variation.toFixed(1)+'%</span>';}
         h+='</div>';
+        if(range&&(outI||outF)){
+          h+='<div style="color:#dc2626;font-size:11px;padding:4px 0;">⚠️ Débit hors plage recommandée ['+range.min+' – '+range.max+' L/min] ('+(p.type==='CT'?'CT':'8h')+')</div>';
+        }
       }
       
       h+='<div class="multi-agent-row"><label>Réf. échant.</label><input type="text" value="'+escapeHtml(ad.refEchantillon||'')+'" placeholder="Référence..." onchange="updateAgentDataSynced('+p.id+','+idx+',\''+escapeJs(aname)+'\',\'refEchantillon\',this.value);"></div>';
@@ -763,7 +875,20 @@ function renderSubPrelForm(p,sb,idx){
   }
   h+='</div>';
 
-  h+='<button class="btn btn-success" onclick="toggleSubComplete('+p.id+','+idx+');">'+(sb.completed?'✓ Complété - Modifier':'✓ Valider')+'</button></div>';
+  // Bouton Valider : grisé + pastille ⓘ si champs manquants
+  if(sb.completed){
+    h+='<button class="btn btn-success" onclick="toggleSubComplete('+p.id+','+idx+');">✓ Complété - Modifier</button></div>';
+  }else{
+    var missing=getMissingFields(p,sb);
+    if(missing.length===0){
+      h+='<button class="btn btn-success" onclick="toggleSubComplete('+p.id+','+idx+');">✓ Valider</button></div>';
+    }else{
+      h+='<div style="display:flex;gap:6px;align-items:stretch;">';
+      h+='<button class="btn btn-gray" style="flex:1;opacity:0.7;cursor:not-allowed;" disabled>✓ Valider ('+missing.length+' manquant'+(missing.length>1?'s':'')+')</button>';
+      h+='<button class="btn btn-small" style="background:#f59e0b;color:white;border:none;padding:0 14px;font-size:16px;font-weight:700;border-radius:8px;" onclick="showMissingFieldsModal('+p.id+','+idx+');" title="Voir les champs manquants">ⓘ</button>';
+      h+='</div></div>';
+    }
+  }
   return h;
 }
 

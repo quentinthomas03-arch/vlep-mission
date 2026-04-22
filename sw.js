@@ -1,8 +1,8 @@
 // sw.js - Service Worker
-// Â© 2025 Quentin THOMAS
+// © 2025 Quentin THOMAS
 
-const CACHE_NAME = 'vlep-mission-v1.6';
-const VERSION = '1.6'; // Incrémenter à chaque mise à jour
+const CACHE_NAME = 'vlep-mission-v1.9';
+const VERSION = '1.9'; // Incrémenter à chaque mise à jour
 const urlsToCache = [
   './',
   './index.html',
@@ -36,8 +36,8 @@ self.addEventListener('install', function(event) {
         return cache.addAll(urlsToCache);
       })
       .then(function() {
-        console.log('[SW] Tous les fichiers mis en cache avec succÃ¨s');
-        return self.skipWaiting(); // Active immÃ©diatement
+        console.log('[SW] Tous les fichiers mis en cache avec succès');
+        return self.skipWaiting(); // Active immédiatement
       })
       .catch(function(err){
         console.error('[SW] Erreur mise en cache:', err);
@@ -60,11 +60,11 @@ self.addEventListener('activate', function(event) {
       );
     })
     .then(function() {
-      console.log('[SW] Prise de contrÃ´le des clients');
-      return self.clients.claim(); // Prend le contrÃ´le immÃ©diatement
+      console.log('[SW] Prise de contrôle des clients');
+      return self.clients.claim(); // Prend le contrôle immédiatement
     })
     .then(function() {
-      // Notifier tous les clients qu'une mise Ã  jour est disponible
+      // Notifier tous les clients qu'une mise à jour est disponible
       return self.clients.matchAll().then(function(clients) {
         clients.forEach(function(client) {
           client.postMessage({
@@ -77,12 +77,12 @@ self.addEventListener('activate', function(event) {
   );
 });
 
-// Fetch - StratÃ©gie Network First pour le dÃ©veloppement
+// Fetch - Stratégie Network First pour le développement
 self.addEventListener('fetch', function(event) {
   event.respondWith(
     fetch(event.request)
       .then(function(response) {
-        // Si la requÃªte rÃ©seau rÃ©ussit, mettre en cache
+        // Si la requête réseau réussit, mettre en cache
         if (response && response.status === 200) {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then(function(cache) {
@@ -92,10 +92,10 @@ self.addEventListener('fetch', function(event) {
         return response;
       })
       .catch(function() {
-        // Si le rÃ©seau Ã©choue, utiliser le cache
+        // Si le réseau échoue, utiliser le cache
         return caches.match(event.request);
       })
   );
 });
 
-console.log('[SW] Service Worker chargÃ© v' + VERSION);
+console.log('[SW] Service Worker chargé v' + VERSION);
