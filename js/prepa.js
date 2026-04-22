@@ -969,18 +969,18 @@ function renderTutoriel(){
       num:'2',color:'#16a34a',title:'Terrain (sur site)',
       steps:[
         {t:'Ouvrir la mission',d:'Accueil → Saisie terrain → sélectionner la mission validée.'},
-        {t:'Saisir les données de prélèvement',d:'Cliquer sur un prélèvement → Onglet du sous-prélèvement concerné. Saisir : opérateur, date, n° pompe, débits initial/final, plages horaires. Le pavé numérique s\'ouvre automatiquement au clic.'},
+        {t:'Saisir les données de prélèvement',d:'Cliquer sur un prélèvement → Onglet du sous-prélèvement concerné. Saisir : opérateur, date, n° pompe, débits initial/final, plages horaires. Le clavier numérique natif du téléphone s\'ouvre automatiquement sur les champs chiffrés.'},
         {t:'EPI respiratoire',d:'Sélectionner sans objet / FFP3 / TH3 / Autre. Si EPI : saisir la durée de port en minutes.'},
         {t:'Plages horaires',d:'Ajouter autant de plages que nécessaire (début → fin). La durée totale se calcule automatiquement.'},
         {t:'Valider le prélèvement',d:'Bouton ✓ Valider en bas de chaque prélèvement. Un ✓ apparaît dans l\'onglet quand c\'est complété.'},
-        {t:'Co-prélèvement (indicateur bleu)',d:'Plusieurs agents sur le même support physique. Les indicateurs bleus signalent cette situation automatiquement.'}
+        {t:'Co-prélèvement (même support)',d:'Plusieurs agents sur le même support physique : bouton 🔗 Même support à côté d\'un agent, cocher ceux concernés, valider. Par défaut le groupement est propagé sur tous les sous-prélèvements (J1/J2/J3). Un badge 🎯 signale automatiquement les agents ayant même Code support et Code prétraitement en base. Bouton Délier pour retirer un agent du groupe (propagé aussi).'}
       ]
     },
     {
       num:'3',color:'#ea580c',title:'Conditions ambiantes',
       steps:[
         {t:'Accès',d:'Dans la vue mission terrain → bouton Conditions ambiantes.'},
-        {t:'Saisir les mesures',d:'Température, pression atmosphérique et humidité relative — initial et final pour chaque jour. Le pavé numérique s\'ouvre au clic sur chaque champ.'},
+        {t:'Saisir les mesures',d:'Température, pression atmosphérique et humidité relative — initial et final pour chaque jour. Le clavier numérique natif s\'ouvre au clic sur chaque champ.'},
         {t:'Fréquence',d:'Une entrée par jour de prélèvement. Cliquer + Ajouter condition pour chaque nouvelle journée.'}
       ]
     },

@@ -1029,13 +1029,16 @@ function unlinkAgentFromSupport(pid,subIdx,agentName){
   var m=getCurrentMission();if(!m)return;
   var p=m.prelevements.find(function(x){return x.id===pid;});
   if(!p)return;
-  var sb=p.subPrelevements[subIdx];
-  if(!sb.coPrelGroups)return;
-  var gi=getCoPrelGroupIndex(sb,agentName);
-  if(gi===-1)return;
-  var pos=sb.coPrelGroups[gi].indexOf(agentName);
-  if(pos!==-1)sb.coPrelGroups[gi].splice(pos,1);
-  if(sb.coPrelGroups[gi].length<2)sb.coPrelGroups.splice(gi,1);
+  // Propagation : on délie sur tous les sous-prélèvements du prélèvement
+  // (cohérent avec le défaut de propagation du modal "Même support")
+  p.subPrelevements.forEach(function(sb){
+    if(!sb.coPrelGroups)return;
+    var gi=getCoPrelGroupIndex(sb,agentName);
+    if(gi===-1)return;
+    var pos=sb.coPrelGroups[gi].indexOf(agentName);
+    if(pos!==-1)sb.coPrelGroups[gi].splice(pos,1);
+    if(sb.coPrelGroups[gi].length<2)sb.coPrelGroups.splice(gi,1);
+  });
   saveData('vlep_missions_v3',state.missions);
   render();
 }
